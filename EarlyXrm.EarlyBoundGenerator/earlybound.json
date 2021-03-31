@@ -1,0 +1,16 @@
+{
+  "ConnectionString": "AuthType=Office365;Url=https://?.dynamics.com;Username=?;Password=?;",
+  "Namespace": "Test",
+  "UseDisplayName": true,
+  "DebugMode": true,
+  "Instrument": false,
+  "Solutions": [ "Crf5fee" ],
+  "Include": {
+    "crb60_cat": null,
+    "email": [ "isbilled", "isunsafe" ]
+  },
+  "Exclude": {
+    "task": null,
+    "*": [ "importsequencenumber", "createdbyexternalparty" ]
+  }
+}

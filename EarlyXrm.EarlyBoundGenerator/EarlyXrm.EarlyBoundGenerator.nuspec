@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata minClientVersion="2.5">
+    <id>EarlyXrm.EarlyBoundGenerator</id>
+    <version>0.1.35</version>
+    <authors>EarlyXrm.EarlyBoundGenerator</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.26" exclude="Build,Analyzers" />
+	  </group>
+    </dependencies>
+    <contentFiles />
+  </metadata>
+  <files>
+	  
+	<file src="EarlyXrm.EarlyBoundGenerator.targets" target="build\EarlyXrm.EarlyBoundGenerator.targets" />
+
+	<file src="bin\Debug\EarlyXrm.EarlyBoundGenerator.exe" target="build\EarlyXrm.EarlyBoundGenerator.exe" />
+	<file src="bin\coretools\CrmSvcUtil.exe" target="build\CrmSvcUtil.exe" />
+	<file src="bin\coretools\Microsoft.Crm.Sdk.Proxy.dll" target="build\Microsoft.Crm.Sdk.Proxy.dll" />
+	<file src="bin\coretools\Microsoft.Xrm.Sdk.dll" target="build\Microsoft.Xrm.Sdk.dll" />
+	<file src="bin\coretools\Microsoft.Xrm.Tooling.CrmConnectControl.dll" target="build\Microsoft.Xrm.Tooling.CrmConnectControl.dll" />
+	<file src="bin\coretools\Microsoft.Xrm.Tooling.Connector.dll" target="build\Microsoft.Xrm.Tooling.Connector.dll" />
+	<file src="bin\coretools\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" target="build\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
+	<file src="generate.bat" target="build\generate.bat" />
+	<file src="bin\Debug\Newtonsoft.Json.dll" target="build\Newtonsoft.Json.dll" />
+	  
+	<file src="earlybound.bat" target="build\earlybound.bat" />
+	<file src="earlybound.json" target="build\earlybound.json" />
+	  
+	<file src="earlybound.bat" target="content\bin\EarlyXrm\earlybound.bat" />
+	<file src="earlybound.json" target="content\bin\EarlyXrm\earlybound.json" />
+	  
+  </files>
+</package>

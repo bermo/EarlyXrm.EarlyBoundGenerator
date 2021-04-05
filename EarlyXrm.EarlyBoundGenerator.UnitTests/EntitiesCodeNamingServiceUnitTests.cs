@@ -31,7 +31,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
 
-            //serviceProvider = Substitute.For<IServiceProvider>();
             var namingService = Substitute.For<INamingService>();
             parameters = new Dictionary<string, string> { 
                 { "UseDisplayNames".ToUpper(), true.ToString() } 

@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EntitiesCodeCustomistationServiceUnitTests.cs" />
+    <Compile Include="EntitiesCodeFilteringServiceUnitTests.cs" />
     <Compile Include="EntitiesCodeNamingServiceUnitTests.cs" />
+    <Compile Include="OptionSetsFilteringServiceUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

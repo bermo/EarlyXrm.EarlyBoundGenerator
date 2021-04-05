@@ -22,6 +22,8 @@ namespace EarlyXrm.EarlyBoundGenerator
         private static Dictionary<string, List<string>> skip = new Dictionary<string, List<string>>();
         private static Dictionary<string, List<string>> extra = new Dictionary<string, List<string>>();
 
+        public static IOrganizationService organisationService;
+
         static SolutionHelper()
         {
             bool.TryParse(GetParameter("DebugMode"?.ToUpper()), out debugMode);
@@ -112,7 +114,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                 var includedEntity = new IncludedEntity { LogicalName = entity.LogicalName };
 
-                foreach(var attribute in entity.Attributes)
+                foreach (var attribute in entity?.Attributes ?? new AttributeMetadata[0])
                 {
                     if ((!skipFields?.Any(y => y == attribute.LogicalName) ?? true) &&
                         (!skipGlobal?.Any(y => y == attribute.LogicalName) ?? true) &&
@@ -175,8 +177,11 @@ namespace EarlyXrm.EarlyBoundGenerator
             $"{nameof(SolutionHelper.GetSolutionComponents)} Start".Debug();
 
             IEnumerable<SolutionComponent> result;
-            using (var service = new CrmServiceClient(GetParameter("connectionstring")))
-                result = service.RetrieveMultiple(query).Entities.Select(x => x.ToEntity<SolutionComponent>());
+
+            if (organisationService == null)
+                organisationService = new CrmServiceClient(GetParameter("connectionstring"));
+            
+            result = organisationService.RetrieveMultiple(query).Entities.Select(x => x.ToEntity<SolutionComponent>());
 
             $"{nameof(SolutionHelper.GetSolutionComponents)} End".Debug();
 

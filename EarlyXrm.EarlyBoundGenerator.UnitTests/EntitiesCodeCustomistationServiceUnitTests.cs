@@ -8,26 +8,18 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
     [TestClass]
-    public class EntitiesCodeCustomistationServiceUnitTests
+    public class EntitiesCodeCustomistationServiceUnitTests : UnitTestBase
     {
         private Dictionary<string, string> parameters;
-        private IServiceProvider serviceProvider;
         private IOrganizationMetadata organizationMetadata;
 
         [TestInitialize]
         public void TestInitialise()
         {
-            typeof(SolutionHelper)
-                .GetField("organisationMetadata", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
-
-            serviceProvider = Substitute.For<IServiceProvider>();
             var metadataProviderService = Substitute.For<IMetadataProviderService>();
             organizationMetadata = Substitute.For<IOrganizationMetadata>();
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
@@ -94,7 +86,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                         }
                     })
             });
-
             parameters["UseDisplayNames".ToUpper()] = true.ToString();
             var sut = new EntitiesCodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
@@ -213,42 +204,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var property = test.Members.OfType<CodeMemberProperty>().First();
             Assert.AreEqual("TestProp", property.Name);
             Assert.AreEqual("TestProp", property.Type.BaseType);
-
-            //var testProp = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "TestProp");
-        }
-
-        private CodeAttributeDeclaration Build<T>(params string [] args) where T : Attribute
-        {
-            var cad = new CodeAttributeDeclaration
-            {
-                Name = typeof(T).Name,
-                Arguments = {}
-            };
-            foreach (var arg in args)
-            {
-                cad.Arguments.Add(new CodeAttributeArgument
-                {
-                    Value = new CodePrimitiveExpression
-                    {
-                        Value = arg
-                    }
-                });
-            }
-            return cad;
-        }
-    }
-
-    public static class Extensions
-    {
-        public static T Set<T, U>(this T t, Expression<Func<T, U>> prop, U val)
-        {
-
-            var me = prop.Body as MemberExpression;
-            var pi = me.Member as PropertyInfo;
-
-            typeof(T).GetProperty(pi.Name).SetValue(t, val);
-
-            return t;
         }
     }
 }

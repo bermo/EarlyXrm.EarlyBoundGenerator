@@ -2,6 +2,7 @@
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace EarlyXrm.EarlyBoundGenerator
@@ -64,16 +65,19 @@ namespace EarlyXrm.EarlyBoundGenerator
             return solutionEntities.Any(x => x.LogicalName == entityMetadata.LogicalName);
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateRelationship(RelationshipMetadataBase relationshipMetadata, EntityMetadata otherEntityMetadata, IServiceProvider services)
         {
             return false;
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateServiceContext(IServiceProvider services)
         {
             return false;
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateOption(OptionMetadata optionMetadata, IServiceProvider services)
         {
             return DefaultService.GenerateOption(optionMetadata, services);

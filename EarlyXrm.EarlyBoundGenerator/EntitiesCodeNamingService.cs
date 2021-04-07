@@ -3,6 +3,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace EarlyXrm.EarlyBoundGenerator
@@ -134,36 +135,43 @@ namespace EarlyXrm.EarlyBoundGenerator
             return returnValue;
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForEntitySet(EntityMetadata entityMetadata, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForEntitySet(entityMetadata, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForMessagePair(SdkMessagePair messagePair, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForMessagePair(messagePair, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForRequestField(SdkMessageRequest request, SdkMessageRequestField requestField, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForRequestField(request, requestField, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForResponseField(SdkMessageResponse response, SdkMessageResponseField responseField, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForResponseField(response, responseField, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForServiceContext(IServiceProvider services)
         {
             return DefaultNamingService.GetNameForServiceContext(services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForOptionSet(EntityMetadata entityMetadata, OptionSetMetadataBase optionSetMetadata, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForOptionSet(entityMetadata, optionSetMetadata, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForOption(OptionSetMetadataBase optionSetMetadata, OptionMetadata optionMetadata, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForOption(optionSetMetadata, optionMetadata, services);

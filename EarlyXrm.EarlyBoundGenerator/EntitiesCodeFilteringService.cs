@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Crm.Services.Utility;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -70,16 +71,19 @@ namespace EarlyXrm.EarlyBoundGenerator
             return generate;
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateServiceContext(IServiceProvider services)
         {
             return _defaultService.GenerateServiceContext(services);
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateOptionSet(OptionSetMetadataBase optionSetMetadata, IServiceProvider services)
         {
             return false;
         }
 
+        [ExcludeFromCodeCoverage]
         public bool GenerateOption(OptionMetadata optionMetadata, IServiceProvider services)
         {
             return false;

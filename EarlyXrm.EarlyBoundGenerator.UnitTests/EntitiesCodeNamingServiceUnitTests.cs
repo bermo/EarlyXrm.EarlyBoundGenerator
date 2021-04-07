@@ -5,27 +5,20 @@ using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
     [TestClass]
-    public class EntitiesCodeNamingServiceUnitTests
+    public class EntitiesCodeNamingServiceUnitTests : UnitTestBase
     {
-        private IServiceProvider serviceProvider;
         private Dictionary<string, string> parameters;
-        private EntitiesCodeNamingService entitiesCodeNamingService;
+        private EntitiesCodeNamingService sut;
         private IOrganizationMetadata organizationMetadata;
         private IMetadataProviderService metadataProviderService;
 
         [TestInitialize]
         public void TestInitialise()
         {
-            typeof(SolutionHelper)
-                .GetField("organisationMetadata", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
-
-            serviceProvider = Substitute.For<IServiceProvider>();
             metadataProviderService = Substitute.For<IMetadataProviderService>();
             organizationMetadata = Substitute.For<IOrganizationMetadata>();
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
@@ -36,7 +29,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 { "UseDisplayNames".ToUpper(), true.ToString() } 
             };
 
-            entitiesCodeNamingService = new EntitiesCodeNamingService(namingService, parameters);
+            sut = new EntitiesCodeNamingService(namingService, parameters);
 
         }
 
@@ -46,7 +39,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             
             var em = new EntityMetadata { DisplayName = new Label("Blah", 1433) };
             var serviceProvider = Substitute.For<IServiceProvider>();
-            var result = entitiesCodeNamingService.GetNameForEntity(em, serviceProvider);
+            var result = sut.GetNameForEntity(em, serviceProvider);
 
             Assert.AreEqual("Blah", result);
         }
@@ -58,7 +51,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var metadata = new EntityMetadata { LogicalName = "ee_test" }
                     .Set(x => x.Attributes, new AttributeMetadata[] {attMetadata});
             
-            var output = entitiesCodeNamingService.GetNameForAttribute(metadata, attMetadata, serviceProvider);
+            var output = sut.GetNameForAttribute(metadata, attMetadata, serviceProvider);
 
             Assert.AreEqual("TestPropRef", output);
         }
@@ -72,7 +65,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                         new StringAttributeMetadata { LogicalName = "ee_value", DisplayName = new Label("Value", 1033) },
                         attMetadata});
 
-            var output = entitiesCodeNamingService.GetNameForAttribute(metadata, attMetadata, serviceProvider);
+            var output = sut.GetNameForAttribute(metadata, attMetadata, serviceProvider);
 
             Assert.AreEqual("Value2", output);
         }
@@ -97,7 +90,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                         new OneToManyRelationshipMetadata { ReferencingAttribute = "ee_testid" }
                     });
 
-            var output = entitiesCodeNamingService.GetNameForRelationship(metadata, relationship, null, serviceProvider);
+            var output = sut.GetNameForRelationship(metadata, relationship, null, serviceProvider);
 
             Assert.AreEqual("TestIdTestProp", output);
         }

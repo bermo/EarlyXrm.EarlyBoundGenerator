@@ -6,43 +6,27 @@ using Microsoft.Xrm.Sdk.Query;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
     [TestClass]
-    public class OptionSetsFilteringServiceUnitTests
+    public class OptionSetsFilteringServiceUnitTests : UnitTestBase
     {
-        private OptionSetsFilteringService optionSetsFilteringService;
+        private OptionSetsFilteringService sut;
         private ICodeWriterFilterService codeWriterFilterService;
-        private IServiceProvider serviceProvider;
         private IOrganizationMetadata organizationMetadata;
         private IMetadataProviderService metadataProviderService;
 
         [TestInitialize]
         public void TestInitialise()
         {
-            typeof(SolutionHelper)
-                .GetField("organisationMetadata", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
-
-            typeof(SolutionHelper)
-                .GetField("solutionEntities", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
-
-            SolutionHelper.organisationService = Substitute.For<IOrganizationService>();
-
-            serviceProvider = Substitute.For<IServiceProvider>();
             metadataProviderService = Substitute.For<IMetadataProviderService>();
             organizationMetadata = Substitute.For<IOrganizationMetadata>();
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
             codeWriterFilterService = Substitute.For<ICodeWriterFilterService>();
 
-            optionSetsFilteringService = new OptionSetsFilteringService(codeWriterFilterService);
+            sut = new OptionSetsFilteringService(codeWriterFilterService);
         }
 
         [TestMethod]
@@ -76,7 +60,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     new Entity("solutioncomponent") { Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
                 }));
 
-            var result = optionSetsFilteringService.GenerateOptionSet(optionSetMetadata, serviceProvider);
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
 
             Assert.IsTrue(result);
         }

@@ -2,7 +2,7 @@
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -56,36 +56,43 @@ namespace EarlyXrm.EarlyBoundGenerator
             return DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForEntity(EntityMetadata entityMetadata, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForEntity(entityMetadata, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForEntitySet(EntityMetadata entityMetadata, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForEntitySet(entityMetadata, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForMessagePair(SdkMessagePair messagePair, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForMessagePair(messagePair, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForRelationship(EntityMetadata entityMetadata, RelationshipMetadataBase relationshipMetadata, EntityRole? reflexiveRole, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForRelationship(entityMetadata, relationshipMetadata, reflexiveRole, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForRequestField(SdkMessageRequest request, SdkMessageRequestField requestField, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForRequestField(request, requestField, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForResponseField(SdkMessageResponse response, SdkMessageResponseField responseField, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForResponseField(response, responseField, services);
         }
 
+        [ExcludeFromCodeCoverage]
         public string GetNameForServiceContext(IServiceProvider services)
         {
             return DefaultNamingService.GetNameForServiceContext(services);

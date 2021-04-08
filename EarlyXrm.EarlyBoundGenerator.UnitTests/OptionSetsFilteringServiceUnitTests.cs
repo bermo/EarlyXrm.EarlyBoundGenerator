@@ -30,6 +30,168 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
+        public void GenerateGlobalOptionSetNoMatch()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = true,
+                OptionSetType = OptionSetType.Picklist,
+                Name = "ee_TestOpt"
+            };
+            var id = Guid.NewGuid();
+            var attId = Guid.NewGuid();
+            var attributeMetadata = new PicklistAttributeMetadata
+            {
+                MetadataId = attId,
+                OptionSet = optionSetMetadata
+            }.Set(x => x.EntityLogicalName, "ee_test");
+
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata {
+                    LogicalName = "ee_test",  MetadataId = id,
+                }
+                .Set(x => x.Attributes, new[] { attributeMetadata })
+            });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } }
+                }));
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void GenerateGlobalOptionSet()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = true,
+                OptionSetType = OptionSetType.Picklist,
+                Name = "ee_TestOpt"
+            };
+            var id = Guid.NewGuid();
+            var attId = Guid.NewGuid();
+            var attributeMetadata = new PicklistAttributeMetadata
+            {
+                MetadataId = attId, OptionSet = optionSetMetadata
+            }.Set(x => x.EntityLogicalName, "ee_test");
+
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { 
+                    LogicalName = "ee_test",  MetadataId = id, 
+                }
+                .Set(x => x.Attributes, new[] { attributeMetadata })
+            });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
+                }));
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateGlobalOptionSetAlreadyGenerated()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = true,
+                OptionSetType = OptionSetType.Picklist,
+                Name = "ee_TestOpt"
+            };
+            var id = Guid.NewGuid();
+            var attId = Guid.NewGuid();
+            var attributeMetadata = new PicklistAttributeMetadata
+            {
+                MetadataId = attId, OptionSet = optionSetMetadata
+            }.Set(x => x.EntityLogicalName, "ee_test");
+
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test", MetadataId = id}
+                .Set(x => x.Attributes, new[] { attributeMetadata })
+            });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
+                }));
+
+            sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void GenerateCustomOptionSet()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                IsCustomOptionSet = true,
+                OptionSetType = OptionSetType.Picklist
+            };
+
+            organizationMetadata.Entities.Returns(new EntityMetadata[0]);
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity>(0)));
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateStateOptionSet()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                IsCustomOptionSet = false,
+                OptionSetType = OptionSetType.State
+            };
+
+            organizationMetadata.Entities.Returns(new EntityMetadata[0]);
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity>(0)));
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateStatusOptionSet()
+        {
+            var optionSetMetadata = new OptionSetMetadata
+            {
+                IsGlobal = false,
+                IsCustomOptionSet = false,
+                OptionSetType = OptionSetType.Status
+            };
+
+            organizationMetadata.Entities.Returns(new EntityMetadata[0]);
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity>(0)));
+
+            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
         public void GenerateOptionSet()
         {
             var optionSetMetadata = new OptionSetMetadata
@@ -63,6 +225,72 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
 
             Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GeneratePicklistAttribute()
+        {
+            var result = sut.GenerateAttribute(new PicklistAttributeMetadata(), serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateStateAttribute()
+        {
+            var result = sut.GenerateAttribute(new StateAttributeMetadata(), serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateStatusAttribute()
+        {
+            var result = sut.GenerateAttribute(new StatusAttributeMetadata(), serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateStringAttribute()
+        {
+            var result = sut.GenerateAttribute(new StringAttributeMetadata(), serviceProvider);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void GenerateEntity()
+        {
+            var id = Guid.NewGuid();
+            var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = id };
+
+            organizationMetadata.Entities.Returns(new[] { entityMetadata });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } }
+                }));
+
+            var result = sut.GenerateEntity(entityMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void GenerateEntityMissing()
+        {
+            var id = Guid.NewGuid();
+            var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = id };
+
+            organizationMetadata.Entities.Returns(new[] { entityMetadata });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {}));
+
+            var result = sut.GenerateEntity(entityMetadata, serviceProvider);
+
+            Assert.IsFalse(result);
         }
     }
 }

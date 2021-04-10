@@ -94,5 +94,33 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             Assert.AreEqual("TestIdTestProp", output);
         }
+
+        [TestMethod]
+        public void GetNameForRelationship_Reflexive()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test", DisplayName = new Label("Test", 1033), DisplayCollectionName = new Label("Tests", 1033)}
+            });
+
+            var relationship = new OneToManyRelationshipMetadata
+            {
+                ReferencingEntity = "ee_test",
+                ReferencingAttribute = "ee_testid",
+                ReferencedEntity = "ee_test",
+                ReferencedAttribute = "ee_testid"
+            };
+            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
+            var metadata = new EntityMetadata { LogicalName = "ee_test" }
+                    .Set(x => x.Attributes, new AttributeMetadata[] { attMetadata })
+                    .Set(x => x.ManyToOneRelationships, new OneToManyRelationshipMetadata[]
+                    {
+                        relationship,
+                        new OneToManyRelationshipMetadata { ReferencingAttribute = "ee_testid" }
+                    });
+
+            var output = sut.GetNameForRelationship(metadata, relationship, EntityRole.Referenced, serviceProvider);
+
+            Assert.AreEqual("TestIdTests", output);
+        }
     }
 }

@@ -69,6 +69,141 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
+        public void ChangingMethodsAreRemovedAsExpected()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test" }
+            });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberMethod
+                                    {
+                                        Name = "OnPropertyChanging"
+                                    },
+                                    new CodeMemberMethod
+                                    {
+                                        Name = "OnPropertyChanged"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
+            Assert.IsFalse(@class.Members.OfType<CodeMemberMethod>().Any());
+        }
+
+        [TestMethod]
+        public void EventsAreRemovedAsExpected()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test" }
+            });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberEvent()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
+            Assert.IsFalse(@class.Members.OfType<CodeMemberEvent>().Any());
+        }
+
+        [TestMethod]
+        public void FieldsAreRemovedAsExpected()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test" }
+            });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberField{ Name = "EntityTypeCode" }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
+            Assert.IsFalse(@class.Members.OfType<CodeMemberField>().Any());
+        }
+
+        [TestMethod]
+        public void CodeTypeMemberBaseIsNotProcessed()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test" }
+            });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeTypeMember()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
+            Assert.IsTrue(@class.Members.OfType<CodeTypeMember>().Any());
+        }
+
+        [TestMethod]
         public void WhenParameterIsSet_EnumAttributeUsesDisplayName()
         {
             organizationMetadata.Entities.Returns(new[] {
@@ -99,6 +234,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                                 Members = {
                                     new CodeMemberProperty
                                     {
+                                        HasSet = true,
                                         Name = "Colour",
                                         CustomAttributes = { Build<AttributeLogicalNameAttribute>("ee_colour") },
                                     }
@@ -204,6 +340,142 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var property = test.Members.OfType<CodeMemberProperty>().First();
             Assert.AreEqual("TestProp", property.Name);
             Assert.AreEqual("TestProp", property.Type.BaseType);
+        }
+
+        [TestMethod]
+        public void NullableAttributeIsBuiltExpected()
+        {
+            organizationMetadata.Entities.Returns(new[] { new EntityMetadata { LogicalName = "ee_test" }});
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.String"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Int32"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Int64"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Boolean"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.DateTime"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Double"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Decimal"))
+                                    },
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Guid"))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var test = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "Test");
+            var properties = test.Members.OfType<CodeMemberProperty>().Select(x => x.Type.BaseType);
+            Assert.IsTrue(properties.SequenceEqual(new[] { "string", "int?", "long?", "bool?", "DateTime?", "double?", "decimal?", "Guid?" }));
+        }
+
+        [TestMethod]
+        public void GenericCollectionOfXrmSdk()
+        {
+            organizationMetadata.Entities.Returns(new[] { new EntityMetadata { LogicalName = "ee_test" } });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberProperty
+                                    {
+                                        Type = new CodeTypeReference("System.Collections.Generic.List", new CodeTypeReference("Microsoft.Xrm.Sdk.Blah"))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var test = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "Test");
+            var member = test.Members.OfType<CodeMemberProperty>().First();
+            Assert.AreEqual("List`1", member.Type.BaseType);
+            Assert.AreEqual("Blah", member.Type.TypeArguments[0].BaseType);
+        }
+
+        [TestMethod]
+        public void RemovesExtraDefaultIdAttribute()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test" }
+                    .Set(x => x.Attributes, new AttributeMetadata[] {
+                        new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testid" }.Set(x => x.IsPrimaryId, true)
+                    })
+            });
+
+            var sut = new EntitiesCodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                Name = "Test",
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberProperty
+                                    {
+                                        CustomAttributes = { Build<AttributeLogicalNameAttribute>("ee_testid") },
+                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.Guid"))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var test = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "Test");
+            Assert.IsFalse(test.Members.OfType<CodeMemberProperty>().Any());
         }
     }
 }

@@ -77,5 +77,37 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             Assert.IsTrue(result);
         }
+
+        [TestMethod]
+        public void GenerateRelationshipReturnsFalse()
+        {
+            codeWriterFilterService.GenerateRelationship(Arg.Any<RelationshipMetadataBase>(), Arg.Any<EntityMetadata>(), serviceProvider).Returns(true);
+
+            var id = Guid.NewGuid();
+            var testId = Guid.NewGuid();
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test", MetadataId = id }
+            });
+
+            var relationshipMetadata = new OneToManyRelationshipMetadata
+            {
+                ReferencedEntity = "ee_test",
+                ReferencingEntity = "ee_test",
+                ReferencingAttribute = "ee_val"
+            };
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test", MetadataId = id, DisplayName = new Label("Test", 1033) }
+            });
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
+                    new Entity("solutioncomponent") { Attributes = { { "objectid", testId }, { "componenttype", 2 } } }
+                }));
+
+            var result = sut.GenerateRelationship(relationshipMetadata, new EntityMetadata(), serviceProvider);
+
+            Assert.IsFalse(result);
+        }
     }
 }

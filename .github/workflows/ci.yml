@@ -22,10 +22,10 @@ jobs:
       uses: NuGet/setup-nuget@v1.0.5
       
     - name: Restore Nuget
-      run: nuget restore *.sln
+      run: nuget restore EarlyXrm.EarlyBoundGenerator.sln
       
     - name: Build
-      run: msbuild *.sln /p:Configuration=Release
+      run: msbuild EarlyXrm.EarlyBoundGenerator.sln /p:Configuration=Release
 
     - name: Test
       run: dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura

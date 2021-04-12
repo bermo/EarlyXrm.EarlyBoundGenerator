@@ -60,4 +60,4 @@ jobs:
       run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -Username ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
 
     - name: Push to github
-      run: nuget push **/*.nupkg -ApiKey ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -SkipDuplicate
+      run: nuget push **/EarlyXrm.EarlyBoundGenerator.*.nupkg -ApiKey ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -SkipDuplicate

@@ -6,7 +6,7 @@
     <authors>a berman</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Early bound generator based on svcutil.exe</description>
-	<projectUrl>https://github.com/bermo/EarlyXrm.EarlyBoundGenerator</projectUrl>
+	<repository url="https://github.com/bermo/EarlyXrm.EarlyBoundGenerator" />
     <dependencies>
       <group targetFramework=".NETFramework4.6.2">
         <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.26" exclude="Build,Analyzers" />

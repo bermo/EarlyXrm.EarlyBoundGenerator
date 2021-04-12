@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata minClientVersion="2.5">
     <id>EarlyXrm.EarlyBoundGenerator</id>
-    <version>0.1.35</version>
+    <version>$version$</version>
     <authors>EarlyXrm.EarlyBoundGenerator</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Package Description</description>

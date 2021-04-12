@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EarlyXrm.EarlyBoundGenerato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EarlyXrm.EarlyBoundGenerator.UnitTests", "EarlyXrm.EarlyBoundGenerator.UnitTests\EarlyXrm.EarlyBoundGenerator.UnitTests.csproj", "{0849B8EE-21C5-4915-8A7A-B243165F86C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BA0151F-10EE-4322-AC62-82D84E16ECA5}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		GitVersion.yml = GitVersion.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

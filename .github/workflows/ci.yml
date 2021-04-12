@@ -1,10 +1,14 @@
-name: .NET
+name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+     - '**'
+    tags:
+     - 'v*.*.*'
   pull_request:
-    branches: [ master ]
+    branches:
+     - '**'
 
 jobs:
   build:
@@ -14,6 +18,8 @@ jobs:
     steps:
     
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.7

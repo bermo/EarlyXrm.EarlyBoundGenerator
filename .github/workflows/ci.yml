@@ -44,9 +44,20 @@ jobs:
     - name: Build
       run: msbuild EarlyXrm.EarlyBoundGenerator.sln /p:Configuration=Release
 
-    - name: Test
-      run: dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+    #- name: Test
+    #  run: dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
 
     - name: Pack EarlyXrm.EarlyBoundGenerator
-      run: msbuild -t:pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.csproj /p:Configuration=Release /p:Version=${{ steps.gitversion.outputs.NuGetVersionV2 }}
-      
+      run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }}
+
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: packages
+        path: ./**/*.*.nupkg
+
+    - name: Add Github Source
+      run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -Username ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push to github
+      run: nuget push **/*.nupkg -ApiKey ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -SkipDuplicate

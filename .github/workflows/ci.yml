@@ -47,6 +47,9 @@ jobs:
     #- name: Test
     #  run: dotnet test -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
 
+    - name: Run tests
+      run:  '& "vstest.console.exe" EarlyXrm.EarlyBoundGenerator.UnitTests\EarlyXrm.EarlyBoundGenerator.UnitTests.dll'
+
     - name: Pack EarlyXrm.EarlyBoundGenerator
       run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }} -properties Configuration=Release
 

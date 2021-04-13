@@ -47,7 +47,10 @@ jobs:
     - name: Run tests
       run:  '& "$(vswhere -property installationPath)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll'
     
-    - run: Install-Module -Name Xrm.Framework.CI.PowerShell.Cmdlets
+    - run: Install-Module -Force -Name Xrm.Framework.CI.PowerShell.Cmdlets
+      shell: pwsh
+      
+    - run: Select-WhoAmI -ConnectionString:"${{secrets.CrmConnectionString}}"
       shell: pwsh
 
     - name: Pack EarlyXrm.EarlyBoundGenerator

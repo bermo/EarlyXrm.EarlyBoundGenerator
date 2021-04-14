@@ -56,10 +56,10 @@ jobs:
     #  run:  vstest.console.exe EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll
     
     - run: Install-Module -Force -Name Xrm.Framework.CI.PowerShell.Cmdlets
-      shell: pwsh
+      shell: powershell
       
     - run: Select-WhoAmI -ConnectionString:"${{secrets.CrmConnectionString}}"
-      shell: pwsh
+      shell: powershell
 
     - name: Pack EarlyXrm.EarlyBoundGenerator
       run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }} -properties Configuration=Release

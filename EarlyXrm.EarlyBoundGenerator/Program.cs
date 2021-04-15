@@ -45,6 +45,15 @@ namespace EarlyXrm.EarlyBoundGenerator
             parameters.Add(earlyBoundConfig.Instrument.ToString());
             parameters.Add(earlyBoundConfig.AddSetters.ToString());
 
+            if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
+            {
+                earlyBoundConfig.EntitiesOut = @"..\..\" + earlyBoundConfig.EntitiesOut;
+                earlyBoundConfig.OptionSetsOut = @"..\..\" + earlyBoundConfig.OptionSetsOut;
+            }
+
+            parameters.Add(earlyBoundConfig.EntitiesOut);
+            parameters.Add(earlyBoundConfig.OptionSetsOut);
+
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo

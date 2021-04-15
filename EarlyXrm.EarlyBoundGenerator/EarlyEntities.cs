@@ -57,6 +57,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("createdby");
 			}
+			set
+			{
+				SetAttributeValue("createdby", nameof(CreatedBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("createdon")]
@@ -66,6 +70,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<DateTime?>("createdon");
 			}
+			set
+			{
+				SetAttributeValue("createdon", nameof(CreatedOn), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("createdonbehalfby")]
@@ -74,6 +82,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<EntityReference>("createdonbehalfby");
+			}
+			set
+			{
+				SetAttributeValue("createdonbehalfby", nameof(CreatedOnBehalfBy), value);
 			}
 		}
 		
@@ -110,6 +122,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<DateTime?>("installedon");
 			}
+			set
+			{
+				SetAttributeValue("installedon", nameof(InstalledOn), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("isapimanaged")]
@@ -118,6 +134,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<bool?>("isapimanaged");
+			}
+			set
+			{
+				SetAttributeValue("isapimanaged", nameof(IsApiManaged), value);
 			}
 		}
 		
@@ -128,6 +148,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<bool?>("ismanaged");
 			}
+			set
+			{
+				SetAttributeValue("ismanaged", nameof(IsManaged), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("isvisible")]
@@ -136,6 +160,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<bool?>("isvisible");
+			}
+			set
+			{
+				SetAttributeValue("isvisible", nameof(IsVisible), value);
 			}
 		}
 		
@@ -146,6 +174,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("modifiedby");
 			}
+			set
+			{
+				SetAttributeValue("modifiedby", nameof(ModifiedBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("modifiedon")]
@@ -154,6 +186,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<DateTime?>("modifiedon");
+			}
+			set
+			{
+				SetAttributeValue("modifiedon", nameof(ModifiedOn), value);
 			}
 		}
 		
@@ -164,6 +200,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("modifiedonbehalfby");
 			}
+			set
+			{
+				SetAttributeValue("modifiedonbehalfby", nameof(ModifiedOnBehalfBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("organizationid")]
@@ -172,6 +212,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<EntityReference>("organizationid");
+			}
+			set
+			{
+				SetAttributeValue("organizationid", nameof(OrganizationId), value);
 			}
 		}
 		
@@ -182,6 +226,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("parentsolutionid");
 			}
+			set
+			{
+				SetAttributeValue("parentsolutionid", nameof(ParentSolutionId), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("pinpointassetid")]
@@ -190,6 +238,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<System.String>("pinpointassetid");
+			}
+			set
+			{
+				SetAttributeValue("pinpointassetid", nameof(PinpointAssetId), value);
 			}
 		}
 		
@@ -200,6 +252,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<long?>("pinpointpublisherid");
 			}
+			set
+			{
+				SetAttributeValue("pinpointpublisherid", nameof(PinpointPublisherId), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("pinpointsolutiondefaultlocale")]
@@ -209,6 +265,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<System.String>("pinpointsolutiondefaultlocale");
 			}
+			set
+			{
+				SetAttributeValue("pinpointsolutiondefaultlocale", nameof(PinpointSolutionDefaultLocale), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("pinpointsolutionid")]
@@ -217,6 +277,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<long?>("pinpointsolutionid");
+			}
+			set
+			{
+				SetAttributeValue("pinpointsolutionid", nameof(PinpointSolutionId), value);
 			}
 		}
 		
@@ -319,6 +383,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<DateTime?>("updatedon");
 			}
+			set
+			{
+				SetAttributeValue("updatedon", nameof(UpdatedOn), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("upgradeinfo")]
@@ -327,6 +395,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<System.String>("upgradeinfo");
+			}
+			set
+			{
+				SetAttributeValue("upgradeinfo", nameof(UpgradeInfo), value);
 			}
 		}
 		
@@ -349,6 +421,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<long?>("versionnumber");
+			}
+			set
+			{
+				SetAttributeValue("versionnumber", nameof(VersionNumber), value);
 			}
 		}
 		
@@ -492,7 +568,7 @@ namespace EarlyXrm
 			}
 			set
 			{
-				SetAttributeValue("componenttype", nameof(ComponentType), new OptionSetValue((int)value));
+				SetAttributeValue("componenttype", nameof(ComponentType), value.HasValue ? new OptionSetValue((int)value.Value) : null);
 			}
 		}
 		
@@ -503,6 +579,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("createdby");
 			}
+			set
+			{
+				SetAttributeValue("createdby", nameof(CreatedBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("createdon")]
@@ -511,6 +591,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<DateTime?>("createdon");
+			}
+			set
+			{
+				SetAttributeValue("createdon", nameof(CreatedOn), value);
 			}
 		}
 		
@@ -521,6 +605,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("createdonbehalfby");
 			}
+			set
+			{
+				SetAttributeValue("createdonbehalfby", nameof(CreatedOnBehalfBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("ismetadata")]
@@ -529,6 +617,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<bool?>("ismetadata");
+			}
+			set
+			{
+				SetAttributeValue("ismetadata", nameof(IsMetadata), value);
 			}
 		}
 		
@@ -539,6 +631,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("modifiedby");
 			}
+			set
+			{
+				SetAttributeValue("modifiedby", nameof(ModifiedBy), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("modifiedon")]
@@ -548,6 +644,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<DateTime?>("modifiedon");
 			}
+			set
+			{
+				SetAttributeValue("modifiedon", nameof(ModifiedOn), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("modifiedonbehalfby")]
@@ -556,6 +656,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<EntityReference>("modifiedonbehalfby");
+			}
+			set
+			{
+				SetAttributeValue("modifiedonbehalfby", nameof(ModifiedOnBehalfBy), value);
 			}
 		}
 		
@@ -579,6 +683,10 @@ namespace EarlyXrm
 			{
 				return (solutioncomponent_rootcomponentbehavior?)GetAttributeValue<OptionSetValue>("rootcomponentbehavior")?.Value;
 			}
+			set
+			{
+				SetAttributeValue("rootcomponentbehavior", nameof(RootComponentBehavior), value.HasValue ? new OptionSetValue((int)value.Value) : null);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("rootsolutioncomponentid")]
@@ -587,6 +695,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<Guid?>("rootsolutioncomponentid");
+			}
+			set
+			{
+				SetAttributeValue("rootsolutioncomponentid", nameof(RootSolutionComponentId), value);
 			}
 		}
 		
@@ -611,6 +723,10 @@ namespace EarlyXrm
 			{
 				return GetAttributeValue<EntityReference>("solutionid");
 			}
+			set
+			{
+				SetAttributeValue("solutionid", nameof(SolutionId), value);
+			}
 		}
 		
 		[AttributeLogicalNameAttribute("versionnumber")]
@@ -619,6 +735,10 @@ namespace EarlyXrm
 			get
 			{
 				return GetAttributeValue<long?>("versionnumber");
+			}
+			set
+			{
+				SetAttributeValue("versionnumber", nameof(VersionNumber), value);
 			}
 		}
 		

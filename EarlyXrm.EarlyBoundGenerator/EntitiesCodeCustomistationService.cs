@@ -286,7 +286,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                             prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return ({optionsSetName}?)GetAttributeValue<OptionSetValue>(\"{enumAtt.LogicalName}\")?.Value;"));
 
-                            if (prop.HasSet)
+                            if (prop.HasSet || AddSetters)
                             {
                                 prop.SetStatements.Clear();
                                 prop.SetStatements.AddRange(new[] {

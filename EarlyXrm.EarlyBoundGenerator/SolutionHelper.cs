@@ -162,7 +162,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         LinkFromEntityName = SolutionComponent.EntityLogicalName,
                         LinkFromAttributeName = nameof(SolutionComponent.SolutionId).ToLower(),
                         LinkToEntityName = Solution.EntityLogicalName,
-                        LinkToAttributeName = nameof(Solution.Id).ToLower(),
+                        LinkToAttributeName = nameof(SolutionComponent.SolutionId).ToLower(),
                         JoinOperator = JoinOperator.Inner,
                         LinkCriteria = { 
                             Conditions = { 

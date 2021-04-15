@@ -2,18 +2,23 @@
   "ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
   //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
   //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;",
-  "Namespace": "Test",
+  
+  "Namespace": "EarlyXrm",
   "UseDisplayName": true,
   "DebugMode": false,
   "Instrument": false,
+  "AddSetters": false,
+  "EntitiesOut": "EarlyEntities.cs",
+  "OptionSetsOut": "EarlyOptionSets.cs",
+
   "Solutions": [],
   "Include": {
     "account": null,
-    "contact": [],
+    "contact": []
     "email": [ "isbilled", "isunsafe" ]
   },
   "Exclude": {
-    "task": null,
+    "email": null,
     "*": [ "importsequencenumber", "createdbyexternalparty" ]
   }
 }

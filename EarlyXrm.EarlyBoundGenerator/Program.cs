@@ -43,6 +43,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             parameters.Add(earlyBoundConfig.UseDisplayNames.ToString());
             parameters.Add(earlyBoundConfig.DebugMode.ToString());
             parameters.Add(earlyBoundConfig.Instrument.ToString());
+            parameters.Add(earlyBoundConfig.AddSetters.ToString());
 
             var process = new Process
             {

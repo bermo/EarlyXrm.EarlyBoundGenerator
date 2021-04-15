@@ -8,7 +8,6 @@ using Microsoft.Xrm.Tooling.Connector;
 using System.Globalization;
 using Microsoft.Crm.Services.Utility;
 using System.Diagnostics;
-using EarlyBoundSolutionGenerator;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
@@ -163,7 +162,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         LinkFromEntityName = SolutionComponent.EntityLogicalName,
                         LinkFromAttributeName = nameof(SolutionComponent.SolutionId).ToLower(),
                         LinkToEntityName = Solution.EntityLogicalName,
-                        LinkToAttributeName = nameof(Solution.SolutionId).ToLower(),
+                        LinkToAttributeName = nameof(Solution.Id).ToLower(),
                         JoinOperator = JoinOperator.Inner,
                         LinkCriteria = { 
                             Conditions = { 

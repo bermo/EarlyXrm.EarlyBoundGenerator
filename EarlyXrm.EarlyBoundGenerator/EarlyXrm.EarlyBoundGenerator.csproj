@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -113,7 +115,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="EarlyBoundTypes.cs" />
+    <Compile Include="EarlyEntities.cs" />
+    <Compile Include="EarlyOptionSets.cs" />
     <Compile Include="EntitiesCodeCustomistationService.cs" />
     <Compile Include="EntitiesCodeFilteringService.cs" />
     <Compile Include="EntitiesCodeNamingService.cs" />

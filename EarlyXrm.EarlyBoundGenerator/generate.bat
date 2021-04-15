@@ -7,7 +7,8 @@ CrmSvcUtil.exe ^
  /usedisplaynames:%6 ^
  /debugMode:%7 ^
  /instrument:%8 ^
- /out:..\..\EarlyEntities.cs ^
+ /addsetters:%9 ^
+ /out:EarlyEntities.cs ^
   /codewriterfilter:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeFilteringService, EarlyXrm.EarlyBoundGenerator" ^
  /codecustomization:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeCustomistationService, EarlyXrm.EarlyBoundGenerator" ^
      /namingservice:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeNamingService, EarlyXrm.EarlyBoundGenerator"
@@ -21,7 +22,8 @@ CrmSvcUtil.exe ^
  /usedisplaynames:%6 ^
  /debugMode:%7 ^
  /instrument:%8 ^
- /out:..\..\EarlyOptionSets.cs ^
+ /addsetters:%9 ^
+ /out:EarlyOptionSets.cs ^
   /codewriterfilter:"EarlyXrm.EarlyBoundGenerator.OptionSetsFilteringService, EarlyXrm.EarlyBoundGenerator" ^
  /codecustomization:"EarlyXrm.EarlyBoundGenerator.OptionSetsCodeCustomisationService, EarlyXrm.EarlyBoundGenerator" ^
      /namingservice:"EarlyXrm.EarlyBoundGenerator.OptionSetsNamingService, EarlyXrm.EarlyBoundGenerator"

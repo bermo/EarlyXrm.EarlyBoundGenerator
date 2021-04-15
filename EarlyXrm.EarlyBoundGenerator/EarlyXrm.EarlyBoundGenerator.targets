@@ -3,73 +3,73 @@
 	<Target Name="CopyEarlyBound" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)EarlyXrm.EarlyBoundGenerator.exe"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\EarlyXrm.EarlyBoundGenerator.exe"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\EarlyXrm.EarlyBoundGenerator.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopySvcUtil" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)CrmSvcUtil.exe"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\CrmSvcUtil.exe"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\CrmSvcUtil.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopySDKProxy" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Crm.Sdk.Proxy.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Microsoft.Crm.Sdk.Proxy.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Crm.Sdk.Proxy.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopySDK" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Sdk.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Microsoft.Xrm.Sdk.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Sdk.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyCrmConnect" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.CrmConnectControl.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Microsoft.Xrm.Tooling.CrmConnectControl.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.CrmConnectControl.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyConnector" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.Connector.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Microsoft.Xrm.Tooling.Connector.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.Connector.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyAD" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyJson" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Newtonsoft.Json.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\Newtonsoft.Json.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Newtonsoft.Json.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyGenerate" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)generate.bat"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\generate.bat"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\generate.bat"
           SkipUnchangedFiles="true"/>
 	</Target>
 
 	<Target Name="CopyBatch" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.bat"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\earlybound.bat"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat"
           SkipUnchangedFiles="true"/>
 	</Target>
 	<Target Name="CopyConfig" BeforeTargets="Build" Condition="!Exists('$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json')">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.json"
-          DestinationFiles="$(MSBuildProjectDirectory)\bin\EarlyXrm\earlybound.json"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
 	<ItemGroup>
-		<Content Include="$(MSBuildProjectDirectory)\bin\EarlyXrm\earlybound.bat" />
-		<Content Include="$(MSBuildProjectDirectory)\bin\EarlyXrm\earlybound.json" />
+		<Content Include="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat" />
+		<Content Include="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json" />
 	</ItemGroup>
 </Project>

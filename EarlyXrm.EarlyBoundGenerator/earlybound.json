@@ -1,12 +1,15 @@
 {
-  "ConnectionString": "AuthType=Office365;Url=https://?.dynamics.com;Username=?;Password=?;",
+  "ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
+  //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
+  //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;",
   "Namespace": "Test",
   "UseDisplayName": true,
-  "DebugMode": true,
+  "DebugMode": false,
   "Instrument": false,
-  "Solutions": [ "Crf5fee" ],
+  "Solutions": [],
   "Include": {
-    "crb60_cat": null,
+    "account": null,
+    "contact": [],
     "email": [ "isbilled", "isunsafe" ]
   },
   "Exclude": {

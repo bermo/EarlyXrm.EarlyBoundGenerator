@@ -13,11 +13,13 @@ namespace EarlyXrm.EarlyBoundGenerator
     {
         private readonly bool UseDisplayNames;
         private readonly bool Instrument;
+        private readonly bool AddSetters;
 
         public EntitiesCodeCustomistationService(IDictionary<string, string> parameters)
         {
             bool.TryParse(parameters[nameof(UseDisplayNames)?.ToUpper()], out UseDisplayNames);
             bool.TryParse(parameters[nameof(Instrument)?.ToUpper()], out Instrument);
+            bool.TryParse(parameters[nameof(AddSetters)?.ToUpper()], out AddSetters);
             this.Debug();
         }
 
@@ -323,7 +325,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return Get{method}<{genericType}>(\"{logicalName}\");"));
                         }
 
-                        if (prop.HasSet)
+                        if (prop.HasSet || AddSetters)
                         {
                             prop.SetStatements.Clear();
                             prop.SetStatements.Add(new CodeSnippetStatement($"{tabs}Set{method}(\"{logicalName}\", nameof({prop.Name}), value);"));

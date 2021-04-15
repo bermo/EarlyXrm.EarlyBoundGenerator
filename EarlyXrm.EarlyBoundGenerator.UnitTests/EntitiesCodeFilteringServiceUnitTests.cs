@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using ModelBuilder;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -68,9 +69,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             });
 
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
-                .Returns(new EntityCollection(new List<Entity> { 
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", testId }, { "componenttype", 2 } } }
+                .Returns(new EntityCollection(new List<Entity> {
+                    Builder.Create<SolutionComponent>().Set(x => { x.ObjectId = id; x.ComponentType = componenttype.Entity; }),
+                    Builder.Create<SolutionComponent>().Set(x => { x.ObjectId = testId; x.ComponentType = componenttype.Attribute; }),
                 }));
 
             var result = sut.GenerateAttribute(attributeMetadata, serviceProvider);

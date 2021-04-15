@@ -4,7 +4,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
-using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +26,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             parameters = new Dictionary<string, string> {
                 { "UseDisplayNames".ToUpper(), false.ToString() },
-                { "Instrument".ToUpper(), false.ToString() }
+                { "Instrument".ToUpper(), false.ToString() },
+                { "AddSetters".ToUpper(), false.ToString() }
             };
         }
 

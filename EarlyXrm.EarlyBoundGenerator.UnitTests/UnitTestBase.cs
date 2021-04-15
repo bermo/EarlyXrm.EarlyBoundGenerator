@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
+using ModelBuilder;
 using NSubstitute;
 using System;
 using System.CodeDom;
@@ -10,10 +11,13 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
     public abstract class UnitTestBase
     {
         protected IServiceProvider serviceProvider;
+        protected IBuildConfiguration Builder;
 
         [TestInitialize]
         public void Initialise()
         {
+            Builder = Model.UsingModule<DynamicsModule>();
+
             typeof(SolutionHelper)
                 .GetField("organisationMetadata", BindingFlags.Static | BindingFlags.NonPublic)
                 .SetValue(null, null);

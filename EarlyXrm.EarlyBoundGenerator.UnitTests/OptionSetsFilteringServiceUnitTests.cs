@@ -88,8 +88,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
                 .Returns(new EntityCollection(new List<Entity> {
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
+                    new Entity("solutioncomponent") { Id = Guid.NewGuid(), Attributes = { { "objectid", id }, { "componenttype", 1 } } },
+                    new Entity("solutioncomponent") { Id = Guid.NewGuid(), Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
                 }));
 
             var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
@@ -218,8 +218,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
                 .Returns(new EntityCollection(new List<Entity> {
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", id }, { "componenttype", 1 } } },
-                    new Entity("solutioncomponent") { Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
+                    new Entity("solutioncomponent") { Id = Guid.NewGuid(), Attributes = { { "objectid", id }, { "componenttype", 1 } } },
+                    new Entity("solutioncomponent") { Id = Guid.NewGuid(), Attributes = { { "objectid", attId }, { "name", "ee_testval" }, { "componenttype", 2 } } }
                 }));
 
             var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);

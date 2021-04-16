@@ -130,9 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="earlybound.debug.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="earlybound.bat" />
     <None Include="EarlyXrm.EarlyBoundGenerator.nuspec" />
     <None Include="EarlyXrm.EarlyBoundGenerator.targets" />

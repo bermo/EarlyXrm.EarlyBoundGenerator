@@ -19,8 +19,9 @@ namespace EarlyXrm
 	using Microsoft.Xrm.Sdk.Client;
 	using System.Collections.Generic;
 	using System.ComponentModel;
-	
-	
+    using System.Diagnostics.CodeAnalysis;
+
+    [ExcludeFromCodeCoverage]
 	[DataContractAttribute()]
 	[EntityLogicalNameAttribute("solution")]
 	public partial class Solution : EarlyEntity
@@ -542,7 +543,8 @@ namespace EarlyXrm
 			public static string Referencingsolution_parent_solution = "solution_parent_solution";
 		}
 	}
-	
+
+	[ExcludeFromCodeCoverage]
 	[DataContractAttribute()]
 	[EntityLogicalNameAttribute("solutioncomponent")]
 	public partial class SolutionComponent : EarlyEntity
@@ -823,7 +825,8 @@ namespace EarlyXrm
 			public static string Referencingsolutioncomponent_parent_solutioncomponent = "solutioncomponent_parent_solutioncomponent";
 		}
 	}
-	
+
+	[ExcludeFromCodeCoverage]
 	[DataContract()]
 	public class EarlyEntity : Entity, INotifyPropertyChanging, INotifyPropertyChanged
 	{

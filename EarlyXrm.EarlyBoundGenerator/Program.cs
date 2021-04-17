@@ -23,27 +23,54 @@ namespace EarlyXrm.EarlyBoundGenerator
             var earlyBoundConfig = JsonConvert.DeserializeObject<EarlyBoundConfig>(settings);
 
             var parameters = new List<string>();
-            parameters.Add(earlyBoundConfig.ConnectionString);
-            parameters.Add(string.Join("; ", earlyBoundConfig.Solutions));
+
+            var solutions = string.Join(";", earlyBoundConfig.Solutions);
+
+            if (earlyBoundConfig.ConnectionString != null)
+            {
+                parameters.Add($"/connectionstring:\"{earlyBoundConfig.ConnectionString}\"");
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(solutions))
+                {
+                    Console.WriteLine($"To filter generation results by one or more solutions, the \"ConnectionString\" setting in the \"earlybound.json\" file must be populated:");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($@"
+    {{
+        ...
+        ""Solutions"": [""{string.Join("\", \"", earlyBoundConfig.Solutions)}""],
+        ""ConnectionString"": ""<!--POPULATE-->"",
+        ...
+    }}");
+                    Console.Read();
+                    return;
+                }
+
+                parameters.Add($"/interactivelogin");
+            }
+            
+            parameters.Add(solutions);
+
             parameters.Add(earlyBoundConfig.Namespace);
 
             var extra = earlyBoundConfig.Include;
 
             if (extra != null)
-                parameters.Add(string.Join("; ", extra.Select(x => x.Key + (x.Value?.Any() == true ? ": " + string.Join(", ", x.Value) : ""))));
+                parameters.Add(string.Join(";", extra.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
             else
-                parameters.Add("");
+                parameters.Add(null);
 
             var skip = earlyBoundConfig.Exclude;
             if (skip != null)
-                parameters.Add(string.Join("; ", skip.Select(x => x.Key + (x.Value?.Any() == true ? ": " + string.Join(", ", x.Value) : ""))));
+                parameters.Add(string.Join(";", skip.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
             else
-                parameters.Add("");
+                parameters.Add(null);
 
-            parameters.Add(earlyBoundConfig.UseDisplayNames.ToString());
-            parameters.Add(earlyBoundConfig.DebugMode.ToString());
-            parameters.Add(earlyBoundConfig.Instrument.ToString());
-            parameters.Add(earlyBoundConfig.AddSetters.ToString());
+            parameters.Add(earlyBoundConfig.UseDisplayNames.ToString().ToLower());
+            parameters.Add(earlyBoundConfig.DebugMode.ToString().ToLower());
+            parameters.Add(earlyBoundConfig.Instrument.ToString().ToLower());
+            parameters.Add(earlyBoundConfig.AddSetters.ToString().ToLower());
 
             if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
             {
@@ -54,12 +81,14 @@ namespace EarlyXrm.EarlyBoundGenerator
             parameters.Add(earlyBoundConfig.EntitiesOut);
             parameters.Add(earlyBoundConfig.OptionSetsOut);
 
+            parameters = parameters.Select(x => x.StartsWith("/") ? x : $"\"{x}\"").ToList();
+
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "generate.bat",
-                    Arguments = "\"" + string.Join("\";\"", parameters) + "\"",
+                    Arguments = string.Join(" ", parameters), // "\"" + string.Join("\"\"", parameters) + "\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false

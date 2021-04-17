@@ -71,7 +71,6 @@ namespace EarlyXrm.EarlyBoundGenerator
         public static IEnumerable<IncludedEntity> LoadSolutionEntities(this IServiceProvider services)
         {
             services.LoadMetadata();
-
             if (solutionEntities == null)
                 solutionEntities = GetSolutionEntities();
 
@@ -141,6 +140,19 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         private static IEnumerable<SolutionComponent> GetSolutionComponents(params componenttype[] componentTypes)
         {
+            if (organisationService == null)
+            {
+                var connectionString = GetParameter("connectionstring");
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    $"No connectionstring has been set!".Debug();
+                    return new List<SolutionComponent>();
+                }
+
+                organisationService = new CrmServiceClient(GetParameter("connectionstring"));
+            }
+                
             solutionName = GetParameter("solutionname");
 
             var types = componentTypes.Select(x => (int)x).ToArray();
@@ -175,12 +187,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             $"{nameof(SolutionHelper.GetSolutionComponents)} Start".Debug();
 
-            IEnumerable<SolutionComponent> result;
-
-            if (organisationService == null)
-                organisationService = new CrmServiceClient(GetParameter("connectionstring"));
-            
-            result = organisationService.RetrieveMultiple(query).Entities.Select(x => x.ToEntity<SolutionComponent>());
+            var result = organisationService.RetrieveMultiple(query).Entities.Select(x => x.ToEntity<SolutionComponent>());
 
             $"{nameof(SolutionHelper.GetSolutionComponents)} End".Debug();
 

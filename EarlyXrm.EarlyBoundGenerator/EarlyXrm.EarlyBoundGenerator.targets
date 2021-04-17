@@ -36,6 +36,12 @@
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.Connector.dll"
           SkipUnchangedFiles="true"/>
 	</Target>
+	<Target Name="CopyUiStyles" BeforeTargets="Build">
+		<Copy
+          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.Connector.dll"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.Ui.Styles.dll"
+          SkipUnchangedFiles="true"/>
+	</Target>
 	<Target Name="CopyAD" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.IdentityModel.Clients.ActiveDirectory.dll"

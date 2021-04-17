@@ -3,7 +3,7 @@ Shift & Shift & Shift & Shift & Shift & Shift & Shift & Shift & Shift
 Set j=%1 & Set k=%2
 
 CrmSvcUtil.exe ^
- /connectionstring:%a% ^
+ %a% ^
  /solutionname:%b% ^
  /namespace:%c% ^
  /extra:%d% ^
@@ -18,7 +18,7 @@ CrmSvcUtil.exe ^
      /namingservice:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeNamingService, EarlyXrm.EarlyBoundGenerator"
 
 CrmSvcUtil.exe ^
- /connectionstring:%a% ^
+ %a% ^
  /solutionname:%b% ^
  /namespace:%c% ^
  /extra:%d% ^

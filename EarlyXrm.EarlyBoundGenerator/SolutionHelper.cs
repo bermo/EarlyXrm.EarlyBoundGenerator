@@ -159,12 +159,12 @@ namespace EarlyXrm.EarlyBoundGenerator
             var query = new QueryExpression(SolutionComponent.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(
-                    nameof(SolutionComponent.ObjectId).ToLower(), 
-                    nameof(SolutionComponent.RootComponentBehavior).ToLower()
+                    SolutionComponent.LogicalNames.ObjectId, 
+                    SolutionComponent.LogicalNames.RootComponentBehavior
                 ),
                 Criteria = { 
                     Conditions = { 
-                        new ConditionExpression(nameof(SolutionComponent.ComponentType).ToLower(), ConditionOperator.In, types) 
+                        new ConditionExpression(SolutionComponent.LogicalNames.ComponentType, ConditionOperator.In, types) 
                     } 
                 },
                 LinkEntities =
@@ -172,13 +172,13 @@ namespace EarlyXrm.EarlyBoundGenerator
                     new LinkEntity()
                     {
                         LinkFromEntityName = SolutionComponent.EntityLogicalName,
-                        LinkFromAttributeName = nameof(SolutionComponent.SolutionId).ToLower(),
+                        LinkFromAttributeName = SolutionComponent.LogicalNames.SolutionId,
                         LinkToEntityName = Solution.EntityLogicalName,
-                        LinkToAttributeName = nameof(SolutionComponent.SolutionId).ToLower(),
+                        LinkToAttributeName = Solution.LogicalNames.Id,
                         JoinOperator = JoinOperator.Inner,
                         LinkCriteria = { 
                             Conditions = { 
-                                new ConditionExpression(nameof(Solution.UniqueName).ToLower(), ConditionOperator.Equal, solutionName) 
+                                new ConditionExpression(Solution.LogicalNames.UniqueName, ConditionOperator.Equal, solutionName) 
                             } 
                         }
                     }

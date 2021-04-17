@@ -7,24 +7,37 @@
   "EntitiesOut": "EarlyEntities.cs",
   "OptionSetsOut": "EarlyOptionSets.cs",
 
-  // custom include / exclude filters of the generation results
   "Include": {
-    "account": null,
-    "contact": [],
-    "email": [ "isbilled", "isunsafe" ]
+
+    "solutioncomponent": [ // include specific attributes for "solutioncomponent" entity
+      "solutionid","componenttype",
+      "objectid","rootcomponentbehavior"
+    ],
+
+    "solution": [] // include all attributes for "solution" entity
   },
+
   "Exclude": {
-    "email": null,
-    "*": [ "importsequencenumber", "createdbyexternalparty" ]
+
+    "solution": [ // exclude specific attributes for "solution" entity
+      "configurationpageid","createdby","createdon","isapimanaged",
+      "modifiedby","modifiedon","pinpointassetid","pinpointpublisherid",
+      "pinpointsolutionid","templatesuffix","thumbprint","upgradeinfo"
+    ],
+
+    "email": [], // exclude whole entity (useful when filtering via the "Solutions" settings)
+
+    "*": [ // exclude for all entities
+      "importsequencenumber","createdbyexternalparty",
+      "createdonbehalfby","modifiedonbehalfby"
+    ]
   },
 
   "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
 
-  // interactive login by default, populate one of the "ConnectionString" options below for convenience (or to enable solution/s filtering)
+  "ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
 
-  "ConnectionString": ""
   //"ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
   //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
   //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;"
-
 }

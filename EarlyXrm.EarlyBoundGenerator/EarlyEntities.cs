@@ -19,11 +19,12 @@ namespace EarlyXrm
 	using Microsoft.Xrm.Sdk.Client;
 	using System.Collections.Generic;
 	using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
-
-    [ExcludeFromCodeCoverage]
+	using System.Diagnostics.CodeAnalysis;
+	
+	
 	[DataContractAttribute()]
 	[EntityLogicalNameAttribute("solution")]
+	[ExcludeFromCodeCoverage()]
 	public partial class Solution : EarlyEntity
 	{
 		
@@ -37,58 +38,6 @@ namespace EarlyXrm
 		public const string EntityLogicalCollectionName = "solutions";
 		
 		public const string EntitySetName = "solutions";
-		
-		[AttributeLogicalNameAttribute("configurationpageid")]
-		public EntityReference ConfigurationPageId
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("configurationpageid");
-			}
-			set
-			{
-				SetAttributeValue("configurationpageid", nameof(ConfigurationPageId), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("createdby")]
-		public EntityReference CreatedBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("createdby");
-			}
-			set
-			{
-				SetAttributeValue("createdby", nameof(CreatedBy), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("createdon")]
-		public DateTime? CreatedOn
-		{
-			get
-			{
-				return GetAttributeValue<DateTime?>("createdon");
-			}
-			set
-			{
-				SetAttributeValue("createdon", nameof(CreatedOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("createdonbehalfby")]
-		public EntityReference CreatedOnBehalfBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("createdonbehalfby");
-			}
-			set
-			{
-				SetAttributeValue("createdonbehalfby", nameof(CreatedOnBehalfBy), value);
-			}
-		}
 		
 		[AttributeLogicalNameAttribute("description")]
 		public string Description
@@ -129,19 +78,6 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("isapimanaged")]
-		public bool? IsApiManaged
-		{
-			get
-			{
-				return GetAttributeValue<bool?>("isapimanaged");
-			}
-			set
-			{
-				SetAttributeValue("isapimanaged", nameof(IsApiManaged), value);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("ismanaged")]
 		public bool? IsManaged
 		{
@@ -165,45 +101,6 @@ namespace EarlyXrm
 			set
 			{
 				SetAttributeValue("isvisible", nameof(IsVisible), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedby")]
-		public EntityReference ModifiedBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("modifiedby");
-			}
-			set
-			{
-				SetAttributeValue("modifiedby", nameof(ModifiedBy), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedon")]
-		public DateTime? ModifiedOn
-		{
-			get
-			{
-				return GetAttributeValue<DateTime?>("modifiedon");
-			}
-			set
-			{
-				SetAttributeValue("modifiedon", nameof(ModifiedOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public EntityReference ModifiedOnBehalfBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("modifiedonbehalfby");
-			}
-			set
-			{
-				SetAttributeValue("modifiedonbehalfby", nameof(ModifiedOnBehalfBy), value);
 			}
 		}
 		
@@ -233,32 +130,6 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("pinpointassetid")]
-		public string PinpointAssetId
-		{
-			get
-			{
-				return GetAttributeValue<System.String>("pinpointassetid");
-			}
-			set
-			{
-				SetAttributeValue("pinpointassetid", nameof(PinpointAssetId), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("pinpointpublisherid")]
-		public long? PinpointPublisherId
-		{
-			get
-			{
-				return GetAttributeValue<long?>("pinpointpublisherid");
-			}
-			set
-			{
-				SetAttributeValue("pinpointpublisherid", nameof(PinpointPublisherId), value);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("pinpointsolutiondefaultlocale")]
 		public string PinpointSolutionDefaultLocale
 		{
@@ -269,19 +140,6 @@ namespace EarlyXrm
 			set
 			{
 				SetAttributeValue("pinpointsolutiondefaultlocale", nameof(PinpointSolutionDefaultLocale), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("pinpointsolutionid")]
-		public long? PinpointSolutionId
-		{
-			get
-			{
-				return GetAttributeValue<long?>("pinpointsolutionid");
-			}
-			set
-			{
-				SetAttributeValue("pinpointsolutionid", nameof(PinpointSolutionId), value);
 			}
 		}
 		
@@ -338,32 +196,6 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("templatesuffix")]
-		public string TemplateSuffix
-		{
-			get
-			{
-				return GetAttributeValue<System.String>("templatesuffix");
-			}
-			set
-			{
-				SetAttributeValue("templatesuffix", nameof(TemplateSuffix), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("thumbprint")]
-		public string Thumbprint
-		{
-			get
-			{
-				return GetAttributeValue<System.String>("thumbprint");
-			}
-			set
-			{
-				SetAttributeValue("thumbprint", nameof(Thumbprint), value);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("uniquename")]
 		public string UniqueName
 		{
@@ -387,19 +219,6 @@ namespace EarlyXrm
 			set
 			{
 				SetAttributeValue("updatedon", nameof(UpdatedOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("upgradeinfo")]
-		public string UpgradeInfo
-		{
-			get
-			{
-				return GetAttributeValue<System.String>("upgradeinfo");
-			}
-			set
-			{
-				SetAttributeValue("upgradeinfo", nameof(UpgradeInfo), value);
 			}
 		}
 		
@@ -469,43 +288,21 @@ namespace EarlyXrm
 		public class LogicalNames
 		{
 			
-			public static string ConfigurationPageId = "configurationpageid";
-			
-			public static string CreatedBy = "createdby";
-			
-			public static string CreatedOn = "createdon";
-			
-			public static string CreatedOnBehalfBy = "createdonbehalfby";
-			
 			public static string Description = "description";
 			
 			public static string FriendlyName = "friendlyname";
 			
 			public static string InstalledOn = "installedon";
 			
-			public static string IsApiManaged = "isapimanaged";
-			
 			public static string IsManaged = "ismanaged";
 			
 			public static string IsVisible = "isvisible";
-			
-			public static string ModifiedBy = "modifiedby";
-			
-			public static string ModifiedOn = "modifiedon";
-			
-			public static string ModifiedOnBehalfBy = "modifiedonbehalfby";
 			
 			public static string OrganizationId = "organizationid";
 			
 			public static string ParentSolutionId = "parentsolutionid";
 			
-			public static string PinpointAssetId = "pinpointassetid";
-			
-			public static string PinpointPublisherId = "pinpointpublisherid";
-			
 			public static string PinpointSolutionDefaultLocale = "pinpointsolutiondefaultlocale";
-			
-			public static string PinpointSolutionId = "pinpointsolutionid";
 			
 			public static string PublisherId = "publisherid";
 			
@@ -515,15 +312,9 @@ namespace EarlyXrm
 			
 			public static string SolutionType = "solutiontype";
 			
-			public static string TemplateSuffix = "templatesuffix";
-			
-			public static string Thumbprint = "thumbprint";
-			
 			public static string UniqueName = "uniquename";
 			
 			public static string UpdatedOn = "updatedon";
-			
-			public static string UpgradeInfo = "upgradeinfo";
 			
 			public static string Version = "version";
 			
@@ -543,10 +334,10 @@ namespace EarlyXrm
 			public static string Referencingsolution_parent_solution = "solution_parent_solution";
 		}
 	}
-
-	[ExcludeFromCodeCoverage]
+	
 	[DataContractAttribute()]
 	[EntityLogicalNameAttribute("solutioncomponent")]
+	[ExcludeFromCodeCoverage()]
 	public partial class SolutionComponent : EarlyEntity
 	{
 		
@@ -574,97 +365,6 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("createdby")]
-		public EntityReference CreatedBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("createdby");
-			}
-			set
-			{
-				SetAttributeValue("createdby", nameof(CreatedBy), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("createdon")]
-		public DateTime? CreatedOn
-		{
-			get
-			{
-				return GetAttributeValue<DateTime?>("createdon");
-			}
-			set
-			{
-				SetAttributeValue("createdon", nameof(CreatedOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("createdonbehalfby")]
-		public EntityReference CreatedOnBehalfBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("createdonbehalfby");
-			}
-			set
-			{
-				SetAttributeValue("createdonbehalfby", nameof(CreatedOnBehalfBy), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("ismetadata")]
-		public bool? IsMetadata
-		{
-			get
-			{
-				return GetAttributeValue<bool?>("ismetadata");
-			}
-			set
-			{
-				SetAttributeValue("ismetadata", nameof(IsMetadata), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedby")]
-		public EntityReference ModifiedBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("modifiedby");
-			}
-			set
-			{
-				SetAttributeValue("modifiedby", nameof(ModifiedBy), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedon")]
-		public DateTime? ModifiedOn
-		{
-			get
-			{
-				return GetAttributeValue<DateTime?>("modifiedon");
-			}
-			set
-			{
-				SetAttributeValue("modifiedon", nameof(ModifiedOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public EntityReference ModifiedOnBehalfBy
-		{
-			get
-			{
-				return GetAttributeValue<EntityReference>("modifiedonbehalfby");
-			}
-			set
-			{
-				SetAttributeValue("modifiedonbehalfby", nameof(ModifiedOnBehalfBy), value);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("objectid")]
 		public Guid? ObjectId
 		{
@@ -688,19 +388,6 @@ namespace EarlyXrm
 			set
 			{
 				SetAttributeValue("rootcomponentbehavior", nameof(RootComponentBehavior), value.HasValue ? new OptionSetValue((int)value.Value) : null);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("rootsolutioncomponentid")]
-		public Guid? RootSolutionComponentId
-		{
-			get
-			{
-				return GetAttributeValue<Guid?>("rootsolutioncomponentid");
-			}
-			set
-			{
-				SetAttributeValue("rootsolutioncomponentid", nameof(RootSolutionComponentId), value);
 			}
 		}
 		
@@ -731,32 +418,6 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("versionnumber")]
-		public long? VersionNumber
-		{
-			get
-			{
-				return GetAttributeValue<long?>("versionnumber");
-			}
-			set
-			{
-				SetAttributeValue("versionnumber", nameof(VersionNumber), value);
-			}
-		}
-		
-		[RelationshipSchemaNameAttribute("solutioncomponent_parent_solutioncomponent", EntityRole.Referenced)]
-		public IEnumerable<SolutionComponent> Referencedsolutioncomponent_parent_solutioncomponent
-		{
-			get
-			{
-				return GetRelatedEntities<SolutionComponent>("solutioncomponent_parent_solutioncomponent", EntityRole.Referenced);
-			}
-			set
-			{
-				SetRelatedEntities<SolutionComponent>("solutioncomponent_parent_solutioncomponent", nameof(Referencedsolutioncomponent_parent_solutioncomponent), value, EntityRole.Referenced);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("solutionid")]
 		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
 		public Solution solution_solutioncomponent
@@ -767,66 +428,31 @@ namespace EarlyXrm
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("rootsolutioncomponentid")]
-		[RelationshipSchemaNameAttribute("solutioncomponent_parent_solutioncomponent", EntityRole.Referencing)]
-		public SolutionComponent Referencingsolutioncomponent_parent_solutioncomponent
-		{
-			get
-			{
-				return GetRelatedEntity<SolutionComponent>("solutioncomponent_parent_solutioncomponent", EntityRole.Referencing);
-			}
-		}
-		
 		[DataContract()]
 		public class LogicalNames
 		{
 			
 			public static string ComponentType = "componenttype";
 			
-			public static string CreatedBy = "createdby";
-			
-			public static string CreatedOn = "createdon";
-			
-			public static string CreatedOnBehalfBy = "createdonbehalfby";
-			
-			public static string IsMetadata = "ismetadata";
-			
-			public static string ModifiedBy = "modifiedby";
-			
-			public static string ModifiedOn = "modifiedon";
-			
-			public static string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			
 			public static string ObjectId = "objectid";
 			
 			public static string RootComponentBehavior = "rootcomponentbehavior";
-			
-			public static string RootSolutionComponentId = "rootsolutioncomponentid";
 			
 			public static string Id = "solutioncomponentid";
 			
 			public static string SolutionId = "solutionid";
 			
-			public static string VersionNumber = "versionnumber";
-			
 			public static string solution_solutioncomponent = "solutionid";
-			
-			public static string Referencingsolutioncomponent_parent_solutioncomponent = "rootsolutioncomponentid";
 		}
 		
 		[DataContract()]
 		public class Relationships
 		{
 			
-			public static string Referencedsolutioncomponent_parent_solutioncomponent = "solutioncomponent_parent_solutioncomponent";
-			
 			public static string solution_solutioncomponent = "solution_solutioncomponent";
-			
-			public static string Referencingsolutioncomponent_parent_solutioncomponent = "solutioncomponent_parent_solutioncomponent";
 		}
 	}
-
-	[ExcludeFromCodeCoverage]
+	
 	[DataContract()]
 	public class EarlyEntity : Entity, INotifyPropertyChanging, INotifyPropertyChanged
 	{

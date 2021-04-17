@@ -38,7 +38,8 @@ namespace EarlyXrm.EarlyBoundGenerator
                 new CodeNamespaceImport { Namespace = "System.Runtime.Serialization" },
                 new CodeNamespaceImport { Namespace = "Microsoft.Xrm.Sdk.Client" },
                 new CodeNamespaceImport { Namespace = "System.Collections.Generic" },
-                new CodeNamespaceImport { Namespace = "System.ComponentModel" }
+                new CodeNamespaceImport { Namespace = "System.ComponentModel" },
+                new CodeNamespaceImport { Namespace = "System.Diagnostics.CodeAnalysis" }
             });
 
             foreach (var entityMetadata in metadata.Entities)
@@ -76,6 +77,8 @@ namespace EarlyXrm.EarlyBoundGenerator
                     if (catt.Name.Contains("GeneratedCodeAttribute"))
                         entityClass.CustomAttributes.RemoveAt(i);
                 }
+
+                entityClass.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
 
                 for (var i = entityClass.Members.Count - 1; i >= 0; i--)
                 {

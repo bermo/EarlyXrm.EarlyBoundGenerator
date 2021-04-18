@@ -13,21 +13,6 @@ CrmSvcUtil.exe ^
  /instrument:%h% ^
  /addsetters:%i% ^
  /out:%j% ^
-  /codewriterfilter:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeFilteringService, EarlyXrm.EarlyBoundGenerator" ^
- /codecustomization:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeCustomistationService, EarlyXrm.EarlyBoundGenerator" ^
-     /namingservice:"EarlyXrm.EarlyBoundGenerator.EntitiesCodeNamingService, EarlyXrm.EarlyBoundGenerator"
-
-CrmSvcUtil.exe ^
- %a% ^
- /solutionname:%b% ^
- /namespace:%c% ^
- /extra:%d% ^
- /skip:%e% ^
- /usedisplaynames:%f% ^
- /debugMode:%g% ^
- /instrument:%h% ^
- /addsetters:%i% ^
- /out:%k% ^
-  /codewriterfilter:"EarlyXrm.EarlyBoundGenerator.OptionSetsFilteringService, EarlyXrm.EarlyBoundGenerator" ^
- /codecustomization:"EarlyXrm.EarlyBoundGenerator.OptionSetsCodeCustomisationService, EarlyXrm.EarlyBoundGenerator" ^
-     /namingservice:"EarlyXrm.EarlyBoundGenerator.OptionSetsNamingService, EarlyXrm.EarlyBoundGenerator"
+  /codewriterfilter:"EarlyXrm.EarlyBoundGenerator.CodeFilteringService, EarlyXrm.EarlyBoundGenerator" ^
+ /codecustomization:"EarlyXrm.EarlyBoundGenerator.CodeCustomistationService, EarlyXrm.EarlyBoundGenerator" ^
+     /namingservice:"EarlyXrm.EarlyBoundGenerator.CodeNamingService, EarlyXrm.EarlyBoundGenerator"

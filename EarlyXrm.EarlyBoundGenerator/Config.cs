@@ -12,8 +12,7 @@ namespace EarlyXrm.EarlyBoundGenerator
         public bool DebugMode;
         public bool Instrument;
         public bool AddSetters;
-        public string EntitiesOut;
-        public string OptionSetsOut;
+        public string Out;
         public string[] Solutions;
         public Dictionary<string, string[]> Include = new Dictionary<string, string[]>();
         public Dictionary<string, string[]> Exclude = new Dictionary<string, string[]>();

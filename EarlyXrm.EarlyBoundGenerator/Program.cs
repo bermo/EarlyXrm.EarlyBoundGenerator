@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
@@ -74,12 +75,14 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
             {
-                earlyBoundConfig.EntitiesOut = @"..\..\" + earlyBoundConfig.EntitiesOut;
-                earlyBoundConfig.OptionSetsOut = @"..\..\" + earlyBoundConfig.OptionSetsOut;
+                earlyBoundConfig.Out = @"..\..\" + earlyBoundConfig.Out;
             }
 
-            parameters.Add(earlyBoundConfig.EntitiesOut);
-            parameters.Add(earlyBoundConfig.OptionSetsOut);
+            var outDir = Path.GetDirectoryName(earlyBoundConfig.Out);
+            if (Directory.Exists(outDir) == false)
+                Directory.CreateDirectory(outDir);
+
+            parameters.Add(earlyBoundConfig.Out);
 
             parameters = parameters.Select(x => x.StartsWith("/") ? x : $"\"{x}\"").ToList();
 
@@ -88,7 +91,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "generate.bat",
-                    Arguments = string.Join(" ", parameters), // "\"" + string.Join("\"\"", parameters) + "\"",
+                    Arguments = string.Join(" ", parameters),
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false

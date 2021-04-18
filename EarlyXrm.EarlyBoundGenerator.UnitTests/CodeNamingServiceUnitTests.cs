@@ -9,12 +9,13 @@ using System.Collections.Generic;
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
     [TestClass]
-    public class EntitiesCodeNamingServiceUnitTests : UnitTestBase
+    public class CodeNamingServiceUnitTests : UnitTestBase
     {
         private Dictionary<string, string> parameters;
-        private EntitiesCodeNamingService sut;
+        private CodeNamingService sut;
         private IOrganizationMetadata organizationMetadata;
         private IMetadataProviderService metadataProviderService;
+        private INamingService namingService;
 
         [TestInitialize]
         public void TestInitialise()
@@ -24,12 +25,12 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
 
-            var namingService = Substitute.For<INamingService>();
+            namingService = Substitute.For<INamingService>();
             parameters = new Dictionary<string, string> { 
-                { "UseDisplayNames".ToUpper(), true.ToString() } 
+                { "UseDisplayNames", true.ToString() } 
             };
 
-            sut = new EntitiesCodeNamingService(namingService, parameters);
+            sut = new CodeNamingService(namingService, parameters);
 
         }
 
@@ -121,6 +122,51 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var output = sut.GetNameForRelationship(metadata, relationship, EntityRole.Referenced, serviceProvider);
 
             Assert.AreEqual("TestIdTests", output);
+        }
+
+        [TestMethod]
+        public void GetNameForAttribute_WhenNotUsingDisplayNames_ReturnsDefault()
+        {
+            namingService.GetNameForAttribute(Arg.Any<EntityMetadata>(), Arg.Any<AttributeMetadata>(), serviceProvider)
+                .Returns("Name");
+            parameters = new Dictionary<string, string> {
+                { "UseDisplayNames", false.ToString() }
+            };
+
+            sut = new CodeNamingService(namingService, parameters);
+
+            var result = sut.GetNameForAttribute(new EntityMetadata(), new AttributeMetadata(), serviceProvider);
+            Assert.AreEqual(result, "Name");
+        }
+
+        [TestMethod]
+        public void GetNameForOptionSet_ReturnsOptionsetName()
+        {
+            var optionSet = new OptionSetMetadata { Name = "OptionsetName" };
+
+            var result = sut.GetNameForOptionSet(new EntityMetadata(), optionSet, serviceProvider);
+
+            Assert.AreEqual(result, "OptionsetName");
+        }
+
+        [TestMethod]
+        public void GetNameForOption_AdjustsOptionName()
+        {
+            var option = new OptionMetadata
+            {
+                Label = new Label("5TestValue", 1033),
+                Value = 6
+            };
+            var optionSet = new OptionSetMetadata()
+                .Set(x => x.Options, new OptionMetadataCollection(new List<OptionMetadata> {
+                    new OptionMetadata { Label = new Label("5TestValue", 1033), Value = 5 },
+                    option
+                }));
+
+
+            var result = sut.GetNameForOption(optionSet, option, serviceProvider);
+
+            Assert.AreEqual(result, "_5TestValue2");
         }
     }
 }

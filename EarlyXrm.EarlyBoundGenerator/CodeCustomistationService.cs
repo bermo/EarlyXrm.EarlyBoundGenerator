@@ -6,20 +6,21 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
-    public class EntitiesCodeCustomistationService : ICustomizeCodeDomService
+    public class CodeCustomistationService : ICustomizeCodeDomService
     {
         private readonly bool UseDisplayNames;
         private readonly bool Instrument;
         private readonly bool AddSetters;
 
-        public EntitiesCodeCustomistationService(IDictionary<string, string> parameters)
+        public CodeCustomistationService(IDictionary<string, string> parameters)
         {
-            bool.TryParse(parameters[nameof(UseDisplayNames)?.ToUpper()], out UseDisplayNames);
-            bool.TryParse(parameters[nameof(Instrument)?.ToUpper()], out Instrument);
-            bool.TryParse(parameters[nameof(AddSetters)?.ToUpper()], out AddSetters);
+            bool.TryParse(parameters[nameof(UseDisplayNames)], out UseDisplayNames);
+            bool.TryParse(parameters[nameof(Instrument)], out Instrument);
+            bool.TryParse(parameters[nameof(AddSetters)], out AddSetters);
             this.Debug();
         }
 
@@ -69,14 +70,14 @@ namespace EarlyXrm.EarlyBoundGenerator
                     entityClass.BaseTypes.Add(new CodeTypeReference("I" + entityClass.Name));
                 }
 
-                for (var i = entityClass.CustomAttributes.Count - 1; i >= 0; i--)
-                {
-                    var catt = entityClass.CustomAttributes[i];
-                    catt.Name = catt.Name.Replace("System.Runtime.Serialization.", "");
-                    catt.Name = catt.Name.Replace("Microsoft.Xrm.Sdk.Client.", "");
-                    if (catt.Name.Contains("GeneratedCodeAttribute"))
-                        entityClass.CustomAttributes.RemoveAt(i);
-                }
+                //for (var i = entityClass.CustomAttributes.Count - 1; i >= 0; i--)
+                //{
+                //    var catt = entityClass.CustomAttributes[i];
+                //    catt.Name = catt.Name.Replace("System.Runtime.Serialization.", "");
+                //    catt.Name = catt.Name.Replace("Microsoft.Xrm.Sdk.Client.", "");
+                //    if (catt.Name.Contains("GeneratedCodeAttribute"))
+                //        entityClass.CustomAttributes.RemoveAt(i);
+                //}
 
                 entityClass.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
 
@@ -385,13 +386,101 @@ namespace EarlyXrm.EarlyBoundGenerator
                 }
             }
 
+            foreach (CodeNamespace ns in codeCompileUnit.Namespaces)
+            {
+                foreach (CodeTypeDeclaration type in ns.Types)
+                {
+                    for (var i = type.CustomAttributes.Count - 1; i >= 0; i--)
+                    {
+                        var catt = type.CustomAttributes[i];
+                        catt.Name = catt.Name.Replace("System.Runtime.Serialization.", "").Replace("DataContractAttribute", "DataContract");
+                        catt.Name = catt.Name.Replace("Microsoft.Xrm.Sdk.Client.", "");
+                        if (catt.Name.Contains("GeneratedCodeAttribute"))
+                            type.CustomAttributes.RemoveAt(i);
+                    }
+
+                    //type.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
+
+                    var optionSet = metadata.OptionSets.FirstOrDefault(x => x.Name == type.Name) as OptionSetMetadata;
+                    var displayName = optionSet?.DisplayName();
+                    EnumAttributeMetadata enumAttributeMetadata = null;
+
+                    if (optionSet == null)
+                    {
+                        enumAttributeMetadata = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y?.OptionSet?.Name == type.Name) ?? Array.Empty<EnumAttributeMetadata>())?.FirstOrDefault();
+                        optionSet = enumAttributeMetadata?.OptionSet;
+
+                        if (optionSet == null)
+                            continue;
+
+                        displayName = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName).DisplayName() + "_" + optionSet?.DisplayName();
+                    }
+
+                    foreach (var field in type.Members.Cast<CodeTypeMember>().OfType<CodeMemberField>())
+                    {
+                        var codeExpression = field.InitExpression as CodePrimitiveExpression;
+                        var val = (int)codeExpression.Value;
+
+                        foreach (CodeAttributeDeclaration att in field.CustomAttributes)
+                            att.Name = att.Name.Replace("System.Runtime.Serialization.", "").Replace("EnumMemberAttribute", "EnumMember");
+
+                        if (optionSet != null)
+                        {
+                            var option = optionSet.Options.FirstOrDefault(x => x.Value.Value == val);
+                            if (option != null)
+                            {
+                                var status = option as StatusOptionMetadata;
+                                if (status != null)
+                                {
+                                    var stateOptionSet = metadata.Entities.SelectMany(x => x.Attributes.OfType<StateAttributeMetadata>().Where(y => y?.OptionSet?.Name == type.Name.Replace("_statuscode", "_statecode"))).FirstOrDefault()?.OptionSet;
+                                    var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
+
+                                    var state = UseDisplayNames ? metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName).DisplayName() + "_" + stateOptionSet.DisplayName() : stateOptionSet.Name;
+
+                                    var namingService = (INamingService)services.GetService(typeof(INamingService));
+
+                                    var name = namingService.GetNameForOption(stateOptionSet, stateOption, services);
+                                    field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
+                                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(state), name)
+                                    )));
+                                }
+
+                                field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("Description", new CodeAttributeArgument(new CodePrimitiveExpression(option.Label?.LocalizedLabels?.FirstOrDefault()?.Label))));
+                            }
+                        }
+                    }
+
+                    if (UseDisplayNames)
+                    {
+                        type.Name = displayName;
+                    }
+                }
+            }
+
+            // re-order alphabetical
+            for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
+            {
+                var types = codeCompileUnit.Namespaces[i].Types;
+
+                var typesCopy = new CodeTypeDeclaration[codeCompileUnit.Namespaces[i].Types.Count];
+                codeCompileUnit.Namespaces[i].Types.CopyTo(typesCopy, 0);
+                var orderedTypes = typesCopy.OrderBy(x => x.Name);
+
+                for (var j = 0; j < codeCompileUnit.Namespaces[i].Types.Count;)
+                    codeCompileUnit.Namespaces[i].Types.RemoveAt(j);
+
+                codeCompileUnit.Namespaces[i].Types.AddRange(orderedTypes.ToArray());
+            }
+
             var tab = new string('\t', 1);
             var twoTabs = new string('\t', 2);
 
             var codeType = new CodeTypeDeclaration("EarlyEntity")
             {
+                TypeAttributes = TypeAttributes.Abstract | TypeAttributes.Public,
                 CustomAttributes = {
-                    new CodeAttributeDeclaration("DataContract")
+                    new CodeAttributeDeclaration("DataContract"),
+                    new CodeAttributeDeclaration("ExcludeFromCodeCoverage")
                 }
             };
             codeType.BaseTypes.AddRange(new[]{

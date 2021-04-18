@@ -11,7 +11,7 @@ using System.Linq;
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
     [TestClass]
-    public class EntitiesCodeCustomistationServiceUnitTests : UnitTestBase
+    public class CodeCustomistationServiceUnitTests : UnitTestBase
     {
         private Dictionary<string, string> parameters;
         private IOrganizationMetadata organizationMetadata;
@@ -25,9 +25,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
 
             parameters = new Dictionary<string, string> {
-                { "UseDisplayNames".ToUpper(), false.ToString() },
-                { "Instrument".ToUpper(), false.ToString() },
-                { "AddSetters".ToUpper(), false.ToString() }
+                { "UseDisplayNames", false.ToString() },
+                { "Instrument", false.ToString() },
+                { "AddSetters", false.ToString() }
             };
         }
 
@@ -38,7 +38,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata { LogicalName = "ee_test" }
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -75,7 +75,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata { LogicalName = "ee_test" }
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -114,7 +114,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata { LogicalName = "ee_test" }
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -146,7 +146,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata { LogicalName = "ee_test" }
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -178,7 +178,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata { LogicalName = "ee_test" }
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -221,8 +221,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                         }
                     })
             });
-            parameters["UseDisplayNames".ToUpper()] = true.ToString();
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            parameters["UseDisplayNames"] = true.ToString();
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -264,7 +264,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     })
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -310,7 +310,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     })
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -347,7 +347,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         {
             organizationMetadata.Entities.Returns(new[] { new EntityMetadata { LogicalName = "ee_test" }});
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -409,7 +409,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         {
             organizationMetadata.Entities.Returns(new[] { new EntityMetadata { LogicalName = "ee_test" } });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -449,7 +449,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     })
             });
 
-            var sut = new EntitiesCodeCustomistationService(parameters);
+            var sut = new CodeCustomistationService(parameters);
             var codeCompileUnit = new CodeCompileUnit
             {
                 Namespaces = {
@@ -476,6 +476,79 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
             var test = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "Test");
             Assert.IsFalse(test.Members.OfType<CodeMemberProperty>().Any());
+        }
+
+        [TestMethod]
+        public void CustomizeCodeDom()
+        {
+            INamingService namingService = Substitute.For<INamingService>();
+            serviceProvider.GetService(typeof(INamingService)).Returns(namingService);
+            organizationMetadata.OptionSets.Returns(new OptionSetMetadataBase[] {
+                new OptionSetMetadata { Name = "A", DisplayName = new Label("A", 1033) }
+            });
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata {
+                    LogicalName = "ee_test",
+                    DisplayName = new Label("Test", 1033)
+                }.Set(x => x.Attributes, new EnumAttributeMetadata []
+                    {
+                        new StateAttributeMetadata {
+                            OptionSet = new OptionSetMetadata{
+                                Name = "B",
+                                DisplayName = new Label("B", 1033),
+                                Options =
+                                {
+                                    new StatusOptionMetadata{ State = 1, Value = 1 }
+                                }
+                            }
+                        }.Set(x => x.EntityLogicalName, "ee_test")
+                    })
+            });
+
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                AssemblyCustomAttributes = {
+                    new CodeAttributeDeclaration(new CodeTypeReference("Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute"))
+                },
+                Namespaces =
+                {
+                    new CodeNamespace("Test"){
+                        Types =
+                        {
+                            new CodeTypeDeclaration { IsEnum = false, Name = "C" },
+                            new CodeTypeDeclaration { IsEnum = true, Name = "B",
+                                Members =
+                                {
+                                    new CodeMemberField()
+                                    {
+                                        Name = "Val",
+                                        InitExpression = new CodePrimitiveExpression{ Value = 1 }
+                                    }
+                                }
+                            },
+                            new CodeTypeDeclaration { IsEnum = true, Name = "A" }
+                        }
+                    }
+                }
+            };
+            namingService.GetNameForOption(Arg.Any<OptionSetMetadataBase>(), Arg.Any<OptionMetadata>(), serviceProvider)
+                .Returns("Blah");
+
+            var sut = new CodeCustomistationService(parameters);
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var types = ns.Types.OfType<CodeTypeDeclaration>();
+
+            var firstType = types.First();
+            Assert.AreEqual("A", firstType.Name);
+
+            var bType = types.First(x => x.Name == "B");
+            var valMember = bType.Members.Cast<CodeTypeMember>().First(x => x.Name == "Val");
+            var customAtt = valMember.CustomAttributes.Cast<CodeAttributeDeclaration>().FirstOrDefault(x => x.Name == "AmbientValue");
+            var firstArg = customAtt.Arguments.Cast<CodeAttributeArgument>().First().Value as CodeFieldReferenceExpression;
+            Assert.AreEqual("B", (firstArg.TargetObject as CodeTypeReferenceExpression).Type.BaseType);
+            Assert.AreEqual("Blah", firstArg.FieldName);
         }
     }
 }

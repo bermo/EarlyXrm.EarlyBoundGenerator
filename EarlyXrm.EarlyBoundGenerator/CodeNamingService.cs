@@ -5,18 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
-    public class EntitiesCodeNamingService : INamingService
+    public class CodeNamingService : INamingService
     {
         private INamingService DefaultNamingService { get; set; }
         private readonly bool useDisplayNames;
 
-        public EntitiesCodeNamingService(INamingService namingService, IDictionary<string, string> parameters)
+        public CodeNamingService(INamingService namingService, IDictionary<string, string> parameters)
         {
             this.Debug();
-            bool.TryParse(parameters["UseDisplayNames"?.ToUpper()], out useDisplayNames);
+            bool.TryParse(parameters["UseDisplayNames"], out useDisplayNames);
             DefaultNamingService = namingService;
         }
 
@@ -165,16 +166,37 @@ namespace EarlyXrm.EarlyBoundGenerator
             return DefaultNamingService.GetNameForServiceContext(services);
         }
 
-        [ExcludeFromCodeCoverage]
         public string GetNameForOptionSet(EntityMetadata entityMetadata, OptionSetMetadataBase optionSetMetadata, IServiceProvider services)
         {
-            return DefaultNamingService.GetNameForOptionSet(entityMetadata, optionSetMetadata, services);
+            return optionSetMetadata.Name;
         }
 
-        [ExcludeFromCodeCoverage]
+        private static string EnsureValidIdentifier(string name)
+        {
+            var pattern = @"^[A-Za-z_][A-Za-z0-9_]*$";
+
+            if (!Regex.IsMatch(name, pattern))
+                name = string.Format("_{0}", name);
+
+            return name;
+        }
+
         public string GetNameForOption(OptionSetMetadataBase optionSetMetadata, OptionMetadata optionMetadata, IServiceProvider services)
         {
-            return DefaultNamingService.GetNameForOption(optionSetMetadata, optionMetadata, services);
+            var optionName = optionMetadata.DisplayName();
+
+            optionName = EnsureValidIdentifier(optionName);
+
+            var optionSet = optionSetMetadata as OptionSetMetadata;
+            var matches = optionSet.Options.Where(x => EnsureValidIdentifier(x.DisplayName()) == optionName).OrderBy(x => x.Value);
+            if (matches.Count() > 1)
+            {
+                var index = matches.ToList().FindIndex(x => x.Value == optionMetadata.Value) + 1;
+                if (index > 1)
+                    optionName += index.ToString();
+            }
+
+            return optionName;
         }
     }
 }

@@ -14,9 +14,9 @@ namespace EarlyXrm.EarlyBoundGenerator
     public static class SolutionHelper
     {
         private static bool debugMode;
+        private static string solutionName;
         private static IOrganizationMetadata organisationMetadata;
         private static IServiceProvider services;
-        private static string solutionName;
         private static IEnumerable<IncludedEntity> solutionEntities;
         private static Dictionary<string, List<string>> skip = new Dictionary<string, List<string>>();
         private static Dictionary<string, List<string>> extra = new Dictionary<string, List<string>>();
@@ -94,7 +94,7 @@ namespace EarlyXrm.EarlyBoundGenerator
         private static IEnumerable<IncludedEntity> GetSolutionEntities()
         {
             var includedEntities = new List<IncludedEntity>();
-            var solutionComponents = GetSolutionComponents(componenttype.Entity, componenttype.Attribute);
+            var solutionComponents = GetSolutionComponents(ComponentType.Entity, ComponentType.Attribute);
 
             var skipGlobal = skip.ContainsKey("*") ? skip["*"] : null;
 
@@ -118,7 +118,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         (!skipGlobal?.Any(y => y == attribute.LogicalName) ?? true) &&
                         (
                             entity.IsCustomEntity == true ||
-                            solutionComponent != null && solutionComponent.RootComponentBehavior == solutioncomponent_rootcomponentbehavior.IncludeSubcomponents ||
+                            solutionComponent != null && solutionComponent.RootComponentBehavior == SolutionComponent_IncludeBehavior.IncludeSubcomponents ||
                             (extraFields?.Any(y => y == attribute.LogicalName) ?? extra.ContainsKey(entity.LogicalName)) ||
                             solutionComponents.Any(y => y.ObjectId.HasValue && attribute.MetadataId.HasValue && y.ObjectId.Value == attribute.MetadataId.Value)
                         )
@@ -138,7 +138,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             return includedEntities;
         }
 
-        private static IEnumerable<SolutionComponent> GetSolutionComponents(params componenttype[] componentTypes)
+        private static IEnumerable<SolutionComponent> GetSolutionComponents(params ComponentType[] componentTypes)
         {
             if (organisationService == null)
             {
@@ -164,7 +164,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 ),
                 Criteria = { 
                     Conditions = { 
-                        new ConditionExpression(SolutionComponent.LogicalNames.ComponentType, ConditionOperator.In, types) 
+                        new ConditionExpression(SolutionComponent.LogicalNames.ObjectTypeCode, ConditionOperator.In, types) 
                     } 
                 },
                 LinkEntities =
@@ -172,13 +172,13 @@ namespace EarlyXrm.EarlyBoundGenerator
                     new LinkEntity()
                     {
                         LinkFromEntityName = SolutionComponent.EntityLogicalName,
-                        LinkFromAttributeName = SolutionComponent.LogicalNames.SolutionId,
+                        LinkFromAttributeName = SolutionComponent.LogicalNames.SolutionRef,
                         LinkToEntityName = Solution.EntityLogicalName,
                         LinkToAttributeName = Solution.LogicalNames.Id,
                         JoinOperator = JoinOperator.Inner,
                         LinkCriteria = { 
                             Conditions = { 
-                                new ConditionExpression(Solution.LogicalNames.UniqueName, ConditionOperator.Equal, solutionName) 
+                                new ConditionExpression(Solution.LogicalNames.Name, ConditionOperator.Equal, solutionName) 
                             } 
                         }
                     }

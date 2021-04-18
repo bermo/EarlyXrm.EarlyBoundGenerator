@@ -118,15 +118,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="EarlyEntities.cs" />
-    <Compile Include="EarlyOptionSets.cs" />
-    <Compile Include="EntitiesCodeCustomistationService.cs" />
-    <Compile Include="EntitiesCodeFilteringService.cs" />
-    <Compile Include="EntitiesCodeNamingService.cs" />
+    <Compile Include="EarlyXrm\EarlyBoundTypes.cs" />
+    <Compile Include="CodeCustomistationService.cs" />
+    <Compile Include="CodeFilteringService.cs" />
+    <Compile Include="CodeNamingService.cs" />
     <Compile Include="IncludedEntity.cs" />
-    <Compile Include="OptionSetsCodeCustomisationService.cs" />
-    <Compile Include="OptionSetsFilteringService.cs" />
-    <Compile Include="OptionSetsNamingService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolutionHelper.cs" />

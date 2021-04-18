@@ -7,11 +7,11 @@ using Microsoft.Xrm.Sdk.Metadata;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
-    public class EntitiesCodeFilteringService : ICodeWriterFilterService
+    public class CodeFilteringService : ICodeWriterFilterService
     {
         private readonly ICodeWriterFilterService _defaultService;
 
-        public EntitiesCodeFilteringService(ICodeWriterFilterService defaultService, IDictionary<string, string> parameters)
+        public CodeFilteringService(ICodeWriterFilterService defaultService, IDictionary<string, string> parameters)
         {
             _defaultService = defaultService;
 
@@ -77,16 +77,43 @@ namespace EarlyXrm.EarlyBoundGenerator
             return _defaultService.GenerateServiceContext(services);
         }
 
-        [ExcludeFromCodeCoverage]
+        private Dictionary<string, bool> GeneratedOptionSets { get; set; } = new Dictionary<string, bool>();
+
         public bool GenerateOptionSet(OptionSetMetadataBase optionSetMetadata, IServiceProvider services)
         {
+            var solutionEntities = services.LoadSolutionEntities();
+
+            if (optionSetMetadata.IsGlobal == true)
+            {
+                if (!solutionEntities.Any(x => x.IncludedFields.Any(y => y.OptionSetName != null && y.OptionSetName == optionSetMetadata.Name)))
+                    return false;
+
+                var name = optionSetMetadata?.Name;
+                if (!string.IsNullOrWhiteSpace(name) && !GeneratedOptionSets.ContainsKey(name))
+                {
+                    GeneratedOptionSets[name] = true;
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (optionSetMetadata.IsCustomOptionSet ?? false)
+                return true;
+
+            if (optionSetMetadata.OptionSetType == OptionSetType.State || optionSetMetadata.OptionSetType == OptionSetType.Status)
+                return true;
+
+            if (solutionEntities.Any(x => x.IncludedFields.Any(y => y.OptionSetName != null && y.OptionSetName == optionSetMetadata.Name)))
+                return true;
+
             return false;
         }
 
         [ExcludeFromCodeCoverage]
         public bool GenerateOption(OptionMetadata optionMetadata, IServiceProvider services)
         {
-            return false;
+            return _defaultService.GenerateOption(optionMetadata, services);
         }
     }
 }

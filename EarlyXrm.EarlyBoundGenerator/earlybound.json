@@ -1,8 +1,8 @@
 {
   "Out": "EarlyXrm\\EarlyBoundTypes.cs", // the path off the project root where to generate the c# file to
-  "Namespace": "EarlyXrm", // the namespace for the generated code
+  "Namespace": "EarlyBoundTypes", // the namespace for the generated code
   "UseDisplayNames": true, // whether to use Dynamics friendly nameas or not
-  "DebugMode": true,
+  "DebugMode": false,
   "Instrument": false,
   "AddSetters": true, // globally add setters to readonly properties (note, this will cause exceptions in some cases)
 
@@ -14,12 +14,16 @@
       "objectid",
       "rootcomponentbehavior"
     ],
-
-    "solution": [] // include all attributes for the "solution" entity
+    "solution": [] // include all solution attributes
   },
 
   "Exclude": {
-
+    "*": [ // global exclude filter for logicalname attributes on any entity
+      "importsequencenumber",
+      "createdbyexternalparty",
+      "createdonbehalfby",
+      "modifiedonbehalfby"
+    ],
     "solution": [ // exclude specific attributes for the "solution" entity
       "configurationpageid",
       "createdby",
@@ -34,20 +38,13 @@
       "thumbprint",
       "upgradeinfo"
     ],
-
-    "email": [], // exclude whole "email" entity (useful when filtering via the "Solutions" settings)
-
-    "*": [ // global exclude filter for attributes on any entity
-      "importsequencenumber",
-      "createdbyexternalparty",
-      "createdonbehalfby",
-      "modifiedonbehalfby"
-    ]
+    "email": [] // exclude whole "email" entity (useful when filtering via the "Solutions" settings)
   },
 
   "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
 
-  "ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
+  "ConnectionString": "AuthType=ClientSecret;Url=https://orgc4b2026b.crm6.dynamics.com/;ClientId=124251e0-1e00-415a-992d-aa4a7a6f0ce9;ClientSecret=uCeX8X53pA5ne1~_RvnZI..hqHsN4xT56Q",
+  //"ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
 
   //"ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
   //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",

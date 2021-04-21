@@ -8,6 +8,7 @@ using Microsoft.Xrm.Tooling.Connector;
 using System.Globalization;
 using Microsoft.Crm.Services.Utility;
 using System.Diagnostics;
+using EarlyBoundTypes;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
@@ -25,12 +26,13 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         static SolutionHelper()
         {
-            bool.TryParse(GetParameter("DebugMode"?.ToUpper()), out debugMode);
+            bool.TryParse(GetParameter("DebugMode"), out debugMode);
 
             var extra = GetParameter("extra");
             if (extra != null)
             {
                 var entities = extra.Split(';').Where(x => !string.IsNullOrWhiteSpace(x));
+
                 var metaInclude = entities.Select(x => x.Split(':')).ToDictionary(x => x.First().Trim(), x => x.Skip(1).FirstOrDefault()?.Split(',')
                                     .Select(y => y.Trim()).ToList());
                 SolutionHelper.extra = metaInclude;
@@ -105,7 +107,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 var skipFields = skip.ContainsKey(entity.LogicalName) ? skip[entity.LogicalName] : null;
                 var fullSkip = skip.ContainsKey(entity.LogicalName) && (!skipFields?.Any() ?? true);
 
-                if (fullSkip || !extra.ContainsKey(entity.LogicalName) && solutionComponent == null)
+                if (fullSkip || !extra.ContainsKey(entity.LogicalName) && solutionComponent == null && !extra.ContainsKey("*"))
                     continue;
 
                 var extraFields = extra.ContainsKey(entity.LogicalName) ? extra[entity.LogicalName] : null;
@@ -264,7 +266,13 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 .Replace("-", "")
                                 .Replace("'", "")
                                 .Replace(",", "")
-                                .Replace("%", "");
+                                .Replace("%", "")
+                                .Replace("?", "")
+                                .Replace("{", "")
+                                .Replace("}", "")
+                                .Replace(";", "")
+                                .Replace("$", "")
+                                ;
 
                 return description;
             }

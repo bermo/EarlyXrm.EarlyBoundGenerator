@@ -118,10 +118,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="EarlyXrm\EarlyBoundTypes.cs" />
     <Compile Include="CodeCustomistationService.cs" />
     <Compile Include="CodeFilteringService.cs" />
     <Compile Include="CodeNamingService.cs" />
+    <Compile Include="EarlyXrm\EarlyBoundTypes.cs" />
     <Compile Include="IncludedEntity.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,0 +1,461 @@
+{
+  "Out": "EarlyXrm\\EarlyBoundTypes3.cs", // the path off the project root where to generate the c# file to
+  "Namespace": "EarlyXrm", // the namespace for the generated code
+  "UseDisplayNames": true, // whether to use Dynamics friendly nameas or not
+  "DebugMode": true,
+  "Instrument": false,
+  "AddSetters": true, // globally add setters to readonly properties (note, this will cause exceptions in some cases)
+
+  "Include": {
+
+    //"solutioncomponent": [ // include specific attributes for the "solutioncomponent" entity
+    //  "solutionid",
+    //  "componenttype",
+    //  "objectid",
+    //  "rootcomponentbehavior"
+    //],
+
+    "aciviewmapper": [], // include all attributes for the "solution" entity
+    "workflowbinary": [],
+    "activity": [],
+    "email": [],
+    "account": [],
+    "contact": [],
+    "solutioncomponent": [],
+    "solution": [],
+    "cardtype": [],
+
+    "actioncardusersettings": [],
+    "actioncarduserstate": [],
+    "activitypointer": [],
+    "activityfileattachment": [],
+    "activityparty": [],
+    "customeraddress": [],
+    "advancedsimilarityrule": [],
+    "msdyn_aibdataset": [],
+
+    "msdyn_aibdatasetfile": [],
+    "msdyn_aibdatasetrecord": [],
+    "msdyn_aibdatasetscontainer": [],
+    "msdyn_aibfile": [],
+    "msdyn_aibfileattacheddata": [],
+    "msdyn_aiconfiguration": [],
+    "msdyn_aifptrainingdocument": [],
+    "msdyn_aimodel": [],
+
+    "msdyn_aiodtrainingboundingbox": [],
+    "msdyn_aiodimage": [],
+    "msdyn_aiodtrainingimage": [],
+    "msdyn_aiodlabel": [],
+    "msdyn_aitemplate": [],
+    "msdyn_analysiscomponent": [],
+    "msdyn_analysisjob": [],
+    "msdyn_analysisresult": [],
+    "msdyn_analysisresultdetail": [],
+    "businessunitnewsarticle": [],
+
+    "annualfiscalcalendar": [],
+    "apisettings": [],
+    "appconfigmaster": [],
+    "appconfig": [],
+    "appconfiginstance": [],
+    "applicationfile": [],
+    "ribboncustomization": [],
+    "applicationuser": [],
+    "applicationuserprofile": [],
+    "applicationuserrole": [],
+
+    "appmodulecomponent": [],
+    "appmodulemetadata": [],
+    "appmodulemetadataoperationlog": [],
+    "appmodulemetadatadependency": [],
+    "appmoduleroles": [],
+    "appointment": [],
+    "kbarticle": [],
+    "kbarticlecomment": [],
+    "kbarticletemplate": [],
+    "activitymimeattachment": [],
+
+    "attachment": [],
+    "attribute": [],
+    "attributemap": [],
+    "audit": [],
+    "authorizationserver": [],
+    "azureserviceconnection": [],
+    "bot_botcomponent": [],
+    "bot_environmentvariabledefinition": [],
+    "botcomponent_botcomponent": [],
+    "botcomponent_environmentvariabledefinition": [],
+    "botcomponent_workflow": [],
+    "msdynce_botcontent": [],
+
+    "bulkdeletefailure": [],
+    "bulkdeleteoperation": [],
+    "businessdatalocalizedlabel": [],
+    "businessprocessflowinstance": [],
+    //"businessunit": [],
+    //"businessunitmap": [], // SubBusinessId dup
+    "calendar": [],
+    "calendarrule": [],
+    "callbackregistration": [],
+    "canvasapp": [],
+    //"canvasappextendedmetadata": [],
+    "cascadegrantrevokeaccessrecordstracker": [],
+    "catalog": [],
+    "catalogassignment": [],
+
+    //"category": [],
+    //"sample_challenge": [],
+    "sample_challengemanagementprocess": [],
+    "channelaccessprofile": [],
+    "channelaccessprofileentityaccesslevel": [],
+    "channelaccessprofilerule": [],
+    "channelaccessprofileruleitem": [],
+    "channelproperty": [],
+    "channelpropertygroup": [],
+    "bot": [],
+    //"botcomponent": [],
+    "clientupdate": [],
+    "columnmapping": [],
+    "postcomment": [],
+
+    "msdyn_componentlayer": [],
+    "msdyn_componentlayerdatasource": [],
+    "connection": [],
+    "connectionreference": [],
+    //"connectionrole": [],
+    "connectionroleassociation": [],
+    "connectionroleobjecttypecode": [],
+    "connector": [],
+    //"msdyn_connector": [],
+    "conversationtranscript": [],
+    "transactioncurrency": [],
+
+    "customapi": [],
+    "customapirequestparameter": [],
+    "customapiresponseproperty": [],
+    "customcontrol": [],
+    "customcontroldefaultconfig": [],
+    "customcontrolresource": [],
+    "customerrelationship": [],
+    "msdyn_dataflow": [],
+    "import": [],
+    "datalakefolder": [],
+    "datalakefolderpermission": [],
+    "datalakeworkspace": [],
+    "datalakeworkspacepermission": [],
+
+    "importmap": [],
+    "dataperformance": [],
+    "delveactionhub": [],
+    "dependency": [],
+    "dependencyfeature": [],
+    "dependencynode": [],
+    "displaystring": [],
+    //"displaystringmap": [],
+    "sharepointdocumentlocation": [],
+    "recommendeddocument": [],
+    "documenttemplate": [],
+    "sample_donation": [],
+
+    //"duplicaterule": [],
+    "duplicaterecord": [],
+    "duplicaterulecondition": [],
+    "emailhash": [],
+    "emailsearch": [],
+    //"emailserverprofile": [],
+    "emailsignature": [],
+    "template": [],
+    "entityanalyticsconfig": [],
+    "entityimageconfig": [],
+    "entitykey": [],
+    "entitymap": [],
+    "entityrelationship": [],
+    "environmentvariabledefinition": [],
+
+    "environmentvariablevalue": [],
+    "exchangesyncidmapping": [],
+    "expanderevent": [],
+    "expiredprocess": [],
+    "exportsolutionupload": [],
+    "externalparty": [],
+    "externalpartyitem": [],
+    //"fax": [],
+    "feedback": [],
+    "fieldpermission": [],
+    "fieldsecurityprofile": [],
+    "principalobjectattributeaccess": [],
+    //"fileattachment": [],
+    "filtertemplate": [],
+
+    "fixedmonthlyfiscalcalendar": [],
+    "flowmachine": [],
+    "flowmachinegroup": [],
+    "flowsession": [],
+    "postfollow": [],
+    "sample_fundraiser": [],
+    "globalsearchconfiguration": [],
+    "goal": [],
+    "metric": [],
+    "msdyn_helppage": [],
+
+    "hierarchyrule": [],
+    "hierarchysecurityconfiguration": [],
+    "holidaywrapper": [],
+    "sample_idea": [],
+    "attributeimageconfig": [],
+    //"imagedescriptor": [],
+    "importdata": [],
+    "importentitymapping": [],
+    "importjob": [],
+    "importlog": [],
+    "importfile": [],
+    "documentindex": [],
+    "integrationstatus": [],
+    "interactionforemail": [],
+    "internaladdress": [],
+    "internalcatalogassignment": [],
+    "interprocesslock": [],
+    "invaliddependency": [],
+
+    "isvconfig": [],
+    "keyvaultreference": [],
+    "knowledgearticle": [],
+    "knowledgearticlescategories": [],
+    "msdyn_knowledgearticleimage": [],
+    "msdyn_kalanguagesetting": [],
+    "msdyn_knowledgearticletemplate": [],
+    //"knowledgearticleviews": [],
+    "knowledgebaserecord": [],
+    "msdyn_federatedarticle": [],
+    "msdyn_federatedarticleincident": [],
+    "msdyn_knowledgeinteractioninsight": [],
+    "msdyn_kmpersonalizationsetting": [],
+    "msdyn_knowledgesearchfilter": [],
+
+    "msdyn_knowledgesearchinsight": [],
+    "knowledgesearchmodel": [],
+    "msdyn_knowledgepersonalfilter": [],
+    //"languagelocale": [],
+    "languageprovisioningstate": [],
+    //"letter": [],
+    "license": [],
+    "postlike": [],
+    "picklistmapping": [],
+    "localconfigstore": [],
+    "lookupmapping": [],
+    "mailbox": [],
+    "mailboxtrackingfolder": [],
+    "mailboxstatistics": [],
+    "mailboxtrackingcategory": [],
+    "mailmergetemplate": [],
+
+    "managedidentity": [],
+    "managedproperty": [],
+    "metadatadifference": [],
+    "mobileofflineprofile": [],
+    "mobileofflineprofileitem": [],
+    //"mobileofflineprofileitemassociation": [],
+    "appmodule": [],
+    "appmodulecomponentnode": [],
+    "appmodulecomponentedge": [],
+    "appelement": [],
+    "appsetting": [],
+    "appusersetting": [],
+    "monthlyfiscalcalendar": [],
+    "msdyn_aiodlabel_msdyn_aiconfiguration": [],
+    "msdyn_sample_product_knowledgearticle": [],
+    "msdyn_sample_product_knowledgebaserecord": [],
+    "multientitysearch": [],
+
+    //"multientitysearchentities": [],
+    "multiselectattributeoptionvalues": [],
+    "navigationsetting": [],
+    "newprocess": [],
+    "msdyn_nonrelationalds": [],
+    "annotation": [],
+    "appnotification": [],
+    //"notification": [],
+    //"msdyn_odatav4ds": [],
+    "officedocument": [],
+    "officegraphdocument": [],
+    "offlinecommanddefinition": [],
+    "optionset": [],
+    //"organization": [],
+
+    "organizationdatasyncsubscription": [],
+    "organizationdatasyncsubscriptionentity": [],
+    "orginsightsmetric": [],
+    "orginsightsnotification": [],
+    "organizationsetting": [],
+    "organizationstatistic": [],
+    "organizationui": [],
+
+    //"owner": [],
+    "ownermapping": [],
+    "package": [],
+    "package_solution": [],
+    "partnerapplication": [],
+    "pdfsetting": [],
+    "personaldocumenttemplate": [],
+    //"phonecall": [],
+    "pluginassembly": [],
+    "plugintracelog": [],
+    "plugintype": [],
+
+    "plugintypestatistic": [],
+    "position": [],
+    "post": [],
+    "postregarding": [],
+    "postrole": [],
+    "principalattributeaccessmap": [],
+    "principalentitymap": [],
+    "principalobjectaccess": [],
+    "principalobjectaccessreadsnapshot": [],
+    "principalsyncattributemap": [],
+
+    "privilege": [],
+    "privilegeobjecttypecodes": [],
+    "workflow": [],
+    "complexcontrol": [],
+    "workflowdependency": [],
+    "workflowlog": [],
+    "processsession": [],
+    "processstage": [],
+    "processstageparameter": [],
+    "processtrigger": [],
+    "sample_product": [],
+
+    "provisionlanguageforuser": [],
+    "publisher": [],
+    "publisheraddress": [],
+    "quarterlyfiscalcalendar": [],
+    "queue": [],
+    "queueitem": [],
+    "queueitemcount": [],
+    "queuemembercount": [],
+    "queuemembership": [],
+    "recordcountsnapshot": [],
+    "convertrule": [],
+
+    "convertruleitem": [],
+    "recurrencerule": [],
+    "recurringappointmentmaster": [],
+    "relationshipattribute": [],
+    "relationship": [],
+    "relationshiprole": [],
+    "relationshiprolemap": [],
+    "replicationbacklog": [],
+    "report": [],
+    "reportlink": [],
+
+    "reportcategory": [],
+    "reportentity": [],
+    "reportvisibility": [],
+    "sample_reservation": [],
+    "sample_review": [],
+    "revokeinheritedaccessrecordstracker": [],
+    "ribbonclientmetadata": [],
+    "ribboncommand": [],
+    "ribboncontextgroup": [],
+    "ribbondiff": [],
+    "ribbonmetadatatoprocess": [],
+    "ribbonrule": [],
+    "ribbontabtocommandmap": [],
+
+    "msdyn_richtextfile": [],
+    //"roleprivileges": [],
+    "roletemplate": [],
+    "roletemplateprivileges": [],
+    "rollupfield": [],
+    "rollupjob": [],
+    "rollupproperties": [],
+    "goalrollupquery": [],
+    "routingrule": [],
+    "routingruleitem": [],
+    "runtimedependency": [],
+    "savedorginsightsconfiguration": [],
+    "userquery": [],
+    "sdkmessage": [],
+    "sdkmessagefilter": [],
+    "sdkmessagepair": [],
+    "sdkmessageprocessingstep": [],
+    "sdkmessageprocessingstepimage": [],
+    "sdkmessageprocessingstepsecureconfig": [],
+    "sdkmessagerequest": [],
+    "sdkmessagerequestfield": [],
+    "sdkmessageresponse": [],
+    "sdkmessageresponsefield": [],
+    "msdyn_kmfederatedsearchconfig": []
+  },
+
+  "Exclude": {
+
+    //"customeraddress": [], // field same name a class
+    //"advancedsimilarityrule": [], // issue with status
+    //"msdyn_analysisresultdetail": [], // dup EntityLogicalName
+    //"appointment": [], // propety same as class name
+    //"attachment": [], // member name same as class name, duplicate name with "activitymimeattachment"
+    //"attribute": [], // LogicalName hiding 
+    //"sample_challenge": [], //"AwardsIssued?": null,
+    //"businessunit": null, // CanvasappExtendedMetadatasOwningBusinessUnit dup
+    //"businessunitmap": [], // SubBusinessId dup
+    //"canvasappextendedmetadata": null, // OwningBusinessUnitBusinessUnit dup / rel OwningBusinessUnitBusinessUnit
+    "botcomponent": [], //ChatbotSubcomponents dup
+    //"msdyn_connector": [], // dup
+    //"category": [], // class with enum for different entity
+    "connectionrole": [], // dup ConnectionRoles properties
+    //"displaystringmap": [], // prop same as class name
+    "entity": [], // obvious issue here!
+    //"duplicaterule": [], // duplicaterule_baseentitytypecode missing MatchingRecordType2
+    //"emailserverprofile": [], // enum EmailServerProfile_SelectTheStatusOfTheTest dups
+    //"fileattachment": [], // issues with relationships with CanvasApps
+    //"fax": [], // prop with same name as class
+    //"imagedescriptor": [], // issue with lots of dups in oother classes
+    //"knowledgearticleviews": [], // prop the same as class name, 2x KnowledgeArticleViews_Status
+    //"languagelocale": [], // property same as class name, 2x Language_Status
+    //"letter": [], // property same as class name
+    //"mobileofflineprofileitemassociation": [], // SelectedMobileOfflineEnabledEntitiesRelationships ends with ?
+    //"multientitysearchentities": [], // multientitysearch_multientitysearchentities missing name?
+    //"organization": [], // [ "fiscalperiodformatperiod", "currencyformatcode", "isvintegrationcode" ], // produces invalid enum "value _Quarter{0} = 1,", "$" in enum values, invlaud char in enum ":"
+    //"notification": [], // dup with appnotification
+    //"msdyn_odatav4ds": null, // missing new_odatadatasource_paginationtype
+    "owner": [], // huge number of dup errors
+    //"phonecall": [], // field name matches parent class
+    //"queue": [ "numberofitems" ], // dup
+    //"queueitemcount": [ "queueitemcount" ], // member name same as parent
+    //"queuemembercount": [ "queuemembercount" ], // member name same as parent
+    //"convertrule": [ "sourcetypecode", "sourcechanneltypecode" ], // enum doesn't exist?
+    //"reportentity": [ "objecttypecode" ],
+    //"ribbonclientmetadata": [ "entitylogicalname" ],
+    //"ribbonmetadatatoprocess": [ "entityname" ],
+    //"roleprivileges": [], // solution_roleprivileges does not have a name on the Solution side
+    //"rollupfield": [ "goalattribute" ],
+
+    "crb60_application": null,
+    "crb60_cat": null,
+    "crb60_country": null,
+    "crb60_accounts_countrys": null,
+    "new_duration": null,
+    "new_bpf_d69d738cc4d84e2f9930255d396bdf5f": null,
+    "crb60_operationalneed": null,
+    "crb60_printjob": null,
+    "new_processduration": null,
+
+    "*": [ // global exclude filter for attributes on any entity
+      "importsequencenumber",
+      "createdbyexternalparty",
+      "createdonbehalfby",
+      "modifiedonbehalfby"
+    ]
+  },
+
+  "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
+
+  "ConnectionString": "AuthType=ClientSecret;Url=https://orgc4b2026b.crm6.dynamics.com/;ClientId=124251e0-1e00-415a-992d-aa4a7a6f0ce9;ClientSecret=uCeX8X53pA5ne1~_RvnZI..hqHsN4xT56Q",
+  //"ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
+
+  //"ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
+  //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
+  //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;"
+}

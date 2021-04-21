@@ -139,6 +139,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     var type = codeMemberProperty.Type;
 
                     if (type.BaseType == "System.Guid") codeMemberProperty.Type = new CodeTypeReference("Guid");
+                    //if (type.BaseType == "System.String") codeMemberProperty.Type = new CodeTypeReference("String");
                     if (type.BaseType.StartsWith("Microsoft.Xrm.Sdk.")) codeMemberProperty.Type = new CodeTypeReference(codeMemberProperty.Type.BaseType.Replace("Microsoft.Xrm.Sdk.", ""));
                     if (type.BaseType.StartsWith(codeNamespace.Name + "."))
                     {
@@ -159,7 +160,6 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                     if (type.BaseType.StartsWith("System.Nullable`1"))
                     {
-                        if (type.TypeArguments[0].BaseType == "System.String") codeMemberProperty.Type = new CodeTypeReference("string");
                         if (type.TypeArguments[0].BaseType == "System.Int32") codeMemberProperty.Type = new CodeTypeReference("int?");
                         if (type.TypeArguments[0].BaseType == "System.Int64") codeMemberProperty.Type = new CodeTypeReference("long?");
                         if (type.TypeArguments[0].BaseType == "System.Boolean") codeMemberProperty.Type = new CodeTypeReference("bool?");
@@ -185,7 +185,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                         }
                     }
 
-                    Console.WriteLine(codeMemberProperty.Name + " " + type.BaseType);
                     if (type.BaseType == "Microsoft.Xrm.Sdk.OptionSetValue" || type.BaseType == "System.Object")
                     {
                         var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => (UseDisplayNames ? x.DisplayName() : x.SchemaName) == codeMemberProperty.Name &&
@@ -257,8 +256,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                 var props = entityClass.Members.Cast<CodeTypeMember>().OfType<CodeMemberProperty>();
                 foreach (var prop in props)
                 {
-                    //var att = entityMetadata.Attributes.FirstOrDefault(x => x.DisplayName() == prop.Name);
-
                     var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
                     if (logicalName != null)
                         logicalNames.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public static string {prop.Name} = \"{logicalName}\";"));
@@ -272,18 +269,25 @@ namespace EarlyXrm.EarlyBoundGenerator
                         if (entityMetadata.Attributes == null)
                             continue;
 
-                        var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => (UseDisplayNames ? x.DisplayName() : x.SchemaName) == prop.Name &&
+                        var propertyLogicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes).First();
+                        var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == propertyLogicalName &&
                                 new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
 
                         if (enumAtt != null)
                         {
                             var optionsSetName = "";
                             if (!UseDisplayNames)
+                            {
                                 optionsSetName = enumAtt.OptionSet.Name;
+                            }
                             else if (enumAtt.OptionSet.IsGlobal ?? false)
+                            {
                                 optionsSetName = enumAtt.OptionSet.DisplayName();
+                            }
                             else
+                            {
                                 optionsSetName = $"{entityMetadata?.DisplayName()}_{enumAtt.OptionSet.DisplayName()}";
+                            }
 
                             prop.Type = new CodeTypeReference(optionsSetName + "?");
                             prop.GetStatements.Clear();
@@ -303,6 +307,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         var baseType = prop.Type.BaseType;
                         baseType = baseType.Replace("System.Byte", "byte");
+                        baseType = baseType.Replace("System.String", "string");
 
                         if (prop.Type.TypeArguments.Count > 0)
                         {
@@ -399,60 +404,63 @@ namespace EarlyXrm.EarlyBoundGenerator
                             type.CustomAttributes.RemoveAt(i);
                     }
 
-                    //type.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
+                    if (type.IsEnum == false)
+                        continue;
 
-                    var optionSet = metadata.OptionSets.FirstOrDefault(x => x.Name == type.Name) as OptionSetMetadata;
-                    var displayName = optionSet?.DisplayName();
+                    var optionSet = metadata.OptionSets.FirstOrDefault(x => x.DisplayName() == type.Name) as OptionSetMetadata;
                     EnumAttributeMetadata enumAttributeMetadata = null;
 
                     if (optionSet == null)
                     {
-                        enumAttributeMetadata = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y?.OptionSet?.Name == type.Name) ?? Array.Empty<EnumAttributeMetadata>())?.FirstOrDefault();
+                        var enumAttributeMetadatas = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => x.DisplayName() + "_" + y.OptionSet.DisplayName() == type.Name) ?? Array.Empty<EnumAttributeMetadata>()); //?.FirstOrDefault();
+                        enumAttributeMetadata = enumAttributeMetadatas.FirstOrDefault();
+                        
                         optionSet = enumAttributeMetadata?.OptionSet;
 
                         if (optionSet == null)
+                        {
                             continue;
-
-                        displayName = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName).DisplayName() + "_" + optionSet?.DisplayName();
+                        }
                     }
 
                     foreach (var field in type.Members.Cast<CodeTypeMember>().OfType<CodeMemberField>())
                     {
                         var codeExpression = field.InitExpression as CodePrimitiveExpression;
+                        if (codeExpression == null)
+                            continue;
+
                         var val = (int)codeExpression.Value;
 
                         foreach (CodeAttributeDeclaration att in field.CustomAttributes)
                             att.Name = att.Name.Replace("System.Runtime.Serialization.", "").Replace("EnumMemberAttribute", "EnumMember");
 
-                        if (optionSet != null)
+                        var option = optionSet.Options.FirstOrDefault(x => x.Value.Value == val);
+                        if (option == null)
+                            continue;
+
+                        var status = option as StatusOptionMetadata;
+                        if (status != null && enumAttributeMetadata.LogicalName == "statuscode")
                         {
-                            var option = optionSet.Options.FirstOrDefault(x => x.Value.Value == val);
-                            if (option != null)
+                            var parentEnt = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName);
+                            var stateOptionSet = parentEnt.Attributes.OfType<StateAttributeMetadata>().FirstOrDefault()?.OptionSet;
+                            if (stateOptionSet == null)
                             {
-                                var status = option as StatusOptionMetadata;
-                                if (status != null)
-                                {
-                                    var stateOptionSet = metadata.Entities.SelectMany(x => x.Attributes.OfType<StateAttributeMetadata>().Where(y => y?.OptionSet?.Name == type.Name.Replace("_statuscode", "_statecode"))).FirstOrDefault()?.OptionSet;
-                                    var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
-
-                                    var state = UseDisplayNames ? metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName).DisplayName() + "_" + stateOptionSet.DisplayName() : stateOptionSet.Name;
-
-                                    var namingService = (INamingService)services.GetService(typeof(INamingService));
-
-                                    var name = namingService.GetNameForOption(stateOptionSet, stateOption, services);
-                                    field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
-                                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(state), name)
-                                    )));
-                                }
-
-                                field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("Description", new CodeAttributeArgument(new CodePrimitiveExpression(option.Label?.LocalizedLabels?.FirstOrDefault()?.Label))));
+                                continue;
                             }
-                        }
-                    }
 
-                    if (UseDisplayNames)
-                    {
-                        type.Name = displayName;
+                            var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
+
+                            var state = UseDisplayNames ? parentEnt.DisplayName() + "_" + stateOptionSet.DisplayName() : stateOptionSet.Name;
+
+                            var namingService = (INamingService)services.GetService(typeof(INamingService));
+
+                            var name = namingService.GetNameForOption(stateOptionSet, stateOption, services);
+                            field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(state), name)
+                            )));
+                        }
+                        
+                        field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("Description", new CodeAttributeArgument(new CodePrimitiveExpression(option.Label?.LocalizedLabels?.FirstOrDefault()?.Label))));
                     }
                 }
             }
@@ -464,13 +472,46 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                 var typesCopy = new CodeTypeDeclaration[codeCompileUnit.Namespaces[i].Types.Count];
                 codeCompileUnit.Namespaces[i].Types.CopyTo(typesCopy, 0);
-                var orderedTypes = typesCopy.OrderBy(x => x.Name);
+                var orderedTypes = typesCopy.OrderBy(x => x.Name).ToArray();
 
                 for (var j = 0; j < codeCompileUnit.Namespaces[i].Types.Count;)
                     codeCompileUnit.Namespaces[i].Types.RemoveAt(j);
 
-                codeCompileUnit.Namespaces[i].Types.AddRange(orderedTypes.ToArray());
+                codeCompileUnit.Namespaces[i].Types.AddRange(orderedTypes);
             }
+
+            //// move around
+            //for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
+            //{
+            //    var types = codeCompileUnit.Namespaces[i].Types;
+
+            //    for (var j = types.Count - 1; j >= 0; j--)
+            //    {
+            //        var type = types[j];
+
+            //        if (!type.IsEnum)
+            //        {
+            //            continue;
+            //        }
+
+            //        var segments = type.Name.Split('_');
+
+            //        if (segments.Count() <= 1)
+            //            continue;
+
+            //        Console.WriteLine($"T {type.Name}");
+            //        var parent = types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name == segments[0]);
+
+            //        if (parent != null)
+            //        {
+            //            type.Name = string.Join("_", segments.Skip(1));
+            //            parent.Members.Add(type);
+
+            //            types.Remove(type);
+            //        }
+
+            //    }
+            //}
 
             var tab = new string('\t', 1);
             var twoTabs = new string('\t', 2);

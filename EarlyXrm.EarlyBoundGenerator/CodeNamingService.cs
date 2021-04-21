@@ -29,7 +29,19 @@ namespace EarlyXrm.EarlyBoundGenerator
             {
                 var dn = entityMetadata?.DisplayName();
                 if (!string.IsNullOrWhiteSpace(dn))
+                {
                     entityName = dn;
+
+                    var metaData = services.LoadMetadata();
+                    var dups = metaData.Entities.Where(x => x.DisplayName() == entityName).OrderBy(x => x.LogicalName).ToList();
+
+                    if(dups.Count() > 1)
+                    {
+                        var index = dups.FindIndex(x => x.LogicalName == entityMetadata.LogicalName) + 1;
+                        if (index > 1)
+                            entityName += index.ToString();
+                    }
+                }
             }
 
             this.Debug(entityName, entityMetadata.LogicalName);
@@ -43,23 +55,42 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (useDisplayNames)
             {
-                attributeName = attributeMetadata.DisplayName();
+                attributeName = UniqueDisplayName(entityMetadata, attributeMetadata, services);
+            }
 
-                var matches = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName).OrderBy(x => x.LogicalName);
-                if (matches.Count() > 1)
-                {
-                    var index = matches.ToList().FindIndex(x => x.LogicalName == attributeMetadata.LogicalName) + 1;
-                    if (index > 1)
-                        attributeName += index.ToString();
-                }
+            this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
 
-                if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
-                    attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
+            return attributeName;
+        }
 
-                if (attributeMetadata.AttributeType == AttributeTypeCode.Lookup || attributeMetadata.AttributeType == AttributeTypeCode.Customer)
-                {
-                    attributeName += "Ref";
-                }
+        private string UniqueDisplayName(EntityMetadata entityMetadata, AttributeMetadata attributeMetadata, IServiceProvider services)
+        {
+            string attributeName = attributeMetadata.DisplayName();
+            var matches = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName).OrderBy(x => x.LogicalName).ToList();
+
+            if (entityMetadata.DisplayName() == attributeName)
+            {
+                matches.Insert(0, new AttributeMetadata { LogicalName = "" });
+            }
+
+            if (matches.Count() > 1)
+            {
+                var index = matches.ToList().FindIndex(x => x.LogicalName == attributeMetadata.LogicalName) + 1;
+                if (index > 1)
+                    attributeName += index.ToString();
+            }
+
+            if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
+                attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
+
+            if (attributeMetadata.AttributeType == AttributeTypeCode.Lookup || attributeMetadata.AttributeType == AttributeTypeCode.Customer)
+            {
+                attributeName += "Ref";
+            }
+
+            if (attributeName == "EntityLogicalName")
+            {
+                attributeName += "2";
             }
 
             this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
@@ -80,7 +111,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 {
                     var one2many = relationshipMetadata as OneToManyRelationshipMetadata;
 
-                    if (one2many.ReferencedEntity == one2many.ReferencingEntity)
+                    if (one2many.ReferencedEntity == one2many.ReferencingEntity) // parent child
                     {
                         var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
 
@@ -92,7 +123,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             returnValue += otherMeta.DisplayCollectionName.DisplayName();
                         }
                     }
-                    else if (entityMetadata.LogicalName == one2many.ReferencingEntity)
+                    else if (entityMetadata.LogicalName == one2many.ReferencingEntity) // many to one
                     {
                         var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
                         var ent = att.DisplayName();
@@ -100,13 +131,21 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         if (dups.Count() > 1)
                         {
-                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencedEntity);
+                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
                             ent += otherMeta.DisplayName();
+                        }
+
+                        var nameDups = entityMetadata.ManyToOneRelationships.Where(x => entityMetadata.Attributes.Any(y => y.DisplayName() == ent)).OrderByDescending(x => x.SchemaName).ToList();
+                        if (nameDups.Count() > 1)
+                        {
+                            var index = nameDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                            if (index > 1)
+                                ent += index.ToString();
                         }
 
                         returnValue = ent;
                     }
-                    else
+                    else // one to many
                     {
                         otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencingEntity);
 
@@ -119,10 +158,23 @@ namespace EarlyXrm.EarlyBoundGenerator
                             ent += at.DisplayName();
                         }
 
-                        returnValue = ent;
+                        if (!string.IsNullOrWhiteSpace(ent))
+                        {
+                            var nameDups = entityMetadata.OneToManyRelationships
+                                .Where(x => metaData.Entities.Any(y => y.LogicalName == one2many.ReferencingEntity && y.Attributes.Any(z => y.DisplayCollectionName.DisplayName() + z.DisplayName() == ent)))
+                                .OrderBy(x => x.SchemaName).ToList();
+                            if (nameDups.Count() > 1)
+                            {
+                                var index = nameDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                                if (index > 1)
+                                    ent += index.ToString();
+                            }
+
+                            returnValue = ent;
+                        }
                     }
                 }
-                else
+                else // many to many
                 {
                     var many2many = relationshipMetadata as ManyToManyRelationshipMetadata;
                     otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == (entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity2LogicalName : many2many.Entity1LogicalName));
@@ -149,7 +201,7 @@ namespace EarlyXrm.EarlyBoundGenerator
         }
 
         [ExcludeFromCodeCoverage]
-        public string GetNameForRequestField(SdkMessageRequest request, SdkMessageRequestField requestField, IServiceProvider services)
+        public string GetNameForRequestField(SdkMessageRequest request, Microsoft.Crm.Services.Utility.SdkMessageRequestField requestField, IServiceProvider services)
         {
             return DefaultNamingService.GetNameForRequestField(request, requestField, services);
         }
@@ -168,7 +220,38 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         public string GetNameForOptionSet(EntityMetadata entityMetadata, OptionSetMetadataBase optionSetMetadata, IServiceProvider services)
         {
-            return optionSetMetadata.Name;
+            var name = optionSetMetadata.Name;
+
+            if (useDisplayNames)
+            {
+                var metadata = services.LoadMetadata();
+
+                var optionSet = metadata.OptionSets.FirstOrDefault(x => x.Name == optionSetMetadata.Name) as OptionSetMetadata;
+                name = optionSet?.DisplayName();
+
+                if (optionSet == null)
+                {
+                    var enumAttributeMetadata = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y?.OptionSet?.Name == optionSetMetadata.Name) ?? Array.Empty<EnumAttributeMetadata>())?.FirstOrDefault();
+                    optionSet = enumAttributeMetadata?.OptionSet;
+
+                    if (optionSet != null)
+                    {
+                        var ent = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName);
+                        name = ent.DisplayName() + "_" + optionSet?.DisplayName();
+
+                        var matches = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => (x.DisplayName() + "_" + y.OptionSet.DisplayName()) == name)).OrderBy(x => x.OptionSet.MetadataId).ToList();
+
+                        if (matches.Count() > 1)
+                        {
+                            var index = matches.FindIndex(x => x.OptionSet.MetadataId == optionSetMetadata.MetadataId) + 1;
+                            if (index > 1)
+                                name += index.ToString();
+                        }
+                    }
+                }
+            }
+
+            return name;
         }
 
         private static string EnsureValidIdentifier(string name)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Crm.Services.Utility;
+﻿using EarlyBoundTypes;
+using Microsoft.Crm.Services.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;

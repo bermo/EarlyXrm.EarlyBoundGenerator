@@ -10,7 +10,7 @@
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
 
-namespace EarlyXrm
+namespace EarlyBoundTypes
 {
 	using System;
 	using System.Linq;
@@ -409,7 +409,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("description");
+				return GetAttributeValue<string>("description");
 			}
 			set
 			{
@@ -422,7 +422,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("friendlyname");
+				return GetAttributeValue<string>("friendlyname");
 			}
 			set
 			{
@@ -500,7 +500,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("pinpointsolutiondefaultlocale");
+				return GetAttributeValue<string>("pinpointsolutiondefaultlocale");
 			}
 			set
 			{
@@ -540,7 +540,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("solutionpackageversion");
+				return GetAttributeValue<string>("solutionpackageversion");
 			}
 			set
 			{
@@ -566,7 +566,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("uniquename");
+				return GetAttributeValue<string>("uniquename");
 			}
 			set
 			{
@@ -592,7 +592,7 @@ namespace EarlyXrm
 		{
 			get
 			{
-				return GetAttributeValue<System.String>("version");
+				return GetAttributeValue<string>("version");
 			}
 			set
 			{
@@ -802,7 +802,7 @@ namespace EarlyXrm
 		
 		[AttributeLogicalNameAttribute("solutionid")]
 		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public Solution Solution
+		public Solution Solution2
 		{
 			get
 			{
@@ -824,14 +824,14 @@ namespace EarlyXrm
 			
 			public static string SolutionRef = "solutionid";
 			
-			public static string Solution = "solutionid";
+			public static string Solution2 = "solutionid";
 		}
 		
 		[DataContract()]
 		public class Relationships
 		{
 			
-			public static string Solution = "solution_solutioncomponent";
+			public static string Solution2 = "solution_solutioncomponent";
 		}
 	}
 	

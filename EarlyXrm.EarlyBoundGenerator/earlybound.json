@@ -38,7 +38,17 @@
       "thumbprint",
       "upgradeinfo"
     ],
-    "email": [] // exclude whole "email" entity (useful when filtering via the "Solutions" settings)
+
+    // the following entities should not be generated as there are bug associated with them
+    "entity": [], // this should really always be excluded
+    "botcomponent": [], // many-to-many parent relationship
+    "connectionrole": [], // dup ConnectionRoles properties
+    "fileattachment": [], // canvasapps
+    "msdyn_connector": [], //dups
+    "subscriptionmanuallytrackedobject": [],
+    "queue": [], // dup with relation to User
+    "solutioncomponentattributeconfiguration": [], // relationship member same name as class
+    "connector": [], // issue with Status and StatusReason (suffixed with 2)
   },
 
   "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated

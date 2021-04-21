@@ -34,7 +34,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void GetNameForEntity()
         {
             
@@ -71,7 +71,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual("Value2", output);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void GetNameForRelationship_LooksUpReferencingEntityAttribute()
         {
             organizationMetadata.Entities.Returns(new[] {
@@ -139,7 +139,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual(result, "Name");
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void GetNameForOptionSet_ReturnsOptionsetName()
         {
             var optionSet = new OptionSetMetadata { Name = "OptionsetName" };

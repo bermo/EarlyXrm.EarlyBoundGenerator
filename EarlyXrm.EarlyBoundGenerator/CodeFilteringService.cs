@@ -23,6 +23,15 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         public bool GenerateEntity(EntityMetadata entityMetadata, IServiceProvider services)
         {
+            if (entityMetadata.LogicalName == "entity")
+                return false;
+
+            if (entityMetadata.LogicalName.StartsWith("new_system_donotuseentity_"))
+                return false;
+
+            if (entityMetadata.IsIntersect == true)
+                return false;
+
             var solutionEntities = services.LoadSolutionEntities();
 
             var generate = solutionEntities.Any(x => x.LogicalName == entityMetadata.LogicalName);

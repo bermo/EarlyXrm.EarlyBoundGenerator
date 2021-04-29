@@ -52,7 +52,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.IsTrue(result);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GenerateAttributes()
         {
             var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = Guid.NewGuid(), DisplayName = new Label("Test", 1033) };           
@@ -322,7 +322,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.IsTrue(result);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GeneratePicklistAttribute()
         {
             var id = Guid.NewGuid();

@@ -255,6 +255,56 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
+        public void ParentChildRelationshipBuiltAsExpected()
+        {
+            var entity = new EntityMetadata { LogicalName = "ee_test", DisplayName = new Label("Test", 1033) };
+            var manyToOne = new OneToManyRelationshipMetadata
+            {
+                ReferencedEntity = entity.LogicalName
+            };
+            organizationMetadata.Entities.Returns(new[] {
+                entity.Set(x => x.OneToManyRelationships, new[] { manyToOne })
+            });
+            parameters["UseDisplayNames"] = true.ToString();
+            var sut = new CodeCustomistationService(parameters);
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces = {
+                    new CodeNamespace("EarlyTest")
+                    {
+                        Types = {
+                            new CodeTypeDeclaration {
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members = {
+                                    new CodeMemberProperty
+                                    {
+                                        HasSet = true,
+                                        Type = new CodeTypeReference("System.Collections.Generic.IEnumerable",new CodeTypeReference("TestProp")),
+                                        Name = "Relationship",
+                                        CustomAttributes = { Build<RelationshipSchemaNameAttribute>(
+                                            new CodePrimitiveExpression("ee_relationship"),
+                                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("EntityRole"), EntityRole.Referenced.ToString() ))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
+            var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
+            var property = @class.Members.OfType<CodeMemberProperty>().First();
+            Assert.AreEqual("IEnumerable`1", property.Type.BaseType);
+            Assert.AreEqual("TestProp", property.Type.TypeArguments.Cast<CodeTypeReference>().First().BaseType);
+            Assert.AreEqual("Referenced", (property.CustomAttributes.Cast<CodeAttributeDeclaration>().First().Arguments.Cast<CodeAttributeArgument>().Last().Value as CodeFieldReferenceExpression).FieldName);
+            var getStatement = property.GetStatements.Cast<CodeSnippetStatement>().First();
+            Assert.IsTrue(getStatement.Value.Contains("EntityRole.Referenced"));
+        }
+
+        [TestMethod]
         public void EntityIsModifiedAsExpected()
         {
             organizationMetadata.Entities.Returns(new[] {
@@ -342,7 +392,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual("TestProp", property.Type.BaseType);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void NullableAttributeIsBuiltExpected()
         {
             organizationMetadata.Entities.Returns(new[] { new EntityMetadata { LogicalName = "ee_test" }});
@@ -360,7 +410,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                                 Members = {
                                     new CodeMemberProperty
                                     {
-                                        Type = new CodeTypeReference("System.Nullable`1", new CodeTypeReference("System.String"))
+                                        Type = new CodeTypeReference("System.String")
                                     },
                                     new CodeMemberProperty
                                     {
@@ -401,7 +451,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
             var test = ns.Types.OfType<CodeTypeDeclaration>().First(x => x.Name == "Test");
             var properties = test.Members.OfType<CodeMemberProperty>().Select(x => x.Type.BaseType);
-            Assert.IsTrue(properties.SequenceEqual(new[] { "string", "int?", "long?", "bool?", "DateTime?", "double?", "decimal?", "Guid?" }));
+            Assert.IsTrue(properties.SequenceEqual(new[] { "System.String", "int?", "long?", "bool?", "DateTime?", "double?", "decimal?", "Guid?" }));
         }
 
         [TestMethod]
@@ -478,13 +528,19 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.IsFalse(test.Members.OfType<CodeMemberProperty>().Any());
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void CustomizeCodeDom()
         {
             INamingService namingService = Substitute.For<INamingService>();
             serviceProvider.GetService(typeof(INamingService)).Returns(namingService);
             organizationMetadata.OptionSets.Returns(new OptionSetMetadataBase[] {
-                new OptionSetMetadata { Name = "A", DisplayName = new Label("A", 1033) }
+                new OptionSetMetadata { 
+                    Name = "Test_B", DisplayName = new Label("Test B", 1033),
+                    Options =
+                    {
+                        new OptionMetadata(new Label("Opt", 1033), 1)
+                    }
+                }
             });
             organizationMetadata.Entities.Returns(new[] {
                 new EntityMetadata {
@@ -493,6 +549,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 }.Set(x => x.Attributes, new EnumAttributeMetadata []
                     {
                         new StateAttributeMetadata {
+                            LogicalName = "statuscode",
                             OptionSet = new OptionSetMetadata{
                                 Name = "B",
                                 DisplayName = new Label("B", 1033),
@@ -516,7 +573,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                         Types =
                         {
                             new CodeTypeDeclaration { IsEnum = false, Name = "C" },
-                            new CodeTypeDeclaration { IsEnum = true, Name = "B",
+                            new CodeTypeDeclaration { IsEnum = true, Name = "Test_B",
                                 Members =
                                 {
                                     new CodeMemberField()
@@ -543,7 +600,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var firstType = types.First();
             Assert.AreEqual("A", firstType.Name);
 
-            var bType = types.First(x => x.Name == "B");
+            var bType = types.First(x => x.Name == "Test_B");
             var valMember = bType.Members.Cast<CodeTypeMember>().First(x => x.Name == "Val");
             var customAtt = valMember.CustomAttributes.Cast<CodeAttributeDeclaration>().FirstOrDefault(x => x.Name == "AmbientValue");
             var firstArg = customAtt.Arguments.Cast<CodeAttributeArgument>().First().Value as CodeFieldReferenceExpression;

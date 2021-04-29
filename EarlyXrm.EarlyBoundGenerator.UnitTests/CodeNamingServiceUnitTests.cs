@@ -34,15 +34,31 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GetNameForEntity()
         {
-            
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_blah", DisplayName = new Label("Blah", 1033) }
+            });
+
             var em = new EntityMetadata { DisplayName = new Label("Blah", 1433) };
-            var serviceProvider = Substitute.For<IServiceProvider>();
             var result = sut.GetNameForEntity(em, serviceProvider);
 
             Assert.AreEqual("Blah", result);
+        }
+
+        [TestMethod]
+        public void GetNameForEntityWithDup()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_blah", DisplayName = new Label("Blah", 1033) },
+                new EntityMetadata { LogicalName = "ee_blah2", DisplayName = new Label("Blah", 1033) }
+            });
+
+            var em = new EntityMetadata { LogicalName = "ee_blah2", DisplayName = new Label("Blah", 1433) };
+            var result = sut.GetNameForEntity(em, serviceProvider);
+
+            Assert.AreEqual("Blah2", result);
         }
 
         [TestMethod]
@@ -71,7 +87,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual("Value2", output);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GetNameForRelationship_LooksUpReferencingEntityAttribute()
         {
             organizationMetadata.Entities.Returns(new[] {
@@ -80,7 +96,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var relationship = new OneToManyRelationshipMetadata { 
                 ReferencingEntity = "ee_test", ReferencingAttribute = "ee_testid",
-                ReferencedEntity = "ee_testprop", ReferencedAttribute = "ee_testid"
+                ReferencedEntity = "ee_testprop"
             };
             var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
             var metadata = new EntityMetadata { LogicalName = "ee_test" }
@@ -88,12 +104,48 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     .Set(x => x.ManyToOneRelationships, new OneToManyRelationshipMetadata[]
                     {
                         relationship,
-                        new OneToManyRelationshipMetadata { ReferencingAttribute = "ee_testid" }
+                        new OneToManyRelationshipMetadata { ReferencingEntity = "ee_testprop", ReferencingAttribute = "ee_testid" }
                     });
 
             var output = sut.GetNameForRelationship(metadata, relationship, null, serviceProvider);
 
             Assert.AreEqual("TestIdTestProp", output);
+        }
+
+        [TestMethod]
+        public void GetNameForRelationship_OneToMany()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_testprop",
+                DisplayCollectionName = new Label("Test Props", 1033) }
+                .Set(x=> x.Attributes, new AttributeMetadata[]
+                {
+                    new StringAttributeMetadata{ 
+                        LogicalName = "ee_testid", 
+                        DisplayName = new Label("Test Id", 1033)
+                    }
+                })
+            });
+
+            var relationship = new OneToManyRelationshipMetadata
+            {
+                ReferencingEntity = "ee_testprop",
+                ReferencingAttribute = "ee_testid",
+                ReferencedEntity = "ee_test",
+                SchemaName = "ee_two"
+            };
+            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
+            var metadata = new EntityMetadata { LogicalName = "ee_test" }
+                    .Set(x => x.Attributes, new AttributeMetadata[] { attMetadata })
+                    .Set(x => x.OneToManyRelationships, new OneToManyRelationshipMetadata[]
+                    {
+                        relationship,
+                        new OneToManyRelationshipMetadata { ReferencingEntity = "ee_testprop", ReferencingAttribute = "ee_testid", SchemaName= "ee_one" }
+                    });
+
+            var output = sut.GetNameForRelationship(metadata, relationship, null, serviceProvider);
+
+            Assert.AreEqual("TestPropsTestId2", output);
         }
 
         [TestMethod]
@@ -139,10 +191,11 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual(result, "Name");
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GetNameForOptionSet_ReturnsOptionsetName()
         {
             var optionSet = new OptionSetMetadata { Name = "OptionsetName" };
+            organizationMetadata.OptionSets.Returns(new[] {optionSet});
 
             var result = sut.GetNameForOptionSet(new EntityMetadata(), optionSet, serviceProvider);
 
@@ -167,6 +220,49 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var result = sut.GetNameForOption(optionSet, option, serviceProvider);
 
             Assert.AreEqual(result, "_5TestValue2");
+        }
+
+        [TestMethod]
+        public void GetNameForRelationship_ManyToMany()
+        {
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_testprop",
+                DisplayCollectionName = new Label("Test Props", 1033) }
+                .Set(x=> x.Attributes, new AttributeMetadata[]
+                {
+                    new StringAttributeMetadata{
+                        LogicalName = "ee_testid",
+                        DisplayName = new Label("Test Id", 1033)
+                    }
+                })
+            });
+
+            var relationship = new OneToManyRelationshipMetadata
+            {
+                ReferencingEntity = "ee_testprop",
+                ReferencingAttribute = "ee_testid",
+                ReferencedEntity = "ee_test",
+                SchemaName = "ee_two"
+            };
+            var many2Many = new ManyToManyRelationshipMetadata
+            {
+                Entity1LogicalName = "ee_test",
+                Entity2LogicalName = "ee_testprop",
+                SchemaName = "ee_testProp_association"
+            };
+            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
+            var metadata = new EntityMetadata { LogicalName = "ee_test" }
+                    .Set(x => x.Attributes, new AttributeMetadata[] { attMetadata })
+                    .Set(x => x.OneToManyRelationships, new OneToManyRelationshipMetadata[]
+                    {
+                        relationship,
+                        new OneToManyRelationshipMetadata { ReferencingEntity = "ee_testprop", ReferencingAttribute = "ee_testid", SchemaName= "ee_one" }
+                    })
+                    .Set(x => x.ManyToManyRelationships, new[] { many2Many });
+
+            var output = sut.GetNameForRelationship(metadata, many2Many, null, serviceProvider);
+
+            Assert.AreEqual("TestProps2", output);
         }
     }
 }

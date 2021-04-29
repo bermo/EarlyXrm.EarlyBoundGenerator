@@ -131,7 +131,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         if (dups.Count() > 1)
                         {
-                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
+                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencedEntity); // one2many.ReferencingAttribute);
                             ent += otherMeta.DisplayName();
                         }
 
@@ -161,7 +161,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                         if (!string.IsNullOrWhiteSpace(ent))
                         {
                             var nameDups = entityMetadata.OneToManyRelationships
-                                .Where(x => metaData.Entities.Any(y => y.LogicalName == one2many.ReferencingEntity && y.Attributes.Any(z => y.DisplayCollectionName.DisplayName() + z.DisplayName() == ent)))
+                                .Where(x => 
+                                x.ReferencingEntity == one2many.ReferencingEntity && 
+                                metaData.Entities.Any(y => y.LogicalName == one2many.ReferencingEntity && y.Attributes.Any(z => y.DisplayCollectionName.DisplayName() + z.DisplayName() == ent)))
                                 .OrderBy(x => x.SchemaName).ToList();
                             if (nameDups.Count() > 1)
                             {
@@ -177,9 +179,28 @@ namespace EarlyXrm.EarlyBoundGenerator
                 else // many to many
                 {
                     var many2many = relationshipMetadata as ManyToManyRelationshipMetadata;
-                    otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == (entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity2LogicalName : many2many.Entity1LogicalName));
+                    var the = entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity1LogicalName : many2many.Entity2LogicalName;
+                    var other = entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity2LogicalName : many2many.Entity1LogicalName;
+                    otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == other);
 
                     returnValue = otherMeta.DisplayCollectionName.DisplayName();
+
+                    var oneToManysAtts = entityMetadata.OneToManyRelationships
+                        .Where(x => x.ReferencingEntity == other);
+                    var start = oneToManysAtts.Count();
+
+                    var manyToManys = entityMetadata.ManyToManyRelationships
+                    .Where(x => (x.Entity1LogicalName == the || x.Entity2LogicalName == the) && otherMeta.DisplayCollectionName.DisplayName() == returnValue)
+                    //.Where(x => x.Entity1LogicalName == many2many.Entity1LogicalName && 
+                    //            x.Entity2LogicalName == many2many.Entity2LogicalName)
+                    .OrderBy(x => x.SchemaName).ToList();
+
+                    var mmIndex = manyToManys.FindIndex(x => x.SchemaName == many2many.SchemaName);
+                    var comIndex = start + mmIndex;
+                    if (comIndex > 0)
+                    {
+                        returnValue += comIndex.ToString();
+                    }
                 }
             }
 

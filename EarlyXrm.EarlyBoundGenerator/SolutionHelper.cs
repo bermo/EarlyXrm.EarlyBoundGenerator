@@ -9,6 +9,7 @@ using System.Globalization;
 using Microsoft.Crm.Services.Utility;
 using System.Diagnostics;
 using EarlyBoundTypes;
+using System.Text.RegularExpressions;
 
 namespace EarlyXrm.EarlyBoundGenerator
 {
@@ -256,14 +257,18 @@ namespace EarlyXrm.EarlyBoundGenerator
                 if (description.Contains(" "))
                     description = new CultureInfo("en-AU", false).TextInfo.ToTitleCase(description);
 
+                description = Regex.Replace(description, @"\s+", "");
+
                 description = description
-                                .Replace(" ", "")
                                 .Replace("(", "")
                                 .Replace(")", "")
+                                .Replace("[", "")
+                                .Replace("]", "")
                                 .Replace("/", "_")
                                 .Replace(":", "_")
                                 .Replace(".", "")
                                 .Replace("-", "")
+                                .Replace("–", "")
                                 .Replace("'", "")
                                 .Replace(",", "")
                                 .Replace("%", "")
@@ -272,6 +277,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 .Replace("}", "")
                                 .Replace(";", "")
                                 .Replace("$", "")
+                                .Replace("’", "")
+                                .Replace("&", "")
+                                .Replace("|", "")
                                 ;
 
                 return description;

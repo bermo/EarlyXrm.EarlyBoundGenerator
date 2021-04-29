@@ -70,15 +70,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                     entityClass.BaseTypes.Add(new CodeTypeReference("I" + entityClass.Name));
                 }
 
-                //for (var i = entityClass.CustomAttributes.Count - 1; i >= 0; i--)
-                //{
-                //    var catt = entityClass.CustomAttributes[i];
-                //    catt.Name = catt.Name.Replace("System.Runtime.Serialization.", "");
-                //    catt.Name = catt.Name.Replace("Microsoft.Xrm.Sdk.Client.", "");
-                //    if (catt.Name.Contains("GeneratedCodeAttribute"))
-                //        entityClass.CustomAttributes.RemoveAt(i);
-                //}
-
                 entityClass.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
 
                 for (var i = entityClass.Members.Count - 1; i >= 0; i--)
@@ -139,7 +130,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                     var type = codeMemberProperty.Type;
 
                     if (type.BaseType == "System.Guid") codeMemberProperty.Type = new CodeTypeReference("Guid");
-                    //if (type.BaseType == "System.String") codeMemberProperty.Type = new CodeTypeReference("String");
                     if (type.BaseType.StartsWith("Microsoft.Xrm.Sdk.")) codeMemberProperty.Type = new CodeTypeReference(codeMemberProperty.Type.BaseType.Replace("Microsoft.Xrm.Sdk.", ""));
                     if (type.BaseType.StartsWith(codeNamespace.Name + "."))
                     {
@@ -166,7 +156,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                         if (type.TypeArguments[0].BaseType == "System.DateTime") codeMemberProperty.Type = new CodeTypeReference("DateTime?");
                         if (type.TypeArguments[0].BaseType == "System.Double") codeMemberProperty.Type = new CodeTypeReference("double?");
                         if (type.TypeArguments[0].BaseType == "System.Decimal") codeMemberProperty.Type = new CodeTypeReference("decimal?");
-                        //if (type.TypeArguments[0].BaseType == "System.Byte") codeMemberProperty.Type = new CodeTypeReference("byte?");
                         if (type.TypeArguments[0].BaseType == "System.Guid")
                         {
                             codeMemberProperty.Type = new CodeTypeReference("Guid?");

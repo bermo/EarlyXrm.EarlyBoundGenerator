@@ -50,5 +50,19 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             }
             return cad;
         }
+
+        protected CodeAttributeDeclaration Build<T>(params CodeExpression[] args) where T : Attribute
+        {
+            var cad = new CodeAttributeDeclaration
+            {
+                Name = typeof(T).Name,
+                Arguments = { }
+            };
+            foreach (var arg in args)
+            {
+                cad.Arguments.Add(new CodeAttributeArgument(arg));
+            }
+            return cad;
+        }
     }
 }

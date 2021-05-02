@@ -12,6 +12,8 @@ namespace EarlyXrm.EarlyBoundGenerator
         public bool DebugMode;
         public bool Instrument;
         public bool AddSetters;
+        public bool GenerateConstants;
+        public bool NestNonGlobalEnums;
         public string Out;
         public string[] Solutions;
         public Dictionary<string, string[]> Include = new Dictionary<string, string[]>();

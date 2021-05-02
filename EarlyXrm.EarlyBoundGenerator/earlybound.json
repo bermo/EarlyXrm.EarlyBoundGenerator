@@ -5,16 +5,17 @@
   "DebugMode": false,
   "Instrument": false,
   "AddSetters": true, // globally add setters to readonly properties (note, this will cause exceptions in some cases)
+  "NestNonGlobalEnums": true, // this nests entity specific enums inside the entity class
+  "GenerateConstants": true, // generates a list of nested constants containing logical name and relationships
 
   "Include": {
-
+    "solution": [], // include all solution attributes
     "solutioncomponent": [ // include specific attributes for the "solutioncomponent" entity
       "solutionid",
       "componenttype",
       "objectid",
       "rootcomponentbehavior"
-    ],
-    "solution": [] // include all solution attributes
+    ]
   },
 
   "Exclude": {
@@ -37,24 +38,12 @@
       "templatesuffix",
       "thumbprint",
       "upgradeinfo"
-    ],
-
-    // the following entities should not be generated as there are bug associated with them
-    "entity": [], // this should really always be excluded
-    "botcomponent": [], // many-to-many parent relationship
-    "connectionrole": [], // dup ConnectionRoles properties
-    "fileattachment": [], // canvasapps
-    "msdyn_connector": [], //dups
-    "subscriptionmanuallytrackedobject": [],
-    "queue": [], // dup with relation to User
-    "solutioncomponentattributeconfiguration": [], // relationship member same name as class
-    "connector": [], // issue with Status and StatusReason (suffixed with 2)
+    ]
   },
 
   "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
 
   "ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
-
   //"ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
   //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
   //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;"

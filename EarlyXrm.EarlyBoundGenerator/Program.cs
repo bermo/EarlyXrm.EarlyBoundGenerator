@@ -83,6 +83,9 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             parameters.Add(earlyBoundConfig.Out);
 
+            parameters.Add(earlyBoundConfig.NestNonGlobalEnums.ToString().ToLower());
+            parameters.Add(earlyBoundConfig.GenerateConstants.ToString().ToLower());
+
             parameters = parameters.Select(x => x.StartsWith("/") ? x : $"\"{x}\"").ToList();
 
             var process = new Process
@@ -99,12 +102,14 @@ namespace EarlyXrm.EarlyBoundGenerator
             process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
             process.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
 
+            Console.WriteLine($"Start {DateTime.Now}!");
+
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             process.WaitForExit();
 
-            Console.WriteLine("Complete!");
+            Console.WriteLine($"Complete {DateTime.Now}!");
 
             Console.Read();
         }

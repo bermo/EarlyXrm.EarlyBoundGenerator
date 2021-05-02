@@ -4,6 +4,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             parameters = new Dictionary<string, string> {
                 { "UseDisplayNames", false.ToString() },
                 { "Instrument", false.ToString() },
-                { "AddSetters", false.ToString() }
+                { "AddSetters", false.ToString() },
+                { "NestNonGlobalEnums", true.ToString() },
+                { "GenerateConstants", true.ToString() }
             };
         }
 
@@ -206,6 +209,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void WhenParameterIsSet_EnumAttributeUsesDisplayName()
         {
+            INamingService namingService = Substitute.For<INamingService>();
+            serviceProvider.GetService(typeof(INamingService)).Returns(namingService);
             organizationMetadata.Entities.Returns(new[] {
                 new EntityMetadata { LogicalName = "ee_test", DisplayName = new Label("Test", 1033) }
                     .Set(x => x.Attributes, new[] {
@@ -239,25 +244,37 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                                         CustomAttributes = { Build<AttributeLogicalNameAttribute>("ee_colour") },
                                     }
                                 }
+                            },
+                            new CodeTypeDeclaration
+                            {
+                                IsEnum = true,
+                                Name = "Test_Colour",
+                                Members = {}
                             }
                         }
                     }
                 }
             };
+            namingService.GetNameForOptionSet(Arg.Any<EntityMetadata>(), Arg.Any<OptionSetMetadataBase>(), serviceProvider)
+                .Returns("Test_Colour");
             sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
 
             var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
             var @class = ns.Types.OfType<CodeTypeDeclaration>().First();
             var property = @class.Members.OfType<CodeMemberProperty>().First();
-            Assert.AreEqual("Test_Colour?", property.Type.BaseType);
+            Assert.AreEqual("Enums.Colour?", property.Type.BaseType);
             var getStatement = property.GetStatements.Cast<CodeSnippetStatement>().First();
-            Assert.IsTrue(getStatement.Value.Contains("return (Test_Colour?)GetAttributeValue<OptionSetValue>(\"ee_colour\")?.Value;"));
+            Assert.IsTrue(getStatement.Value.Contains("return (Enums.Colour?)GetAttributeValue<OptionSetValue>(\"ee_colour\")?.Value;"));
         }
 
         [TestMethod]
         public void ParentChildRelationshipBuiltAsExpected()
         {
-            var entity = new EntityMetadata { LogicalName = "ee_test", DisplayName = new Label("Test", 1033) };
+            var entity = new EntityMetadata { 
+                LogicalName = "ee_test", 
+                DisplayName = new Label("Test", 1033)
+            }
+            .Set(x => x.ManyToManyRelationships, Array.Empty<ManyToManyRelationshipMetadata>());
             var manyToOne = new OneToManyRelationshipMetadata
             {
                 ReferencedEntity = entity.LogicalName
@@ -546,7 +563,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 new EntityMetadata {
                     LogicalName = "ee_test",
                     DisplayName = new Label("Test", 1033)
-                }.Set(x => x.Attributes, new EnumAttributeMetadata []
+                }
+                .Set(x => x.Attributes, new AttributeMetadata []
                     {
                         new StateAttributeMetadata {
                             LogicalName = "statuscode",
@@ -572,6 +590,16 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     new CodeNamespace("Test"){
                         Types =
                         {
+                            new CodeTypeDeclaration { 
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members =
+                                {
+                                    new CodeMemberProperty
+                                    {
+                                        CustomAttributes = { Build<AttributeLogicalNameAttribute>("statuscode") }
+                                    }
+                                }
+                            },
                             new CodeTypeDeclaration { IsEnum = false, Name = "C" },
                             new CodeTypeDeclaration { IsEnum = true, Name = "Test_B",
                                 Members =
@@ -590,6 +618,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             };
             namingService.GetNameForOption(Arg.Any<OptionSetMetadataBase>(), Arg.Any<OptionMetadata>(), serviceProvider)
                 .Returns("Blah");
+            namingService.GetNameForOptionSet(Arg.Any<EntityMetadata>(), Arg.Any<OptionSetMetadataBase>(), serviceProvider)
+                .Returns("Test_B");
 
             var sut = new CodeCustomistationService(parameters);
             sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
@@ -597,8 +627,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var ns = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First();
             var types = ns.Types.OfType<CodeTypeDeclaration>();
 
-            var firstType = types.First();
-            Assert.AreEqual("A", firstType.Name);
+            var aType = types.First(x => x.Name == "A");
+            Assert.IsNotNull(aType);
 
             var bType = types.First(x => x.Name == "Test_B");
             var valMember = bType.Members.Cast<CodeTypeMember>().First(x => x.Name == "Val");

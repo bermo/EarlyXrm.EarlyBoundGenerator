@@ -3,6 +3,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -55,42 +56,28 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (useDisplayNames)
             {
-                attributeName = UniqueDisplayName(entityMetadata, attributeMetadata, services);
-            }
+                attributeName = attributeMetadata.DisplayName();
 
-            this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
+                var matches = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName).OrderBy(x => x.LogicalName).ToList();
+                if (entityMetadata.DisplayName() == attributeName)
+                {
+                    matches.Insert(0, new AttributeMetadata { LogicalName = "" });
+                }
 
-            return attributeName;
-        }
+                if (matches.Count() > 1)
+                {
+                    var index = matches.ToList().FindIndex(x => x.LogicalName == attributeMetadata.LogicalName) + 1;
+                    if (index > 1)
+                        attributeName += index.ToString();
+                }
 
-        private string UniqueDisplayName(EntityMetadata entityMetadata, AttributeMetadata attributeMetadata, IServiceProvider services)
-        {
-            string attributeName = attributeMetadata.DisplayName();
-            var matches = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName).OrderBy(x => x.LogicalName).ToList();
+                if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
+                    attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
 
-            if (entityMetadata.DisplayName() == attributeName)
-            {
-                matches.Insert(0, new AttributeMetadata { LogicalName = "" });
-            }
-
-            if (matches.Count() > 1)
-            {
-                var index = matches.ToList().FindIndex(x => x.LogicalName == attributeMetadata.LogicalName) + 1;
-                if (index > 1)
-                    attributeName += index.ToString();
-            }
-
-            if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
-                attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
-
-            if (attributeMetadata.AttributeType == AttributeTypeCode.Lookup || attributeMetadata.AttributeType == AttributeTypeCode.Customer)
-            {
-                attributeName += "Ref";
-            }
-
-            if (attributeName == "EntityLogicalName")
-            {
-                attributeName += "2";
+                if (attributeName == "EntityLogicalName")
+                {
+                    attributeName += "2";
+                }
             }
 
             this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
@@ -100,6 +87,8 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         public string GetNameForRelationship(EntityMetadata entityMetadata, RelationshipMetadataBase relationshipMetadata, EntityRole? reflexiveRole, IServiceProvider services)
         {
+            var tmr = new Stopwatch();tmr.Start();
+
             var metaData = services.LoadMetadata();
 
             var returnValue = DefaultNamingService.GetNameForRelationship(entityMetadata, relationshipMetadata, reflexiveRole, services);
@@ -115,7 +104,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     {
                         var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
 
-                        returnValue = att.DisplayName();
+                        returnValue = att.DisplayName(false);
 
                         if (reflexiveRole == EntityRole.Referenced)
                         {
@@ -126,52 +115,78 @@ namespace EarlyXrm.EarlyBoundGenerator
                     else if (entityMetadata.LogicalName == one2many.ReferencingEntity) // many to one
                     {
                         var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
-                        var ent = att.DisplayName();
-                        var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == one2many.ReferencingAttribute);
 
+                        var name = att.DisplayName(false);
+
+                        var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == one2many.ReferencingAttribute);
+                        // is this even possible?
                         if (dups.Count() > 1)
                         {
-                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencedEntity); // one2many.ReferencingAttribute);
-                            ent += otherMeta.DisplayName();
+                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencedEntity);
+                            name += otherMeta.DisplayName(false);
                         }
 
-                        var nameDups = entityMetadata.ManyToOneRelationships.Where(x => entityMetadata.Attributes.Any(y => y.DisplayName() == ent)).OrderByDescending(x => x.SchemaName).ToList();
+                        var takenAttNameDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name) + metaData.Entities.Count(x => x.DisplayName() == name);
+                        if (takenAttNameDups > 0)
+                        {
+                            name += takenAttNameDups.ToString();
+                        }
+
+                        var nameDups = entityMetadata.ManyToOneRelationships
+                            .Where(x => entityMetadata.Attributes.Any(y => y.LogicalName == x.ReferencingAttribute && y.DisplayName(false) == name))
+                            .OrderByDescending(x => x.SchemaName).ToList();
                         if (nameDups.Count() > 1)
                         {
                             var index = nameDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
                             if (index > 1)
-                                ent += index.ToString();
+                                name += index.ToString();
                         }
 
-                        returnValue = ent;
+                        var nameDups2 = entityMetadata.ManyToOneRelationships
+                            .Where(x => entityMetadata.Attributes.Any(y => y.DisplayName(false) + metaData.Entities.FirstOrDefault(z => z.LogicalName == x.ReferencedEntity).DisplayName() == name))
+                            .OrderByDescending(x => x.SchemaName).ToList();
+
+                        if (nameDups2.Count() > 1)
+                        {
+                            var index = nameDups2.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                            if (index > 1)
+                                name += (index).ToString();
+                        }
+
+                        returnValue = name;
                     }
                     else // one to many
                     {
                         otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencingEntity);
 
-                        var ent = otherMeta.DisplayCollectionName.DisplayName();
+                        var ent = otherMeta.DisplayCollectionName.DisplayName() ?? otherMeta.SchemaName;
                         var oneToManys = entityMetadata.OneToManyRelationships.Where(x => x.ReferencingEntity == one2many.ReferencingEntity);
 
                         if (oneToManys.Count() > 1)
                         {
-                            var at = otherMeta.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
-                            ent += at.DisplayName();
+                            var at = otherMeta.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute || x.AttributeOf == one2many.ReferencingAttribute);
+                            ent = (at.DisplayName(false) ?? at.SchemaName) + ent;
+                        }
+
+                        var dups = entityMetadata.OneToManyRelationships
+                                    .Select(x => new { x, y = metaData.Entities.FirstOrDefault(y => y.LogicalName == x.ReferencingEntity) })
+                                    .Select(x => new { x, d = x.y.DisplayCollectionName?.DisplayName() ?? x.x.SchemaName })
+                                    .Where(x => 
+                                        x.d == ent ||
+                                        x.x.y.Attributes.Any(z => (z.DisplayName(false) ?? z.SchemaName) + x.d == ent)
+                                    )
+                                    .Select(x => x.x.x)
+                                    .OrderBy(x => x.SchemaName).ToList();
+
+                        if (dups.Count() > 1)
+                        {
+                            var index = dups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                            if (index > 1)
+                                ent += index.ToString();
                         }
 
                         if (!string.IsNullOrWhiteSpace(ent))
                         {
-                            var nameDups = entityMetadata.OneToManyRelationships
-                                .Where(x => 
-                                x.ReferencingEntity == one2many.ReferencingEntity && 
-                                metaData.Entities.Any(y => y.LogicalName == one2many.ReferencingEntity && y.Attributes.Any(z => y.DisplayCollectionName.DisplayName() + z.DisplayName() == ent)))
-                                .OrderBy(x => x.SchemaName).ToList();
-                            if (nameDups.Count() > 1)
-                            {
-                                var index = nameDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
-                                if (index > 1)
-                                    ent += index.ToString();
-                            }
-
                             returnValue = ent;
                         }
                     }
@@ -185,14 +200,17 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                     returnValue = otherMeta.DisplayCollectionName.DisplayName();
 
+                    if (reflexiveRole != null)
+                    {
+                        returnValue = $"{reflexiveRole.Value}{returnValue}";
+                    }
+
                     var oneToManysAtts = entityMetadata.OneToManyRelationships
                         .Where(x => x.ReferencingEntity == other);
                     var start = oneToManysAtts.Count();
 
                     var manyToManys = entityMetadata.ManyToManyRelationships
                     .Where(x => (x.Entity1LogicalName == the || x.Entity2LogicalName == the) && otherMeta.DisplayCollectionName.DisplayName() == returnValue)
-                    //.Where(x => x.Entity1LogicalName == many2many.Entity1LogicalName && 
-                    //            x.Entity2LogicalName == many2many.Entity2LogicalName)
                     .OrderBy(x => x.SchemaName).ToList();
 
                     var mmIndex = manyToManys.FindIndex(x => x.SchemaName == many2many.SchemaName);
@@ -205,6 +223,11 @@ namespace EarlyXrm.EarlyBoundGenerator
             }
 
             this.Debug(returnValue, entityMetadata.LogicalName, relationshipMetadata.SchemaName, reflexiveRole?.ToString() ?? "null");
+
+            tmr.Stop();
+
+            if (tmr.ElapsedMilliseconds > 200)
+                Console.WriteLine($"{tmr.ElapsedMilliseconds}: GetNameForRelationship({entityMetadata.LogicalName} {relationshipMetadata.SchemaName}{reflexiveRole}");
 
             return returnValue;
         }
@@ -247,20 +270,46 @@ namespace EarlyXrm.EarlyBoundGenerator
             {
                 var metadata = services.LoadMetadata();
 
-                var optionSet = metadata.OptionSets.FirstOrDefault(x => x.Name == optionSetMetadata.Name) as OptionSetMetadata;
-                name = optionSet?.DisplayName();
+                var optionSet = metadata.OptionSets.FirstOrDefault(x => x.Name == optionSetMetadata.Name) as OptionSetMetadata;      
 
-                if (optionSet == null)
+                if (optionSet != null) // global
                 {
-                    var enumAttributeMetadata = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y?.OptionSet?.Name == optionSetMetadata.Name) ?? Array.Empty<EnumAttributeMetadata>())?.FirstOrDefault();
+                    name = optionSet?.DisplayName();
+
+                    var matches = metadata.OptionSets.Where(x => x.DisplayName() == name).OrderBy(x => x.Name).ToList();
+                    if (metadata.Entities.Any(x => x.DisplayName() == name)) {
+                        matches.Insert(0, new OptionSetMetadata { Name = "" });
+                    }
+
+                    if (matches.Count() > 1)
+                    {
+                        var index = matches.FindIndex(x => x.Name == optionSetMetadata.Name) + 1;
+                        if (index > 1)
+                            name += index.ToString();
+                    }
+                }
+                else // not global
+                { 
+                    var enumAttributeMetadata = entityMetadata.Attributes.OfType<EnumAttributeMetadata>().FirstOrDefault(x => x?.OptionSet?.Name == optionSetMetadata.Name);
+
                     optionSet = enumAttributeMetadata?.OptionSet;
 
                     if (optionSet != null)
                     {
-                        var ent = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName);
-                        name = ent.DisplayName() + "_" + optionSet?.DisplayName();
+                        var entName = entityMetadata.DisplayName();
 
-                        var matches = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => (x.DisplayName() + "_" + y.OptionSet.DisplayName()) == name)).OrderBy(x => x.OptionSet.MetadataId).ToList();
+                        var entMatches = metadata.Entities.Where(x => x.DisplayName() == entName).OrderBy(x => x.LogicalName).ToList();
+                        if (entMatches.Count() > 1)
+                        {
+                            var index = entMatches.FindIndex(x => x.LogicalName == entityMetadata.LogicalName) + 1;
+                            if (index > 1)
+                                entName += index.ToString();
+                        }
+
+                        name = entName + "_" + optionSet?.DisplayName();
+
+                        var matches = metadata.Entities.Where(x => x.DisplayName() == entityMetadata.DisplayName()).SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y.OptionSet.DisplayName() == optionSet?.DisplayName()))
+                                        .OrderBy(x => x.OptionSet.MetadataId).ToList();
 
                         if (matches.Count() > 1)
                         {

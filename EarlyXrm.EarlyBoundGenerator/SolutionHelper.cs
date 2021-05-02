@@ -121,7 +121,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         (!skipGlobal?.Any(y => y == attribute.LogicalName) ?? true) &&
                         (
                             entity.IsCustomEntity == true ||
-                            solutionComponent != null && solutionComponent.RootComponentBehavior == SolutionComponent_IncludeBehavior.IncludeSubcomponents ||
+                            solutionComponent != null && solutionComponent.RootComponentBehavior == SolutionComponent.Enums.IncludeBehavior.IncludeSubcomponents ||
                             (extraFields?.Any(y => y == attribute.LogicalName) ?? extra.ContainsKey(entity.LogicalName)) ||
                             solutionComponents.Any(y => y.ObjectId.HasValue && attribute.MetadataId.HasValue && y.ObjectId.Value == attribute.MetadataId.Value)
                         )
@@ -197,24 +197,44 @@ namespace EarlyXrm.EarlyBoundGenerator
             return result;
         }
 
-        public static string DisplayName(this MetadataBase metadataBase)
+        public static string DisplayName(this MetadataBase metadataBase, bool useRef = true)
         {
-            var displayName = "";
+            string displayName = null;
             var attribute = metadataBase as AttributeMetadata;
             if (attribute != null)
             {
                 displayName = attribute.DisplayName.DisplayName();
 
-                if (displayName == null)
+                if (string.IsNullOrWhiteSpace(displayName))
                 {
-                    return attribute.SchemaName;
+                    displayName = attribute.SchemaName;
                 }
+
+                if (useRef && (
+                    attribute.AttributeType == AttributeTypeCode.Lookup ||
+                    attribute.AttributeType == AttributeTypeCode.Customer ||
+                    attribute.AttributeType == AttributeTypeCode.Owner
+                ))
+                {
+                    displayName += "Ref";
+                }
+            }
+
+            var oneToMany = metadataBase as OneToManyRelationshipMetadata;
+            if (oneToMany != null)
+            {
+
             }
 
             var entity = metadataBase as EntityMetadata;
             if (entity != null)
             {
-                return entity.DisplayName.DisplayName();
+                displayName = entity.DisplayName.DisplayName();
+
+                if (string.IsNullOrWhiteSpace(displayName))
+                {
+                    displayName = entity.SchemaName;
+                }
             }
 
             var option = metadataBase as OptionMetadata;
@@ -243,7 +263,8 @@ namespace EarlyXrm.EarlyBoundGenerator
                 }
             }
 
-            return displayName;
+            //throw new Exception($"Not supported type - {typeof(MetadataBase).FullName}");
+            return string.IsNullOrWhiteSpace(displayName) ? null : displayName;
         }
 
         public static string DisplayName(this Label label)
@@ -252,7 +273,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 return null;
 
             var description = label?.LocalizedLabels?.FirstOrDefault()?.Label ?? null;
-            if (description != null)
+            if (!string.IsNullOrEmpty(description))
             {
                 if (description.Contains(" "))
                     description = new CultureInfo("en-AU", false).TextInfo.ToTitleCase(description);

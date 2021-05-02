@@ -29,9 +29,6 @@ namespace EarlyXrm.EarlyBoundGenerator
             if (entityMetadata.LogicalName.StartsWith("new_system_donotuseentity_"))
                 return false;
 
-            if (entityMetadata.IsIntersect == true)
-                return false;
-
             var solutionEntities = services.LoadSolutionEntities();
 
             var generate = solutionEntities.Any(x => x.LogicalName == entityMetadata.LogicalName);
@@ -50,6 +47,8 @@ namespace EarlyXrm.EarlyBoundGenerator
                 generate = true;
             else if (attributeMetadata.AttributeOf != null && attributeMetadata.GetType() != typeof(ImageAttributeMetadata))
                 generate = false;
+            else if (attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
+                generate = true;
             else if (solutionEntities.Any(x => x.LogicalName == attributeMetadata.EntityLogicalName && x.IncludedFields.Any(y => y.LogicalName == attributeMetadata.LogicalName)))
                 generate = _defaultService.GenerateAttribute(attributeMetadata, services);
 

@@ -15,12 +15,21 @@ namespace EarlyXrm.EarlyBoundGenerator
         private readonly bool UseDisplayNames;
         private readonly bool Instrument;
         private readonly bool AddSetters;
+        private readonly bool NestNonGlobalEnums;
+        private readonly bool GenerateConstants;
+
+        private IOrganizationMetadata metadata;
+        private ICodeWriterFilterService filteringService;
+        private INamingService namingService;
+        private IServiceProvider Services;
 
         public CodeCustomistationService(IDictionary<string, string> parameters)
         {
             bool.TryParse(parameters[nameof(UseDisplayNames)], out UseDisplayNames);
             bool.TryParse(parameters[nameof(Instrument)], out Instrument);
             bool.TryParse(parameters[nameof(AddSetters)], out AddSetters);
+            bool.TryParse(parameters[nameof(NestNonGlobalEnums)], out NestNonGlobalEnums);
+            bool.TryParse(parameters[nameof(GenerateConstants)], out GenerateConstants);
             this.Debug();
         }
 
@@ -28,7 +37,12 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         public void CustomizeCodeDom(CodeCompileUnit codeCompileUnit, IServiceProvider services)
         {
-            var metadata = services.LoadMetadata();
+            Services = services;
+            metadata = services.LoadMetadata();
+            filteringService = (ICodeWriterFilterService)services.GetService(typeof(ICodeWriterFilterService));
+            namingService = (INamingService)services.GetService(typeof(INamingService));
+
+            Console.WriteLine($"Customise {DateTime.Now}");
 
             var codeNamespace = codeCompileUnit.Namespaces[0];
             var imports = codeNamespace.Imports;
@@ -111,6 +125,15 @@ namespace EarlyXrm.EarlyBoundGenerator
                     if (codeMemberProperty == null)
                         continue;
 
+                    if (entityMetadata.IsIntersect == true)
+                    {
+                        var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(codeMemberProperty.CustomAttributes)?.FirstOrDefault();
+                        if (relationshipSchema != null && entityMetadata.ManyToManyRelationships.Any(x => x.SchemaName == relationshipSchema))
+                        {
+                            entityClass.Members.RemoveAt(i);
+                        }
+                    }
+
                     codeMemberProperty.Comments.Clear();
 
                     foreach (CodeAttributeDeclaration att in codeTypeMember.CustomAttributes)
@@ -174,7 +197,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         }
                     }
 
-                    if (type.BaseType == "Microsoft.Xrm.Sdk.OptionSetValue" || type.BaseType == "System.Object")
+                    if (type.BaseType == "Microsoft.Xrm.Sdk.OptionSetValue" || type.BaseType == "System.Object") // this seems a bit useless
                     {
                         var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => (UseDisplayNames ? x.DisplayName() : x.SchemaName) == codeMemberProperty.Name &&
                                 new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
@@ -236,22 +259,14 @@ namespace EarlyXrm.EarlyBoundGenerator
                     }
                 }
 
-                var logicalNames = new CodeTypeDeclaration("LogicalNames") { CustomAttributes = { new CodeAttributeDeclaration("DataContract") } };
-                entityClass.Members.Add(logicalNames);
+                var props = entityClass.Members.Cast<CodeTypeMember>().OfType<CodeMemberProperty>().ToList();
 
-                var relationships = new CodeTypeDeclaration("Relationships") { CustomAttributes = { new CodeAttributeDeclaration("DataContract") } };
-                entityClass.Members.Add(relationships);
-
-                var props = entityClass.Members.Cast<CodeTypeMember>().OfType<CodeMemberProperty>();
-                foreach (var prop in props)
+                for (var index = props.Count()-1; index >= 0; index--)
                 {
-                    var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
-                    if (logicalName != null)
-                        logicalNames.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public static string {prop.Name} = \"{logicalName}\";"));
+                    var prop = props[index];
 
-                    var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
-                    if (relationshipSchema != null)
-                        relationships.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public static string {prop.Name} = \"{relationshipSchema}\";"));
+                    var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
+                    var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();                   
 
                     if (logicalName != null && relationshipSchema == null)
                     {
@@ -264,21 +279,18 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         if (enumAtt != null)
                         {
-                            var optionsSetName = "";
-                            if (!UseDisplayNames)
+                            var optionsSetName = namingService.GetNameForOptionSet(entityMetadata, enumAtt.OptionSet, services);
+                            var enumDef = codeNamespace.Types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsEnum && x.Name == optionsSetName);
+                            
+                            CleanEnum(enumDef, enumAtt);
+
+                            if (NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)
                             {
-                                optionsSetName = enumAtt.OptionSet.Name;
-                            }
-                            else if (enumAtt.OptionSet.IsGlobal ?? false)
-                            {
-                                optionsSetName = enumAtt.OptionSet.DisplayName();
-                            }
-                            else
-                            {
-                                optionsSetName = $"{entityMetadata?.DisplayName()}_{enumAtt.OptionSet.DisplayName()}";
+                                optionsSetName = $"Enums.{string.Join("_", optionsSetName.Split('_').Skip(1))}";
                             }
 
                             prop.Type = new CodeTypeReference(optionsSetName + "?");
+
                             prop.GetStatements.Clear();
 
                             prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return ({optionsSetName}?)GetAttributeValue<OptionSetValue>(\"{enumAtt.LogicalName}\")?.Value;"));
@@ -348,7 +360,31 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                     if (logicalName == null && relationshipSchema != null)
                     {
+                        var m2mRelationship = entityMetadata.ManyToManyRelationships.FirstOrDefault(x => x.SchemaName == relationshipSchema);
+                        
+                        if (m2mRelationship != null)
+                        {
+                            var atts = new List<CodeAttributeArgument> {
+                                new CodeAttributeArgument(new CodePrimitiveExpression(m2mRelationship.IntersectEntityName))
+                            };
+
+                            var m2mEnt = metadata.Entities.FirstOrDefault(x => x.LogicalName == m2mRelationship.IntersectEntityName);
+                            var generate = filteringService.GenerateEntity(m2mEnt, services);
+                            
+                            if (generate)
+                            {
+                                var type = m2mEnt.DisplayName();
+                                if (string.IsNullOrEmpty(type))
+                                    type = m2mEnt.SchemaName;
+
+                                atts.Insert(0, new CodeAttributeArgument(new CodeTypeOfExpression(type)));
+                            }
+
+                            prop.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", atts.ToArray()));
+                        }
+
                         var baseType = prop.Type.TypeArguments[0].BaseType.Replace(codeNamespace.Name + ".", "");
+
                         prop.Type = new CodeTypeReference(prop.Type.BaseType.Replace("System.Collections.Generic.", ""), new CodeTypeReference($"{baseType}"));
                         prop.GetStatements.Clear();
                         prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return GetRelatedEntities<{baseType}>(\"{relationshipSchema}\"{entityRole});"));
@@ -392,72 +428,23 @@ namespace EarlyXrm.EarlyBoundGenerator
                         if (catt.Name.Contains("GeneratedCodeAttribute"))
                             type.CustomAttributes.RemoveAt(i);
                     }
-
-                    if (type.IsEnum == false)
-                        continue;
-
-                    var optionSet = metadata.OptionSets.FirstOrDefault(x => x.DisplayName() == type.Name) as OptionSetMetadata;
-                    EnumAttributeMetadata enumAttributeMetadata = null;
-
-                    if (optionSet == null)
-                    {
-                        var enumAttributeMetadatas = metadata.Entities.SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => x.DisplayName() + "_" + y.OptionSet.DisplayName() == type.Name) ?? Array.Empty<EnumAttributeMetadata>()); //?.FirstOrDefault();
-                        enumAttributeMetadata = enumAttributeMetadatas.FirstOrDefault();
-                        
-                        optionSet = enumAttributeMetadata?.OptionSet;
-
-                        if (optionSet == null)
-                        {
-                            continue;
-                        }
-                    }
-
-                    foreach (var field in type.Members.Cast<CodeTypeMember>().OfType<CodeMemberField>())
-                    {
-                        var codeExpression = field.InitExpression as CodePrimitiveExpression;
-                        if (codeExpression == null)
-                            continue;
-
-                        var val = (int)codeExpression.Value;
-
-                        foreach (CodeAttributeDeclaration att in field.CustomAttributes)
-                            att.Name = att.Name.Replace("System.Runtime.Serialization.", "").Replace("EnumMemberAttribute", "EnumMember");
-
-                        var option = optionSet.Options.FirstOrDefault(x => x.Value.Value == val);
-                        if (option == null)
-                            continue;
-
-                        var status = option as StatusOptionMetadata;
-                        if (status != null && enumAttributeMetadata.LogicalName == "statuscode")
-                        {
-                            var parentEnt = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName);
-                            var stateOptionSet = parentEnt.Attributes.OfType<StateAttributeMetadata>().FirstOrDefault()?.OptionSet;
-                            if (stateOptionSet == null)
-                            {
-                                continue;
-                            }
-
-                            var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
-
-                            var state = UseDisplayNames ? parentEnt.DisplayName() + "_" + stateOptionSet.DisplayName() : stateOptionSet.Name;
-
-                            var namingService = (INamingService)services.GetService(typeof(INamingService));
-
-                            var name = namingService.GetNameForOption(stateOptionSet, stateOption, services);
-                            field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
-                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(state), name)
-                            )));
-                        }
-                        
-                        field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("Description", new CodeAttributeArgument(new CodePrimitiveExpression(option.Label?.LocalizedLabels?.FirstOrDefault()?.Label))));
-                    }
                 }
             }
 
             // re-order alphabetical
             for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
             {
-                var types = codeCompileUnit.Namespaces[i].Types;
+                var types = codeCompileUnit.Namespaces[i].Types.Cast<CodeTypeDeclaration>().ToList();
+
+                for (var j = 0; j < types.Count; ++j)
+                {
+                    var membersCopy = new CodeTypeMember[types[j].Members.Count];
+                    types[j].Members.CopyTo(membersCopy, 0);
+                    var orderedMembers = membersCopy.OrderBy(x => x.Name).ToArray();
+
+                    types[j].Members.Clear();
+                    types[j].Members.AddRange(orderedMembers);
+                }
 
                 var typesCopy = new CodeTypeDeclaration[codeCompileUnit.Namespaces[i].Types.Count];
                 codeCompileUnit.Namespaces[i].Types.CopyTo(typesCopy, 0);
@@ -469,38 +456,77 @@ namespace EarlyXrm.EarlyBoundGenerator
                 codeCompileUnit.Namespaces[i].Types.AddRange(orderedTypes);
             }
 
-            //// move around
-            //for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
-            //{
-            //    var types = codeCompileUnit.Namespaces[i].Types;
+            if (NestNonGlobalEnums)
+            {
+                for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
+                {
+                    var classes = codeCompileUnit.Namespaces[i].Types;
 
-            //    for (var j = types.Count - 1; j >= 0; j--)
-            //    {
-            //        var type = types[j];
+                    for (var j = classes.Count - 1; j >= 0; j--)
+                    {
+                        var type = classes[j];
 
-            //        if (!type.IsEnum)
-            //        {
-            //            continue;
-            //        }
+                        if (type.IsEnum)
+                        {
 
-            //        var segments = type.Name.Split('_');
+                            var segments = type.Name.Split('_');
 
-            //        if (segments.Count() <= 1)
-            //            continue;
+                            if (segments.Count() <= 1)
+                                continue;
 
-            //        Console.WriteLine($"T {type.Name}");
-            //        var parent = types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name == segments[0]);
+                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name == segments[0]);
 
-            //        if (parent != null)
-            //        {
-            //            type.Name = string.Join("_", segments.Skip(1));
-            //            parent.Members.Add(type);
+                            if (parent != null)
+                            {
+                                var enums = parent.Members.Cast<CodeTypeMember>().FirstOrDefault(x => x.Name == "Enums") as CodeTypeDeclaration;
+                                if (enums == null)
+                                {
+                                    enums = new CodeTypeDeclaration("Enums") { IsStruct = true, CustomAttributes = { new CodeAttributeDeclaration("DataContract") } };
+                                    parent.Members.Add(enums);
+                                }
 
-            //            types.Remove(type);
-            //        }
+                                type.Name = string.Join("_", segments.Skip(1));
 
-            //    }
-            //}
+                                enums.Members.Add(type);
+
+                                classes.Remove(type);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (GenerateConstants)
+            {
+                for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
+                {
+                    var classes = codeCompileUnit.Namespaces[i].Types;
+
+                    foreach (var type in classes.Cast<CodeTypeDeclaration>())
+                    {
+                        if (type.IsClass)
+                        {
+                            var logicalNames = new CodeTypeDeclaration("LogicalNames") { IsStruct = true, CustomAttributes = { new CodeAttributeDeclaration("DataContract") } };
+                            type.Members.Add(logicalNames);
+
+                            var relationships = new CodeTypeDeclaration("Relationships") { IsStruct = true, CustomAttributes = { new CodeAttributeDeclaration("DataContract") } };
+                            type.Members.Add(relationships);
+
+                            var props = type.Members.Cast<CodeTypeMember>().OfType<CodeMemberProperty>();
+                            foreach (var prop in props)
+                            {
+                                var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
+                                if (logicalName != null)
+                                    logicalNames.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public const string {prop.Name} = \"{logicalName}\";"));
+
+                                var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
+                                if (relationshipSchema != null)
+                                    relationships.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public const string {prop.Name} = \"{relationshipSchema}\";"));
+                            }
+                        }
+                    }
+                }
+            }
 
             var tab = new string('\t', 1);
             var twoTabs = new string('\t', 2);
@@ -589,6 +615,55 @@ namespace EarlyXrm.EarlyBoundGenerator
         }"),
             });
             codeNamespace.Types.Add(codeType);
+        }
+
+        private void CleanEnum(CodeTypeDeclaration type, EnumAttributeMetadata enumAttributeMetadata)
+        {
+            foreach (var field in type.Members.Cast<CodeTypeMember>().OfType<CodeMemberField>())
+            {
+                if (field.CustomAttributes.Cast<CodeAttributeDeclaration>().Any(x => x.Name == "Description"))
+                    return;
+
+                var codeExpression = field.InitExpression as CodePrimitiveExpression;
+                if (codeExpression == null)
+                    continue;
+
+                var val = (int)codeExpression.Value;
+
+                foreach (CodeAttributeDeclaration att in field.CustomAttributes)
+                    att.Name = att.Name.Replace("System.Runtime.Serialization.", "").Replace("EnumMemberAttribute", "EnumMember");
+
+                var option = enumAttributeMetadata.OptionSet.Options.FirstOrDefault(x => x.Value.Value == val);
+                if (option == null)
+                    continue;
+
+                field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("Description", new CodeAttributeArgument(new CodePrimitiveExpression(option.Label?.LocalizedLabels?.FirstOrDefault()?.Label))));
+
+                var status = option as StatusOptionMetadata;
+                if (status != null && enumAttributeMetadata.LogicalName == "statuscode")
+                {
+                    var parentEnt = metadata.Entities.First(x => x.LogicalName == enumAttributeMetadata.EntityLogicalName);
+                    var stateOptionSet = parentEnt.Attributes.OfType<StateAttributeMetadata>().FirstOrDefault()?.OptionSet;
+                    if (stateOptionSet == null)
+                    {
+                        continue;
+                    }
+
+                    var stateOptionSetName = namingService.GetNameForOptionSet(parentEnt, stateOptionSet, Services);
+                    if (NestNonGlobalEnums)
+                    {
+                        var stateParts = stateOptionSetName.Split('_');
+                        stateOptionSetName = $"{string.Join("_", stateParts.Skip(1))}";
+                    }
+
+                    var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
+
+                    var optionName = namingService.GetNameForOption(stateOptionSet, stateOption, Services);
+                    field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
+                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(stateOptionSetName), optionName)
+                    )));
+                }
+            }
         }
 
         private IEnumerable<string> GetAttributeValues<T>(CodeAttributeDeclarationCollection customAttributes) where T : Attribute

@@ -26,245 +26,65 @@ namespace EarlyBoundTypes
 	public enum ComponentType
 	{
 		
-		[Description("Entity")]
+		[Description("AI Configuration")]
 		[EnumMember()]
-		Entity = 1,
+		AIConfiguration = 402,
 		
-		[Description("Attribute")]
+		[Description("AI Project")]
 		[EnumMember()]
-		Attribute = 2,
+		AIProject = 401,
 		
-		[Description("Relationship")]
+		[Description("AI Project Type")]
 		[EnumMember()]
-		Relationship = 3,
-		
-		[Description("Attribute Picklist Value")]
-		[EnumMember()]
-		AttributePicklistValue = 4,
-		
-		[Description("Attribute Lookup Value")]
-		[EnumMember()]
-		AttributeLookupValue = 5,
-		
-		[Description("View Attribute")]
-		[EnumMember()]
-		ViewAttribute = 6,
-		
-		[Description("Localized Label")]
-		[EnumMember()]
-		LocalizedLabel = 7,
-		
-		[Description("Relationship Extra Condition")]
-		[EnumMember()]
-		RelationshipExtraCondition = 8,
-		
-		[Description("Option Set")]
-		[EnumMember()]
-		OptionSet = 9,
-		
-		[Description("Entity Relationship")]
-		[EnumMember()]
-		EntityRelationship = 10,
-		
-		[Description("Entity Relationship Role")]
-		[EnumMember()]
-		EntityRelationshipRole = 11,
-		
-		[Description("Entity Relationship Relationships")]
-		[EnumMember()]
-		EntityRelationshipRelationships = 12,
-		
-		[Description("Managed Property")]
-		[EnumMember()]
-		ManagedProperty = 13,
-		
-		[Description("Entity Key")]
-		[EnumMember()]
-		EntityKey = 14,
-		
-		[Description("Privilege")]
-		[EnumMember()]
-		Privilege = 16,
-		
-		[Description("PrivilegeObjectTypeCode")]
-		[EnumMember()]
-		PrivilegeObjectTypeCode = 17,
-		
-		[Description("Role")]
-		[EnumMember()]
-		Role = 20,
-		
-		[Description("Role Privilege")]
-		[EnumMember()]
-		RolePrivilege = 21,
-		
-		[Description("Display String")]
-		[EnumMember()]
-		DisplayString = 22,
-		
-		[Description("Display String Map")]
-		[EnumMember()]
-		DisplayStringMap = 23,
-		
-		[Description("Form")]
-		[EnumMember()]
-		Form = 24,
-		
-		[Description("Organization")]
-		[EnumMember()]
-		Organization = 25,
-		
-		[Description("Saved Query")]
-		[EnumMember()]
-		SavedQuery = 26,
-		
-		[Description("Workflow")]
-		[EnumMember()]
-		Workflow = 29,
-		
-		[Description("Report")]
-		[EnumMember()]
-		Report = 31,
-		
-		[Description("Report Entity")]
-		[EnumMember()]
-		ReportEntity = 32,
-		
-		[Description("Report Category")]
-		[EnumMember()]
-		ReportCategory = 33,
-		
-		[Description("Report Visibility")]
-		[EnumMember()]
-		ReportVisibility = 34,
+		AIProjectType = 400,
 		
 		[Description("Attachment")]
 		[EnumMember()]
 		Attachment = 35,
 		
-		[Description("Email Template")]
+		[Description("Attribute")]
 		[EnumMember()]
-		EmailTemplate = 36,
+		Attribute = 2,
 		
-		[Description("Contract Template")]
+		[Description("Attribute Image Configuration")]
 		[EnumMember()]
-		ContractTemplate = 37,
+		AttributeImageConfiguration = 431,
 		
-		[Description("KB Article Template")]
+		[Description("Attribute Lookup Value")]
 		[EnumMember()]
-		KBArticleTemplate = 38,
-		
-		[Description("Mail Merge Template")]
-		[EnumMember()]
-		MailMergeTemplate = 39,
-		
-		[Description("Duplicate Rule")]
-		[EnumMember()]
-		DuplicateRule = 44,
-		
-		[Description("Duplicate Rule Condition")]
-		[EnumMember()]
-		DuplicateRuleCondition = 45,
-		
-		[Description("Entity Map")]
-		[EnumMember()]
-		EntityMap = 46,
+		AttributeLookupValue = 5,
 		
 		[Description("Attribute Map")]
 		[EnumMember()]
 		AttributeMap = 47,
 		
-		[Description("Ribbon Command")]
+		[Description("Attribute Picklist Value")]
 		[EnumMember()]
-		RibbonCommand = 48,
+		AttributePicklistValue = 4,
 		
-		[Description("Ribbon Context Group")]
+		[Description("Canvas App")]
 		[EnumMember()]
-		RibbonContextGroup = 49,
-		
-		[Description("Ribbon Customization")]
-		[EnumMember()]
-		RibbonCustomization = 50,
-		
-		[Description("Ribbon Rule")]
-		[EnumMember()]
-		RibbonRule = 52,
-		
-		[Description("Ribbon Tab To Command Map")]
-		[EnumMember()]
-		RibbonTabToCommandMap = 53,
-		
-		[Description("Ribbon Diff")]
-		[EnumMember()]
-		RibbonDiff = 55,
-		
-		[Description("Saved Query Visualization")]
-		[EnumMember()]
-		SavedQueryVisualization = 59,
-		
-		[Description("System Form")]
-		[EnumMember()]
-		SystemForm = 60,
-		
-		[Description("Web Resource")]
-		[EnumMember()]
-		WebResource = 61,
-		
-		[Description("Site Map")]
-		[EnumMember()]
-		SiteMap = 62,
-		
-		[Description("Connection Role")]
-		[EnumMember()]
-		ConnectionRole = 63,
+		CanvasApp = 300,
 		
 		[Description("Complex Control")]
 		[EnumMember()]
 		ComplexControl = 64,
 		
-		[Description("Field Security Profile")]
+		[Description("Connection Role")]
 		[EnumMember()]
-		FieldSecurityProfile = 70,
+		ConnectionRole = 63,
 		
-		[Description("Field Permission")]
+		[Description("Connector")]
 		[EnumMember()]
-		FieldPermission = 71,
+		Connector = 371,
 		
-		[Description("Plugin Type")]
+		[Description("Connector")]
 		[EnumMember()]
-		PluginType = 90,
+		Connector2 = 372,
 		
-		[Description("Plugin Assembly")]
+		[Description("Contract Template")]
 		[EnumMember()]
-		PluginAssembly = 91,
-		
-		[Description("SDK Message Processing Step")]
-		[EnumMember()]
-		SDKMessageProcessingStep = 92,
-		
-		[Description("SDK Message Processing Step Image")]
-		[EnumMember()]
-		SDKMessageProcessingStepImage = 93,
-		
-		[Description("Service Endpoint")]
-		[EnumMember()]
-		ServiceEndpoint = 95,
-		
-		[Description("Routing Rule")]
-		[EnumMember()]
-		RoutingRule = 150,
-		
-		[Description("Routing Rule Item")]
-		[EnumMember()]
-		RoutingRuleItem = 151,
-		
-		[Description("SLA")]
-		[EnumMember()]
-		SLA = 152,
-		
-		[Description("SLA Item")]
-		[EnumMember()]
-		SLAItem = 153,
+		ContractTemplate = 37,
 		
 		[Description("Convert Rule")]
 		[EnumMember()]
@@ -273,22 +93,6 @@ namespace EarlyBoundTypes
 		[Description("Convert Rule Item")]
 		[EnumMember()]
 		ConvertRuleItem = 155,
-		
-		[Description("Hierarchy Rule")]
-		[EnumMember()]
-		HierarchyRule = 65,
-		
-		[Description("Mobile Offline Profile")]
-		[EnumMember()]
-		MobileOfflineProfile = 161,
-		
-		[Description("Mobile Offline Profile Item")]
-		[EnumMember()]
-		MobileOfflineProfileItem = 162,
-		
-		[Description("Similarity Rule")]
-		[EnumMember()]
-		SimilarityRule = 165,
 		
 		[Description("Custom Control")]
 		[EnumMember()]
@@ -302,6 +106,210 @@ namespace EarlyBoundTypes
 		[EnumMember()]
 		DataSourceMapping = 166,
 		
+		[Description("Display String")]
+		[EnumMember()]
+		DisplayString = 22,
+		
+		[Description("Display String Map")]
+		[EnumMember()]
+		DisplayStringMap = 23,
+		
+		[Description("Duplicate Rule")]
+		[EnumMember()]
+		DuplicateRule = 44,
+		
+		[Description("Duplicate Rule Condition")]
+		[EnumMember()]
+		DuplicateRuleCondition = 45,
+		
+		[Description("Email Template")]
+		[EnumMember()]
+		EmailTemplate = 36,
+		
+		[Description("Entity")]
+		[EnumMember()]
+		Entity = 1,
+		
+		[Description("Entity Analytics Configuration")]
+		[EnumMember()]
+		EntityAnalyticsConfiguration = 430,
+		
+		[Description("Entity Image Configuration")]
+		[EnumMember()]
+		EntityImageConfiguration = 432,
+		
+		[Description("Entity Key")]
+		[EnumMember()]
+		EntityKey = 14,
+		
+		[Description("Entity Map")]
+		[EnumMember()]
+		EntityMap = 46,
+		
+		[Description("Entity Relationship")]
+		[EnumMember()]
+		EntityRelationship = 10,
+		
+		[Description("Entity Relationship Relationships")]
+		[EnumMember()]
+		EntityRelationshipRelationships = 12,
+		
+		[Description("Entity Relationship Role")]
+		[EnumMember()]
+		EntityRelationshipRole = 11,
+		
+		[Description("Environment Variable Definition")]
+		[EnumMember()]
+		EnvironmentVariableDefinition = 380,
+		
+		[Description("Environment Variable Value")]
+		[EnumMember()]
+		EnvironmentVariableValue = 381,
+		
+		[Description("Field Permission")]
+		[EnumMember()]
+		FieldPermission = 71,
+		
+		[Description("Field Security Profile")]
+		[EnumMember()]
+		FieldSecurityProfile = 70,
+		
+		[Description("Form")]
+		[EnumMember()]
+		Form = 24,
+		
+		[Description("Hierarchy Rule")]
+		[EnumMember()]
+		HierarchyRule = 65,
+		
+		[Description("Import Map")]
+		[EnumMember()]
+		ImportMap = 208,
+		
+		[Description("Index")]
+		[EnumMember()]
+		Index = 18,
+		
+		[Description("KB Article Template")]
+		[EnumMember()]
+		KBArticleTemplate = 38,
+		
+		[Description("Localized Label")]
+		[EnumMember()]
+		LocalizedLabel = 7,
+		
+		[Description("Mail Merge Template")]
+		[EnumMember()]
+		MailMergeTemplate = 39,
+		
+		[Description("Managed Property")]
+		[EnumMember()]
+		ManagedProperty = 13,
+		
+		[Description("Mobile Offline Profile")]
+		[EnumMember()]
+		MobileOfflineProfile = 161,
+		
+		[Description("Mobile Offline Profile Item")]
+		[EnumMember()]
+		MobileOfflineProfileItem = 162,
+		
+		[Description("Option Set")]
+		[EnumMember()]
+		OptionSet = 9,
+		
+		[Description("Organization")]
+		[EnumMember()]
+		Organization = 25,
+		
+		[Description("Plugin Assembly")]
+		[EnumMember()]
+		PluginAssembly = 91,
+		
+		[Description("Plugin Type")]
+		[EnumMember()]
+		PluginType = 90,
+		
+		[Description("Privilege")]
+		[EnumMember()]
+		Privilege = 16,
+		
+		[Description("PrivilegeObjectTypeCode")]
+		[EnumMember()]
+		PrivilegeObjectTypeCode = 17,
+		
+		[Description("Relationship")]
+		[EnumMember()]
+		Relationship = 3,
+		
+		[Description("Relationship Extra Condition")]
+		[EnumMember()]
+		RelationshipExtraCondition = 8,
+		
+		[Description("Report")]
+		[EnumMember()]
+		Report = 31,
+		
+		[Description("Report Category")]
+		[EnumMember()]
+		ReportCategory = 33,
+		
+		[Description("Report Entity")]
+		[EnumMember()]
+		ReportEntity = 32,
+		
+		[Description("Report Visibility")]
+		[EnumMember()]
+		ReportVisibility = 34,
+		
+		[Description("Ribbon Command")]
+		[EnumMember()]
+		RibbonCommand = 48,
+		
+		[Description("Ribbon Context Group")]
+		[EnumMember()]
+		RibbonContextGroup = 49,
+		
+		[Description("Ribbon Customization")]
+		[EnumMember()]
+		RibbonCustomization = 50,
+		
+		[Description("Ribbon Diff")]
+		[EnumMember()]
+		RibbonDiff = 55,
+		
+		[Description("Ribbon Rule")]
+		[EnumMember()]
+		RibbonRule = 52,
+		
+		[Description("Ribbon Tab To Command Map")]
+		[EnumMember()]
+		RibbonTabToCommandMap = 53,
+		
+		[Description("Role")]
+		[EnumMember()]
+		Role = 20,
+		
+		[Description("Role Privilege")]
+		[EnumMember()]
+		RolePrivilege = 21,
+		
+		[Description("Routing Rule")]
+		[EnumMember()]
+		RoutingRule = 150,
+		
+		[Description("Routing Rule Item")]
+		[EnumMember()]
+		RoutingRuleItem = 151,
+		
+		[Description("Saved Query")]
+		[EnumMember()]
+		SavedQuery = 26,
+		
+		[Description("Saved Query Visualization")]
+		[EnumMember()]
+		SavedQueryVisualization = 59,
+		
 		[Description("SDKMessage")]
 		[EnumMember()]
 		SDKMessage = 201,
@@ -313,6 +321,14 @@ namespace EarlyBoundTypes
 		[Description("SdkMessagePair")]
 		[EnumMember()]
 		SdkMessagePair = 203,
+		
+		[Description("SDK Message Processing Step")]
+		[EnumMember()]
+		SDKMessageProcessingStep = 92,
+		
+		[Description("SDK Message Processing Step Image")]
+		[EnumMember()]
+		SDKMessageProcessingStepImage = 93,
 		
 		[Description("SdkMessageRequest")]
 		[EnumMember()]
@@ -330,61 +346,45 @@ namespace EarlyBoundTypes
 		[EnumMember()]
 		SdkMessageResponseField = 207,
 		
+		[Description("Service Endpoint")]
+		[EnumMember()]
+		ServiceEndpoint = 95,
+		
+		[Description("Similarity Rule")]
+		[EnumMember()]
+		SimilarityRule = 165,
+		
+		[Description("Site Map")]
+		[EnumMember()]
+		SiteMap = 62,
+		
+		[Description("SLA")]
+		[EnumMember()]
+		SLA = 152,
+		
+		[Description("SLA Item")]
+		[EnumMember()]
+		SLAItem = 153,
+		
+		[Description("System Form")]
+		[EnumMember()]
+		SystemForm = 60,
+		
+		[Description("View Attribute")]
+		[EnumMember()]
+		ViewAttribute = 6,
+		
+		[Description("Web Resource")]
+		[EnumMember()]
+		WebResource = 61,
+		
 		[Description("WebWizard")]
 		[EnumMember()]
 		WebWizard = 210,
 		
-		[Description("Index")]
+		[Description("Workflow")]
 		[EnumMember()]
-		Index = 18,
-		
-		[Description("Import Map")]
-		[EnumMember()]
-		ImportMap = 208,
-		
-		[Description("Canvas App")]
-		[EnumMember()]
-		CanvasApp = 300,
-		
-		[Description("Connector")]
-		[EnumMember()]
-		Connector = 371,
-		
-		[Description("Connector")]
-		[EnumMember()]
-		Connector2 = 372,
-		
-		[Description("Environment Variable Definition")]
-		[EnumMember()]
-		EnvironmentVariableDefinition = 380,
-		
-		[Description("Environment Variable Value")]
-		[EnumMember()]
-		EnvironmentVariableValue = 381,
-		
-		[Description("AI Project Type")]
-		[EnumMember()]
-		AIProjectType = 400,
-		
-		[Description("AI Project")]
-		[EnumMember()]
-		AIProject = 401,
-		
-		[Description("AI Configuration")]
-		[EnumMember()]
-		AIConfiguration = 402,
-		
-		[Description("Entity Analytics Configuration")]
-		[EnumMember()]
-		EntityAnalyticsConfiguration = 430,
-		
-		[Description("Attribute Image Configuration")]
-		[EnumMember()]
-		AttributeImageConfiguration = 431,
-		
-		[Description("Entity Image Configuration")]
-		[EnumMember()]
-		EntityImageConfiguration = 432,
+		Workflow = 29,
 	}
 	
 	[DataContract()]
@@ -397,12 +397,6 @@ namespace EarlyBoundTypes
 				base(EntityLogicalName)
 		{
 		}
-		
-		public const string EntityLogicalName = "solution";
-		
-		public const string EntityLogicalCollectionName = "solutions";
-		
-		public const string EntitySetName = "solutions";
 		
 		[AttributeLogicalNameAttribute("description")]
 		public string Description
@@ -430,6 +424,26 @@ namespace EarlyBoundTypes
 			}
 		}
 		
+		public const string EntityLogicalCollectionName = "solutions";
+		
+		public const string EntityLogicalName = "solution";
+		
+		public const string EntitySetName = "solutions";
+		
+		[AttributeLogicalNameAttribute("solutionid")]
+		public new virtual Guid Id
+		{
+			get
+			{
+				return base.Id != default ? base.Id : GetAttributeValue<Guid>("solutionid");
+			}
+			set
+			{
+				SetAttributeValue("solutionid", nameof(Id), value);
+				base.Id = value;
+			}
+		}
+		
 		[AttributeLogicalNameAttribute("installedon")]
 		public DateTime? InstalledOn
 		{
@@ -440,19 +454,6 @@ namespace EarlyBoundTypes
 			set
 			{
 				SetAttributeValue("installedon", nameof(InstalledOn), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("ismanaged")]
-		public bool? PackageType
-		{
-			get
-			{
-				return GetAttributeValue<bool?>("ismanaged");
-			}
-			set
-			{
-				SetAttributeValue("ismanaged", nameof(PackageType), value);
 			}
 		}
 		
@@ -469,6 +470,19 @@ namespace EarlyBoundTypes
 			}
 		}
 		
+		[AttributeLogicalNameAttribute("uniquename")]
+		public string Name
+		{
+			get
+			{
+				return GetAttributeValue<string>("uniquename");
+			}
+			set
+			{
+				SetAttributeValue("uniquename", nameof(Name), value);
+			}
+		}
+		
 		[AttributeLogicalNameAttribute("organizationid")]
 		public EntityReference OrganizationRef
 		{
@@ -482,6 +496,29 @@ namespace EarlyBoundTypes
 			}
 		}
 		
+		[AttributeLogicalNameAttribute("ismanaged")]
+		public bool? PackageType
+		{
+			get
+			{
+				return GetAttributeValue<bool?>("ismanaged");
+			}
+			set
+			{
+				SetAttributeValue("ismanaged", nameof(PackageType), value);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("parentsolutionid")]
+		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referencing)]
+		public Solution ParentSolution
+		{
+			get
+			{
+				return GetRelatedEntity<Solution>("solution_parent_solution", EntityRole.Referencing);
+			}
+		}
+		
 		[AttributeLogicalNameAttribute("parentsolutionid")]
 		public EntityReference ParentSolutionRef
 		{
@@ -492,6 +529,19 @@ namespace EarlyBoundTypes
 			set
 			{
 				SetAttributeValue("parentsolutionid", nameof(ParentSolutionRef), value);
+			}
+		}
+		
+		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referenced)]
+		public IEnumerable<Solution> ParentSolutionSolutions
+		{
+			get
+			{
+				return GetRelatedEntities<Solution>("solution_parent_solution", EntityRole.Referenced);
+			}
+			set
+			{
+				SetRelatedEntities<Solution>("solution_parent_solution", nameof(ParentSolutionSolutions), value, EntityRole.Referenced);
 			}
 		}
 		
@@ -521,17 +571,16 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("solutionid")]
-		public new virtual Guid Id
+		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
+		public IEnumerable<SolutionComponent> SolutionComponents
 		{
 			get
 			{
-				return base.Id != default ? base.Id : GetAttributeValue<Guid>("solutionid");
+				return GetRelatedEntities<SolutionComponent>("solution_solutioncomponent");
 			}
 			set
 			{
-				SetAttributeValue("solutionid", nameof(Id), value);
-				base.Id = value;
+				SetRelatedEntities<SolutionComponent>("solution_solutioncomponent", nameof(SolutionComponents), value);
 			}
 		}
 		
@@ -549,28 +598,15 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("solutiontype")]
-		public Solution_SolutionType? SolutionType
+		public Enums.SolutionType? SolutionType
 		{
 			get
 			{
-				return (Solution_SolutionType?)GetAttributeValue<OptionSetValue>("solutiontype")?.Value;
+				return (Enums.SolutionType?)GetAttributeValue<OptionSetValue>("solutiontype")?.Value;
 			}
 			set
 			{
 				SetAttributeValue("solutiontype", nameof(SolutionType), value.HasValue ? new OptionSetValue((int)value.Value) : null);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("uniquename")]
-		public string Name
-		{
-			get
-			{
-				return GetAttributeValue<string>("uniquename");
-			}
-			set
-			{
-				SetAttributeValue("uniquename", nameof(Name), value);
 			}
 		}
 		
@@ -613,108 +649,77 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referenced)]
-		public IEnumerable<Solution> ParentSolutionSolutions
+		[DataContract()]
+		public struct Enums
 		{
-			get
+			
+			[DataContract()]
+			public enum SolutionType
 			{
-				return GetRelatedEntities<Solution>("solution_parent_solution", EntityRole.Referenced);
-			}
-			set
-			{
-				SetRelatedEntities<Solution>("solution_parent_solution", nameof(ParentSolutionSolutions), value, EntityRole.Referenced);
-			}
-		}
-		
-		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public IEnumerable<SolutionComponent> SolutionComponents
-		{
-			get
-			{
-				return GetRelatedEntities<SolutionComponent>("solution_solutioncomponent");
-			}
-			set
-			{
-				SetRelatedEntities<SolutionComponent>("solution_solutioncomponent", nameof(SolutionComponents), value);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("parentsolutionid")]
-		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referencing)]
-		public Solution ParentSolution
-		{
-			get
-			{
-				return GetRelatedEntity<Solution>("solution_parent_solution", EntityRole.Referencing);
+				
+				[Description("Internal")]
+				[EnumMember()]
+				Internal = 2,
+				
+				[Description("None")]
+				[EnumMember()]
+				None = 0,
+				
+				[Description("Snapshot")]
+				[EnumMember()]
+				Snapshot = 1,
 			}
 		}
 		
 		[DataContract()]
-		public class LogicalNames
+		public struct LogicalNames
 		{
 			
-			public static string Description = "description";
+			public const string Description = "description";
 			
-			public static string DisplayName = "friendlyname";
+			public const string DisplayName = "friendlyname";
 			
-			public static string InstalledOn = "installedon";
+			public const string Id = "solutionid";
 			
-			public static string PackageType = "ismanaged";
+			public const string InstalledOn = "installedon";
 			
-			public static string IsVisibleOutsidePlatform = "isvisible";
+			public const string IsVisibleOutsidePlatform = "isvisible";
 			
-			public static string OrganizationRef = "organizationid";
+			public const string Name = "uniquename";
 			
-			public static string ParentSolutionRef = "parentsolutionid";
+			public const string OrganizationRef = "organizationid";
 			
-			public static string PinpointSolutionDefaultLocale = "pinpointsolutiondefaultlocale";
+			public const string PackageType = "ismanaged";
 			
-			public static string PublisherRef = "publisherid";
+			public const string ParentSolution = "parentsolutionid";
 			
-			public static string Id = "solutionid";
+			public const string ParentSolutionRef = "parentsolutionid";
 			
-			public static string SolutionPackageVersion = "solutionpackageversion";
+			public const string PinpointSolutionDefaultLocale = "pinpointsolutiondefaultlocale";
 			
-			public static string SolutionType = "solutiontype";
+			public const string PublisherRef = "publisherid";
 			
-			public static string Name = "uniquename";
+			public const string SolutionPackageVersion = "solutionpackageversion";
 			
-			public static string UpdatedOn = "updatedon";
+			public const string SolutionType = "solutiontype";
 			
-			public static string Version = "version";
+			public const string UpdatedOn = "updatedon";
 			
-			public static string VersionNumber = "versionnumber";
+			public const string Version = "version";
 			
-			public static string ParentSolution = "parentsolutionid";
+			public const string VersionNumber = "versionnumber";
 		}
 		
 		[DataContract()]
-		public class Relationships
+		public struct Relationships
 		{
 			
-			public static string ParentSolutionSolutions = "solution_parent_solution";
+			public const string ParentSolution = "solution_parent_solution";
 			
-			public static string SolutionComponents = "solution_solutioncomponent";
+			public const string ParentSolutionSolutions = "solution_parent_solution";
 			
-			public static string ParentSolution = "solution_parent_solution";
+			public const string SolutionComponents = "solution_solutioncomponent";
 		}
-	}
-	
-	[DataContract()]
-	public enum Solution_SolutionType
-	{
-		
-		[Description("None")]
-		[EnumMember()]
-		None = 0,
-		
-		[Description("Snapshot")]
-		[EnumMember()]
-		Snapshot = 1,
-		
-		[Description("Internal")]
-		[EnumMember()]
-		Internal = 2,
 	}
 	
 	[DataContract()]
@@ -728,22 +733,23 @@ namespace EarlyBoundTypes
 		{
 		}
 		
-		public const string EntityLogicalName = "solutioncomponent";
-		
 		public const string EntityLogicalCollectionName = "solutioncomponentss";
+		
+		public const string EntityLogicalName = "solutioncomponent";
 		
 		public const string EntitySetName = "solutioncomponents";
 		
-		[AttributeLogicalNameAttribute("componenttype")]
-		public ComponentType? ObjectTypeCode
+		[AttributeLogicalNameAttribute("solutioncomponentid")]
+		public new virtual Guid Id
 		{
 			get
 			{
-				return (ComponentType?)GetAttributeValue<OptionSetValue>("componenttype")?.Value;
+				return base.Id != default ? base.Id : GetAttributeValue<Guid>("solutioncomponentid");
 			}
 			set
 			{
-				SetAttributeValue("componenttype", nameof(ObjectTypeCode), value.HasValue ? new OptionSetValue((int)value.Value) : null);
+				SetAttributeValue("solutioncomponentid", nameof(Id), value);
+				base.Id = value;
 			}
 		}
 		
@@ -760,12 +766,25 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("rootcomponentbehavior")]
-		public SolutionComponent_IncludeBehavior? RootComponentBehavior
+		[AttributeLogicalNameAttribute("componenttype")]
+		public ComponentType? ObjectTypeCode
 		{
 			get
 			{
-				return (SolutionComponent_IncludeBehavior?)GetAttributeValue<OptionSetValue>("rootcomponentbehavior")?.Value;
+				return (ComponentType?)GetAttributeValue<OptionSetValue>("componenttype")?.Value;
+			}
+			set
+			{
+				SetAttributeValue("componenttype", nameof(ObjectTypeCode), value.HasValue ? new OptionSetValue((int)value.Value) : null);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("rootcomponentbehavior")]
+		public Enums.IncludeBehavior? RootComponentBehavior
+		{
+			get
+			{
+				return (Enums.IncludeBehavior?)GetAttributeValue<OptionSetValue>("rootcomponentbehavior")?.Value;
 			}
 			set
 			{
@@ -773,17 +792,26 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("solutioncomponentid")]
-		public new virtual Guid Id
+		[AttributeLogicalNameAttribute("rootsolutioncomponentid")]
+		public Guid? RootSolutionComponentId
 		{
 			get
 			{
-				return base.Id != default ? base.Id : GetAttributeValue<Guid>("solutioncomponentid");
+				return GetAttributeValue<Guid?>("rootsolutioncomponentid");
 			}
 			set
 			{
-				SetAttributeValue("solutioncomponentid", nameof(Id), value);
-				base.Id = value;
+				SetAttributeValue("rootsolutioncomponentid", nameof(RootSolutionComponentId), value);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("solutionid")]
+		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
+		public Solution Solution1
+		{
+			get
+			{
+				return GetRelatedEntity<Solution>("solution_solutioncomponent");
 			}
 		}
 		
@@ -800,56 +828,53 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("solutionid")]
-		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public Solution Solution2
+		[DataContract()]
+		public struct Enums
 		{
-			get
+			
+			[DataContract()]
+			public enum IncludeBehavior
 			{
-				return GetRelatedEntity<Solution>("solution_solutioncomponent");
+				
+				[Description("Do not include subcomponents")]
+				[EnumMember()]
+				DoNotIncludeSubcomponents = 1,
+				
+				[Description("Include As Shell Only")]
+				[EnumMember()]
+				IncludeAsShellOnly = 2,
+				
+				[Description("Include Subcomponents")]
+				[EnumMember()]
+				IncludeSubcomponents = 0,
 			}
 		}
 		
 		[DataContract()]
-		public class LogicalNames
+		public struct LogicalNames
 		{
 			
-			public static string ObjectTypeCode = "componenttype";
+			public const string Id = "solutioncomponentid";
 			
-			public static string ObjectId = "objectid";
+			public const string ObjectId = "objectid";
 			
-			public static string RootComponentBehavior = "rootcomponentbehavior";
+			public const string ObjectTypeCode = "componenttype";
 			
-			public static string Id = "solutioncomponentid";
+			public const string RootComponentBehavior = "rootcomponentbehavior";
 			
-			public static string SolutionRef = "solutionid";
+			public const string RootSolutionComponentId = "rootsolutioncomponentid";
 			
-			public static string Solution2 = "solutionid";
+			public const string Solution1 = "solutionid";
+			
+			public const string SolutionRef = "solutionid";
 		}
 		
 		[DataContract()]
-		public class Relationships
+		public struct Relationships
 		{
 			
-			public static string Solution2 = "solution_solutioncomponent";
+			public const string Solution1 = "solution_solutioncomponent";
 		}
-	}
-	
-	[DataContract()]
-	public enum SolutionComponent_IncludeBehavior
-	{
-		
-		[Description("Include Subcomponents")]
-		[EnumMember()]
-		IncludeSubcomponents = 0,
-		
-		[Description("Do not include subcomponents")]
-		[EnumMember()]
-		DoNotIncludeSubcomponents = 1,
-		
-		[Description("Include As Shell Only")]
-		[EnumMember()]
-		IncludeAsShellOnly = 2,
 	}
 	
 	[DataContract()]

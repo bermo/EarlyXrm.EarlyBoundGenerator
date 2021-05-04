@@ -22,7 +22,7 @@
 
 	<file src="bin\$configuration$\EarlyXrm.EarlyBoundGenerator.exe" target="build\EarlyXrm.EarlyBoundGenerator.exe" />
 	<file src="bin\$configuration$\CrmSvcUtil.exe" target="build\CrmSvcUtil.exe" />
-	<file src="bin\$configuration$\CrmSvcUtil.exe" target="build\CrmSvcUtil.exe.config" />
+	<file src="bin\$configuration$\CrmSvcUtil.exe.config" target="build\CrmSvcUtil.exe.config" />
 	<file src="bin\$configuration$\Microsoft.Crm.Sdk.Proxy.dll" target="build\Microsoft.Crm.Sdk.Proxy.dll" />
 	<file src="bin\$configuration$\Microsoft.Xrm.Sdk.dll" target="build\Microsoft.Xrm.Sdk.dll" />
 	<file src="bin\$configuration$\Microsoft.Xrm.Tooling.CrmConnectControl.dll" target="build\Microsoft.Xrm.Tooling.CrmConnectControl.dll" />

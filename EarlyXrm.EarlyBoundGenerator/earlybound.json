@@ -5,7 +5,7 @@
   "DebugMode": false,
   "Instrument": false,
   "AddSetters": true, // globally add setters to readonly properties (note, this will cause exceptions in some cases)
-  "NestNonGlobalEnums": true, // this nests entity specific enums inside the entity class
+  "NestNonGlobalEnums": true, // this nests entity specific enums inside the entity class.  Only works if UseDisplayNames = true
   "GenerateConstants": true, // generates a list of nested constants containing logical name and relationships
 
   "Include": {

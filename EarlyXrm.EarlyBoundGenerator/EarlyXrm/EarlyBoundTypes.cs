@@ -691,8 +691,6 @@ namespace EarlyBoundTypes
 			
 			public const string PackageType = "ismanaged";
 			
-			public const string ParentSolution = "parentsolutionid";
-			
 			public const string ParentSolutionRef = "parentsolutionid";
 			
 			public const string PinpointSolutionDefaultLocale = "pinpointsolutiondefaultlocale";
@@ -863,8 +861,6 @@ namespace EarlyBoundTypes
 			public const string RootComponentBehavior = "rootcomponentbehavior";
 			
 			public const string RootSolutionComponentId = "rootsolutioncomponentid";
-			
-			public const string Solution1 = "solutionid";
 			
 			public const string SolutionRef = "solutionid";
 		}

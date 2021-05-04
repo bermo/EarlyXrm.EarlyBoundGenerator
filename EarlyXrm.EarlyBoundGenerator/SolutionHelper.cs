@@ -120,6 +120,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     if ((!skipFields?.Any(y => y == attribute.LogicalName) ?? true) &&
                         (!skipGlobal?.Any(y => y == attribute.LogicalName) ?? true) &&
                         (
+                            extra.ContainsKey("*") ||
                             entity.IsCustomEntity == true ||
                             solutionComponent != null && solutionComponent.RootComponentBehavior == SolutionComponent.Enums.IncludeBehavior.IncludeSubcomponents ||
                             (extraFields?.Any(y => y == attribute.LogicalName) ?? extra.ContainsKey(entity.LogicalName)) ||
@@ -299,6 +300,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 .Replace(";", "")
                                 .Replace("$", "")
                                 .Replace("’", "")
+                                .Replace("=", "")
                                 .Replace("&", "")
                                 .Replace("|", "")
                                 ;

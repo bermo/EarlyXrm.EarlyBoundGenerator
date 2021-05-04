@@ -634,7 +634,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var valMember = bType.Members.Cast<CodeTypeMember>().First(x => x.Name == "Val");
             var customAtt = valMember.CustomAttributes.Cast<CodeAttributeDeclaration>().FirstOrDefault(x => x.Name == "AmbientValue");
             var firstArg = customAtt.Arguments.Cast<CodeAttributeArgument>().First().Value as CodeFieldReferenceExpression;
-            Assert.AreEqual("B", (firstArg.TargetObject as CodeTypeReferenceExpression).Type.BaseType);
+            Assert.AreEqual("Test_B", (firstArg.TargetObject as CodeTypeReferenceExpression).Type.BaseType);
             Assert.AreEqual("Blah", firstArg.FieldName);
         }
     }

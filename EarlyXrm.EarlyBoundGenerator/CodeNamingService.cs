@@ -72,9 +72,11 @@ namespace EarlyXrm.EarlyBoundGenerator
                 }
 
                 if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
+                {
                     attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
+                }
 
-                if (attributeName == "EntityLogicalName")
+                if (attributeName == "EntityLogicalName" || attributeName == "LogicalName" || attributeName == "Attributes")
                 {
                     attributeName += "2";
                 }
@@ -178,11 +180,13 @@ namespace EarlyXrm.EarlyBoundGenerator
                                     .Select(x => x.x.x)
                                     .OrderBy(x => x.SchemaName).ToList();
 
-                        if (dups.Count() > 1)
+                        var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == ent);
+
+                        if ((attDups + dups.Count()) > 1)
                         {
-                            var index = dups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                            var index = attDups + dups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
                             if (index > 1)
-                                ent += index.ToString();
+                                ent += (attDups + index).ToString();
                         }
 
                         if (!string.IsNullOrWhiteSpace(ent))
@@ -326,6 +330,11 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         private static string EnsureValidIdentifier(string name)
         {
+            if (name == null)
+            {
+                return "_";
+            }
+
             var pattern = @"^[A-Za-z_][A-Za-z0-9_]*$";
 
             if (!Regex.IsMatch(name, pattern))

@@ -284,7 +284,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             
                             CleanEnum(enumDef, enumAtt);
 
-                            if (NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)
+                            if (UseDisplayNames && NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)
                             {
                                 optionsSetName = $"Enums.{string.Join("_", optionsSetName.Split('_').Skip(1))}";
                             }
@@ -373,7 +373,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             
                             if (generate)
                             {
-                                var type = m2mEnt.DisplayName();
+                                var type = UseDisplayNames ? m2mEnt.DisplayName() : m2mEnt.SchemaName;
                                 if (string.IsNullOrEmpty(type))
                                     type = m2mEnt.SchemaName;
 
@@ -456,7 +456,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 codeCompileUnit.Namespaces[i].Types.AddRange(orderedTypes);
             }
 
-            if (NestNonGlobalEnums)
+            if (UseDisplayNames && NestNonGlobalEnums)
             {
                 for (var i = 0; i < codeCompileUnit.Namespaces.Count; ++i)
                 {
@@ -468,13 +468,12 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         if (type.IsEnum)
                         {
-
                             var segments = type.Name.Split('_');
 
                             if (segments.Count() <= 1)
                                 continue;
 
-                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name == segments[0]);
+                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name.StartsWith(segments[0], StringComparison.OrdinalIgnoreCase));
 
                             if (parent != null)
                             {
@@ -516,10 +515,11 @@ namespace EarlyXrm.EarlyBoundGenerator
                             foreach (var prop in props)
                             {
                                 var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
-                                if (logicalName != null)
+                                var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
+
+                                if (logicalName != null && relationshipSchema == null)
                                     logicalNames.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public const string {prop.Name} = \"{logicalName}\";"));
 
-                                var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
                                 if (relationshipSchema != null)
                                     relationships.Members.Add(new CodeSnippetTypeMember($"{new string('\t', 3)}public const string {prop.Name} = \"{relationshipSchema}\";"));
                             }
@@ -650,7 +650,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     }
 
                     var stateOptionSetName = namingService.GetNameForOptionSet(parentEnt, stateOptionSet, Services);
-                    if (NestNonGlobalEnums)
+                    if (NestNonGlobalEnums && UseDisplayNames)
                     {
                         var stateParts = stateOptionSetName.Split('_');
                         stateOptionSetName = $"{string.Join("_", stateParts.Skip(1))}";

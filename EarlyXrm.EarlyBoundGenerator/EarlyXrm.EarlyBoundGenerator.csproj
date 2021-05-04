@@ -39,9 +39,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CrmSvcUtil, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.CrmSdk.CoreTools.9.1.0.77\content\bin\coretools\CrmSvcUtil.exe</HintPath>
+    <Reference Include="CrmSvcUtil">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreTools.9.1.0.79\content\bin\coretools\CrmSvcUtil.exe</HintPath>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.33\lib\net462\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
@@ -50,7 +49,7 @@
       <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.5.2.9\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Rest.ClientRuntime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Rest.ClientRuntime.2.3.23\lib\net461\Microsoft.Rest.ClientRuntime.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CrmSdk.XrmTooling.CoreAssembly.9.1.0.79\lib\net462\Microsoft.Rest.ClientRuntime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Xrm.Sdk, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -63,7 +62,7 @@
       <HintPath>..\packages\Microsoft.CrmSdk.Workflow.9.0.2.33\lib\net462\Microsoft.Xrm.Sdk.Workflow.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xrm.Tooling.Connector, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CrmSdk.XrmTooling.CoreAssembly.9.1.0.77\lib\net462\Microsoft.Xrm.Tooling.Connector.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CrmSdk.XrmTooling.CoreAssembly.9.1.0.79\lib\net462\Microsoft.Xrm.Tooling.Connector.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Xrm.Tooling.Ui.Styles, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -129,9 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bin\coretools\CrmSvcUtil.exe.config" />
-    <None Include="bin\coretools\LicenseTerms.docx" />
-    <None Include="bin\coretools\SolutionPackager.exe.config" />
     <None Include="earlybound.bat" />
     <None Include="EarlyXrm.EarlyBoundGenerator.nuspec" />
     <None Include="EarlyXrm.EarlyBoundGenerator.targets" />
@@ -143,31 +139,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Debug\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\coretools\CrmSvcUtil.exe" />
-    <Content Include="bin\coretools\CrmSvcUtil.xml" />
-    <Content Include="bin\coretools\Microsoft.ApplicationInsights.dll" />
-    <Content Include="bin\coretools\Microsoft.Crm.Sdk.Proxy.dll" />
-    <Content Include="bin\coretools\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
-    <Content Include="bin\coretools\Microsoft.PowerApps.AppInsights.BatchedTelemetry.dll" />
-    <Content Include="bin\coretools\Microsoft.PowerApps.AppInsights.BatchedTelemetryChannel.dll" />
-    <Content Include="bin\coretools\Microsoft.Rest.ClientRuntime.dll" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Sdk.Deployment.dll" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Sdk.dll" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Tooling.Connector.dll" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Tooling.CrmConnectControl.dll" />
-    <Content Include="bin\coretools\Microsoft.Xrm.Tooling.Ui.Styles.dll" />
-    <Content Include="bin\coretools\Newtonsoft.Json.dll" />
-    <Content Include="bin\coretools\Other Redistributable.txt" />
-    <Content Include="bin\coretools\pacTelemetryUpload.exe" />
-    <Content Include="bin\coretools\SolutionPackager.exe" />
-    <Content Include="bin\coretools\SolutionPackagerLib.dll" />
-    <Content Include="bin\coretools\System.Diagnostics.DiagnosticSource.dll" />
-    <Content Include="bin\coretools\System.ValueTuple.dll" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -12,6 +12,12 @@
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\CrmSvcUtil.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
+	<Target Name="CopySvcUtil" BeforeTargets="Build">
+		<Copy
+          SourceFiles="$(MSBuildThisFileDirectory)CrmSvcUtil.exe.config"
+          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\CrmSvcUtil.exe.config"
+          SkipUnchangedFiles="true"/>
+	</Target>
 	<Target Name="CopySDKProxy" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Crm.Sdk.Proxy.dll"

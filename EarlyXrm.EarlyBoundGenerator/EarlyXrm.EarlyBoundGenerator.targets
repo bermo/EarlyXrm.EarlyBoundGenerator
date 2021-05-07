@@ -3,80 +3,31 @@
 	<Target Name="CopyEarlyBound" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)EarlyXrm.EarlyBoundGenerator.exe"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\EarlyXrm.EarlyBoundGenerator.exe"
+          DestinationFiles="$(MSBuildProjectDirectory)\bin\coretools\EarlyXrm.EarlyBoundGenerator.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
-	<Target Name="CopySvcUtil" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)CrmSvcUtil.exe"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\CrmSvcUtil.exe"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopySvcUtil" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)CrmSvcUtil.exe.config"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\CrmSvcUtil.exe.config"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopySDKProxy" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Crm.Sdk.Proxy.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Crm.Sdk.Proxy.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopySDK" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Sdk.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Sdk.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyCrmConnect" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.CrmConnectControl.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.CrmConnectControl.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyConnector" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.Connector.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.Connector.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyUiStyles" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.Xrm.Tooling.Connector.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.Xrm.Tooling.Ui.Styles.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyAD" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyJson" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)Newtonsoft.Json.dll"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\Newtonsoft.Json.dll"
-          SkipUnchangedFiles="true"/>
-	</Target>
-	<Target Name="CopyGenerate" BeforeTargets="Build">
-		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)generate.bat"
-          DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\generate.bat"
-          SkipUnchangedFiles="true"/>
-	</Target>
-
+	
 	<Target Name="CopyBatch" BeforeTargets="Build">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.bat"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat"
           SkipUnchangedFiles="true"/>
 	</Target>
+	
 	<Target Name="CopyConfig" BeforeTargets="Build" Condition="!Exists('$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json')">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.json"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json"
+          SkipUnchangedFiles="true"/>
+	</Target>
+
+	<Target Name="CopyCoreTools" BeforeTargets="Build">
+		<ItemGroup>
+			<CoreTools Include="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\*\content\bin\coretools\*.*" />
+		</ItemGroup>
+		<Copy
+          SourceFiles="@(CoreTools)"
+          DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
 	</Target>
 	

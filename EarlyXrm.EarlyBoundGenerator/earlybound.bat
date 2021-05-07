@@ -1,1 +1,1 @@
-EarlyXrm.EarlyBoundGenerator.exe
+..\bin\coretools\EarlyXrm.EarlyBoundGenerator.exe

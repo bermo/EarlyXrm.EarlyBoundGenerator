@@ -16,19 +16,19 @@ namespace EarlyXrm.EarlyBoundGenerator
             var configFile = new FileInfo("earlybound.json");
 
             if (!configFile.Exists)
-                throw new ApplicationException("Cannot find config file!");
+                throw new ApplicationException("Cannot find config file (\"earlybound.json\")!");
 
             var settings = File.ReadAllText(configFile.FullName);
 
             var earlyBoundConfig = JsonConvert.DeserializeObject<EarlyBoundConfig>(settings);
 
-            var parameters = new List<string>();
+            var parameters = new Dictionary<string,string>();
 
             var solutions = string.Join(";", earlyBoundConfig.Solutions);
 
             if (earlyBoundConfig.ConnectionString != null)
             {
-                parameters.Add($"/connectionstring:\"{earlyBoundConfig.ConnectionString}\"");
+                parameters.Add($"connectionstring", $"\"{earlyBoundConfig.ConnectionString}\"");
             }
             else
             {
@@ -47,56 +47,63 @@ namespace EarlyXrm.EarlyBoundGenerator
                     return;
                 }
 
-                parameters.Add($"/interactivelogin");
+                parameters.Add($"interactivelogin", null);
             }
             
-            parameters.Add(solutions);
+            parameters.Add("solutionname", solutions);
 
-            parameters.Add(earlyBoundConfig.Namespace);
+            parameters.Add("namespace", earlyBoundConfig.Namespace);
 
             var extra = earlyBoundConfig.Include;
 
             if (extra != null)
-                parameters.Add(string.Join(";", extra.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
+                parameters.Add("extra", string.Join(";", extra.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
             else
-                parameters.Add(null);
+                parameters.Add("extra", null);
 
             var skip = earlyBoundConfig.Exclude;
             if (skip != null)
-                parameters.Add(string.Join(";", skip.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
+                parameters.Add("skip", string.Join(";", skip.Select(x => x.Key + (x.Value?.Any() == true ? ":" + string.Join(",", x.Value) : ""))));
             else
-                parameters.Add(null);
+                parameters.Add("skip", null);
 
-            parameters.Add(earlyBoundConfig.UseDisplayNames.ToString().ToLower());
-            parameters.Add(earlyBoundConfig.DebugMode.ToString().ToLower());
-            parameters.Add(earlyBoundConfig.Instrument.ToString().ToLower());
-            parameters.Add(earlyBoundConfig.AddSetters.ToString().ToLower());
+            parameters.Add("usedisplaynames", earlyBoundConfig.UseDisplayNames.ToString().ToLower());
+            parameters.Add("debugMode", earlyBoundConfig.DebugMode.ToString().ToLower());
+            parameters.Add("instrument", earlyBoundConfig.Instrument.ToString().ToLower());
+            parameters.Add("addsetters", earlyBoundConfig.AddSetters.ToString().ToLower());
 
-            if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
-            {
+            //if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
+            //{
                 earlyBoundConfig.Out = @"..\..\" + earlyBoundConfig.Out;
-            }
+            //}
 
             var outDir = Path.GetDirectoryName(earlyBoundConfig.Out);
             if (Directory.Exists(outDir) == false)
                 Directory.CreateDirectory(outDir);
 
-            parameters.Add(earlyBoundConfig.Out);
+            parameters.Add("out", earlyBoundConfig.Out);
 
-            parameters.Add(earlyBoundConfig.NestNonGlobalEnums.ToString().ToLower());
-            parameters.Add(earlyBoundConfig.GenerateConstants.ToString().ToLower());
+            parameters.Add("nestnonglobalenums", earlyBoundConfig.NestNonGlobalEnums.ToString().ToLower());
+            parameters.Add("generateconstants", earlyBoundConfig.GenerateConstants.ToString().ToLower());
 
-            parameters = parameters.Select(x => x.StartsWith("/") ? x : $"\"{x}\"").ToList();
+            parameters.Add("codewriterfilter", $"{typeof(CodeFilteringService).AssemblyQualifiedName}");
+            parameters.Add("codecustomization", $"{typeof(CodeCustomistationService).AssemblyQualifiedName}");
+            parameters.Add("namingservice", $"{typeof(CodeNamingService).AssemblyQualifiedName}");
+
+            var arguments = parameters.Select(x => $"/{x.Key}{(x.Value == null ? string.Empty : $":\"{x.Value}\"")}");
+
+            var path = configFile.DirectoryName.EndsWith(@"\bin\Debug") ? "" : @"..\bin\coretools\";
 
             var process = new Process
             {
-                StartInfo = new ProcessStartInfo
+                StartInfo = new ProcessStartInfo()
                 {
-                    FileName = "generate.bat",
-                    Arguments = string.Join(" ", parameters),
+                    WorkingDirectory = path,
+                    FileName = path + "CrmSvcUtil.exe",
+                    Arguments = string.Join(" ", arguments),
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
                 }
             };
             process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata minClientVersion="2.5">
     <id>EarlyXrm.EarlyBoundGenerator</id>
-    <version>0.0.6</version>
+    <version>0.1.0-beta001</version>
     <authors>a berman</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<license type="expression">MIT</license>
@@ -11,7 +11,8 @@
 	<repository type="git" url="https://github.com/bermo/EarlyXrm.EarlyBoundGenerator.git"></repository>
     <dependencies>
       <group targetFramework=".NETFramework4.6.2">
-        <dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.33" exclude="Build,Analyzers" />
+		<dependency id="Microsoft.CrmSdk.CoreTools" version="9.1.0.79" exclude="Build,Analyzers" />
+		<dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.33" exclude="Build,Analyzers" />
 	  </group>
     </dependencies>
     <contentFiles />
@@ -25,8 +26,8 @@
 	<file src="earlybound.bat" target="build\earlybound.bat" />
 	<file src="earlybound.json" target="build\earlybound.json" />
 	  
-	<file src="earlybound.bat" target="content\bin\EarlyXrm\earlybound.bat" />
-	<file src="earlybound.json" target="content\bin\EarlyXrm\earlybound.json" />
+	<file src="earlybound.bat" target="content\EarlyXrm\earlybound.bat" />
+	<file src="earlybound.json" target="content\EarlyXrm\earlybound.json" />
 	  
   </files>
 </package>

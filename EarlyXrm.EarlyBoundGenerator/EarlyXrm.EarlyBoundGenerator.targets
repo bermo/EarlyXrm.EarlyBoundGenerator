@@ -31,8 +31,4 @@
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<ItemGroup>
-		<Content Include="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat" />
-		<Content Include="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json" />
-	</ItemGroup>
 </Project>

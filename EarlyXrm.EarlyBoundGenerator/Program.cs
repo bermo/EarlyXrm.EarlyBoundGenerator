@@ -72,10 +72,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             parameters.Add("instrument", earlyBoundConfig.Instrument.ToString().ToLower());
             parameters.Add("addsetters", earlyBoundConfig.AddSetters.ToString().ToLower());
 
-            //if (configFile.DirectoryName.EndsWith(@"\bin\Debug"))
-            //{
-                earlyBoundConfig.Out = @"..\..\" + earlyBoundConfig.Out;
-            //}
+            earlyBoundConfig.Out = @"..\..\" + earlyBoundConfig.Out;
 
             var outDir = Path.GetDirectoryName(earlyBoundConfig.Out);
             if (Directory.Exists(outDir) == false)

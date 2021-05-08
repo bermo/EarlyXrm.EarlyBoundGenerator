@@ -1,0 +1,1 @@
+nuget pack EarlyXrm.EarlyBoundGenerator.nuspec -p Configuration=Debug

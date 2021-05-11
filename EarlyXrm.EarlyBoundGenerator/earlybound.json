@@ -21,9 +21,15 @@
   "Exclude": {
     "*": [ // global exclude filter for logicalname attributes on any entity
       "importsequencenumber",
-      "createdbyexternalparty",
       "createdonbehalfby",
-      "modifiedonbehalfby"
+      "createdbyexternalparty",
+      "modifiedonbehalfby",
+      "modifiedbyexternalparty",
+      "versionnumber",
+      "transactioncurrencyid",
+      "overriddencreatedon",
+      "timezoneruleversionnumber",
+      "utcconversiontimezonecode"
     ],
     "solution": [ // exclude specific attributes for the "solution" entity
       "configurationpageid",

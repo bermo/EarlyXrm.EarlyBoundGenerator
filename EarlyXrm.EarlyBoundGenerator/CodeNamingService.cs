@@ -31,6 +31,11 @@ namespace EarlyXrm.EarlyBoundGenerator
                 var dn = entityMetadata?.DisplayName();
                 if (!string.IsNullOrWhiteSpace(dn))
                 {
+                    if (dn == "Entity")
+                    {
+                        return dn += "1";
+                    }
+
                     entityName = dn;
 
                     var metaData = services.LoadMetadata();
@@ -76,7 +81,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
                 }
 
-                if (attributeName == "EntityLogicalName" || attributeName == "LogicalName" || attributeName == "Attributes")
+                if (attributeName == "EntityLogicalName" || attributeName == "EntitySetName" || attributeName == "LogicalName" || attributeName == "Attributes")
                 {
                     attributeName += "2";
                 }
@@ -84,7 +89,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
 
-            return attributeName;
+            return EnsureValidIdentifier(attributeName);
         }
 
         public string GetNameForRelationship(EntityMetadata entityMetadata, RelationshipMetadataBase relationshipMetadata, EntityRole? reflexiveRole, IServiceProvider services)

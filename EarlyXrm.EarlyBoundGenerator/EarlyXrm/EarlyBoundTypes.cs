@@ -20,9 +20,8 @@ namespace EarlyBoundTypes
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
-	
-	
-	[DataContract()]
+
+    [DataContract()]
 	public enum ComponentType
 	{
 		
@@ -636,19 +635,6 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("versionnumber")]
-		public long? VersionNumber
-		{
-			get
-			{
-				return GetAttributeValue<long?>("versionnumber");
-			}
-			set
-			{
-				SetAttributeValue("versionnumber", nameof(VersionNumber), value);
-			}
-		}
-		
 		[DataContract()]
 		public struct Enums
 		{
@@ -704,8 +690,6 @@ namespace EarlyBoundTypes
 			public const string UpdatedOn = "updatedon";
 			
 			public const string Version = "version";
-			
-			public const string VersionNumber = "versionnumber";
 		}
 		
 		[DataContract()]

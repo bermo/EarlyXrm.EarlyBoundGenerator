@@ -364,23 +364,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         
                         if (m2mRelationship != null)
                         {
-                            var atts = new List<CodeAttributeArgument> {
-                                new CodeAttributeArgument(new CodePrimitiveExpression(m2mRelationship.IntersectEntityName))
-                            };
-
-                            var m2mEnt = metadata.Entities.FirstOrDefault(x => x.LogicalName == m2mRelationship.IntersectEntityName);
-                            var generate = filteringService.GenerateEntity(m2mEnt, services);
-                            
-                            if (generate)
-                            {
-                                var type = UseDisplayNames ? m2mEnt.DisplayName() : m2mEnt.SchemaName;
-                                if (string.IsNullOrEmpty(type))
-                                    type = m2mEnt.SchemaName;
-
-                                atts.Insert(0, new CodeAttributeArgument(new CodeTypeOfExpression(type)));
-                            }
-
-                            prop.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", atts.ToArray()));
+                            prop.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(new CodePrimitiveExpression(m2mRelationship.IntersectEntityName))));
                         }
 
                         var baseType = prop.Type.TypeArguments[0].BaseType.Replace(codeNamespace.Name + ".", "");
@@ -473,7 +457,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             if (segments.Count() <= 1)
                                 continue;
 
-                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name.StartsWith(segments[0], StringComparison.OrdinalIgnoreCase));
+                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name.Equals(segments[0], StringComparison.OrdinalIgnoreCase));
 
                             if (parent != null)
                             {
@@ -656,12 +640,15 @@ namespace EarlyXrm.EarlyBoundGenerator
                         stateOptionSetName = $"{string.Join("_", stateParts.Skip(1))}";
                     }
 
-                    var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
+                    if (stateOptionSet.Options.Any())
+                    {
+                        var stateOption = stateOptionSet.Options.FirstOrDefault(x => x.Value.Value == status.State.Value);
 
-                    var optionName = namingService.GetNameForOption(stateOptionSet, stateOption, Services);
-                    field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
-                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(stateOptionSetName), optionName)
-                    )));
+                        var optionName = namingService.GetNameForOption(stateOptionSet, stateOption, Services);
+                        field.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(
+                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(stateOptionSetName), optionName)
+                        )));
+                    }
                 }
             }
         }

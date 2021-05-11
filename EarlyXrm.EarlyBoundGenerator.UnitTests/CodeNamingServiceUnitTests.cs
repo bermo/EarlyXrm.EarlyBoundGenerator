@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
-using System;
 using System.Collections.Generic;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
@@ -31,7 +30,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             };
 
             sut = new CodeNamingService(namingService, parameters);
-
         }
 
         [TestMethod]

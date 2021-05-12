@@ -29,7 +29,8 @@
       "transactioncurrencyid",
       "overriddencreatedon",
       "timezoneruleversionnumber",
-      "utcconversiontimezonecode"
+      "utcconversiontimezonecode",
+      "overwritetime"
     ],
     "solution": [ // exclude specific attributes for the "solution" entity
       "configurationpageid",

@@ -282,11 +282,11 @@ namespace EarlyXrm.EarlyBoundGenerator
                             var optionsSetName = namingService.GetNameForOptionSet(entityMetadata, enumAtt.OptionSet, services);
                             var enumDef = codeNamespace.Types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsEnum && x.Name == optionsSetName);
                             
-                            CleanEnum(enumDef, enumAtt);
+                            CleanEnum(enumDef, enumAtt, entityClass.Name);
 
                             if (UseDisplayNames && NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)
                             {
-                                optionsSetName = $"Enums.{string.Join("_", optionsSetName.Split('_').Skip(1))}";
+                                optionsSetName = $"Enums.{optionsSetName.Substring(entityClass.Name.Length + 1)}";
                             }
 
                             prop.Type = new CodeTypeReference(optionsSetName + "?");
@@ -452,12 +452,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         if (type.IsEnum)
                         {
-                            var segments = type.Name.Split('_');
-
-                            if (segments.Count() <= 1)
-                                continue;
-
-                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && x.Name.Equals(segments[0], StringComparison.OrdinalIgnoreCase));
+                            var parent = classes.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsClass && type.Name.StartsWith(x.Name + "_", StringComparison.OrdinalIgnoreCase));
 
                             if (parent != null)
                             {
@@ -468,7 +463,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                                     parent.Members.Add(enums);
                                 }
 
-                                type.Name = string.Join("_", segments.Skip(1));
+                                type.Name = type.Name.Substring(parent.Name.Length + 1);
 
                                 enums.Members.Add(type);
 
@@ -601,7 +596,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             codeNamespace.Types.Add(codeType);
         }
 
-        private void CleanEnum(CodeTypeDeclaration type, EnumAttributeMetadata enumAttributeMetadata)
+        private void CleanEnum(CodeTypeDeclaration type, EnumAttributeMetadata enumAttributeMetadata, string className)
         {
             foreach (var field in type.Members.Cast<CodeTypeMember>().OfType<CodeMemberField>())
             {
@@ -636,8 +631,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     var stateOptionSetName = namingService.GetNameForOptionSet(parentEnt, stateOptionSet, Services);
                     if (NestNonGlobalEnums && UseDisplayNames)
                     {
-                        var stateParts = stateOptionSetName.Split('_');
-                        stateOptionSetName = $"{string.Join("_", stateParts.Skip(1))}";
+                        stateOptionSetName = stateOptionSetName.Substring(className.Length + 1);
                     }
 
                     if (stateOptionSet.Options.Any())

@@ -30,6 +30,15 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             var generate = solutionEntities.Any(x => x.LogicalName == entityMetadata.LogicalName);
 
+            if (!generate && entityMetadata.IsIntersect == true)
+            {
+                var m2m = entityMetadata.ManyToManyRelationships.FirstOrDefault();
+                if (m2m != null)
+                {
+                    generate = solutionEntities.Count(x => x.LogicalName == m2m.Entity1LogicalName || x.LogicalName == m2m.Entity2LogicalName) == 2;
+                }
+            }
+
             this.Debug(generate, entityMetadata.LogicalName);
 
             return generate;

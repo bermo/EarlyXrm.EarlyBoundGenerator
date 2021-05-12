@@ -206,7 +206,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.IsTrue(@class.Members.OfType<CodeTypeMember>().Any());
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void WhenParameterIsSet_EnumAttributeUsesDisplayName()
         {
             INamingService namingService = Substitute.For<INamingService>();

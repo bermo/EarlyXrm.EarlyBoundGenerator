@@ -131,7 +131,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         includedEntity.IncludedFields.Add(new IncludedField
                         {
                             LogicalName = attribute.LogicalName,
-                            OptionSetName = (attribute as PicklistAttributeMetadata)?.OptionSet?.Name
+                            OptionSetName = (attribute as EnumAttributeMetadata)?.OptionSet?.Name
                         });
                     }
                 }

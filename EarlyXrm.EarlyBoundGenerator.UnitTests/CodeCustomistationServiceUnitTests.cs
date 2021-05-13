@@ -206,7 +206,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.IsTrue(@class.Members.OfType<CodeTypeMember>().Any());
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void WhenParameterIsSet_EnumAttributeUsesDisplayName()
         {
             INamingService namingService = Substitute.For<INamingService>();
@@ -235,6 +235,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                     {
                         Types = {
                             new CodeTypeDeclaration {
+                                Name = "Test",
                                 CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
                                 Members = {
                                     new CodeMemberProperty

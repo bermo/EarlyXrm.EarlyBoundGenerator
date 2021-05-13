@@ -20,8 +20,9 @@ namespace EarlyBoundTypes
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
-
-    [DataContract()]
+	
+	
+	[DataContract()]
 	public enum ComponentType
 	{
 		
@@ -889,9 +890,19 @@ namespace EarlyBoundTypes
 		    return base.GetAttributeValue<EntityCollection>(attributeLogicalName)?.Entities?.Cast<T>();
 	    }
 		
+		public IEnumerable<T> GetAttributeEnums<T>(string attributeLogicalName) where T : struct, IConvertible
+	    {
+		    return base.GetAttributeValue<OptionSetValueCollection>(attributeLogicalName)?.Select(x => (T)(object)x.Value);
+	    }
+		
 		protected void SetAttributeValues<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : Entity
         {
             SetAttributeValue(logicalName, attributePropertyName, new EntityCollection(new List<Entity>(value)));
+        }
+		
+		protected void SetAttributeEnums<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : struct, IConvertible
+        {
+            SetAttributeValue(logicalName, attributePropertyName, new OptionSetValueCollection(new List<OptionSetValue>(value.Select(x => new OptionSetValue((int)(object)x)))));
         }
 		
 		protected void SetAttributeValue(string logicalName, string attributePropertyName, object value)

@@ -51,7 +51,7 @@
   "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
 
   "ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
-  //"ConnectionString": "AuthType=OAuth; Url=https://?.crm!.dynamics.com/;Username=?; Password=?; ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
-  //"ConnectionString": "AuthType=ClientSecret; Url=https://?.crm!.dynamics.com/; ClientId=?; ClientSecret=?;",
-  //"ConnectionString": "AuthType=Office365; Url=https://?.dynamics.com; Username=?; Password=?;"
+  //"ConnectionString": "AuthType=OAuth;Url=https://?.crm!.dynamics.com/;Username=?;Password=?;ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
+  //"ConnectionString": "AuthType=ClientSecret;Url=https://?.crm!.dynamics.com/;ClientId=?;ClientSecret=?;",
+  //"ConnectionString": "AuthType=Office365;Url=https://?.dynamics.com;Username=?;Password=?;"
 }

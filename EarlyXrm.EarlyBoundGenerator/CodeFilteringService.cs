@@ -97,29 +97,48 @@ namespace EarlyXrm.EarlyBoundGenerator
         {
             var solutionEntities = services.LoadSolutionEntities();
 
+            var generate = false;
+
             if (optionSetMetadata.IsGlobal == true)
             {
                 if (!solutionEntities.Any(x => x.IncludedFields.Any(y => y.OptionSetName != null && y.OptionSetName == optionSetMetadata.Name)))
-                    return false;
+                {
+                    generate = false;
+                    this.Debug(generate, optionSetMetadata.Name);
+                    return generate;
+                }
 
                 var name = optionSetMetadata?.Name;
                 if (!string.IsNullOrWhiteSpace(name) && !GeneratedOptionSets.ContainsKey(name))
                 {
                     GeneratedOptionSets[name] = true;
+                    this.Debug(true, optionSetMetadata.Name);
                     return true;
                 }
 
+                this.Debug(false, optionSetMetadata.Name);
                 return false;
             }
 
             if (optionSetMetadata.IsCustomOptionSet ?? false)
+            {
+                this.Debug(false, optionSetMetadata.Name);
                 return true;
+            }
 
             if (optionSetMetadata.OptionSetType == OptionSetType.State || optionSetMetadata.OptionSetType == OptionSetType.Status)
+            {
+                this.Debug(true, optionSetMetadata.Name);
                 return true;
+            }
 
             if (solutionEntities.Any(x => x.IncludedFields.Any(y => y.OptionSetName != null && y.OptionSetName == optionSetMetadata.Name)))
+            {
+                this.Debug(true, optionSetMetadata.Name);
                 return true;
+            }
+
+            this.Debug(false, optionSetMetadata.Name);
 
             return false;
         }

@@ -200,7 +200,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     if (type.BaseType == "Microsoft.Xrm.Sdk.OptionSetValue" || type.BaseType == "System.Object") // this seems a bit useless
                     {
                         var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => (UseDisplayNames ? x.DisplayName() : x.SchemaName) == codeMemberProperty.Name &&
-                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
+                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State, AttributeTypeCode.Virtual }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
 
                         if (enumAtt != null)
                         {
@@ -275,13 +275,13 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         var propertyLogicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes).First();
                         var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == propertyLogicalName &&
-                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
+                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State, AttributeTypeCode.Virtual }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
 
                         if (enumAtt != null)
                         {
                             var optionsSetName = namingService.GetNameForOptionSet(entityMetadata, enumAtt.OptionSet, services);
                             var enumDef = codeNamespace.Types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsEnum && x.Name == optionsSetName);
-                            
+
                             CleanEnum(enumDef, enumAtt, entityClass.Name);
 
                             if (UseDisplayNames && NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)
@@ -289,18 +289,33 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 optionsSetName = $"Enums.{optionsSetName.Substring(entityClass.Name.Length + 1)}";
                             }
 
-                            prop.Type = new CodeTypeReference(optionsSetName + "?");
-
                             prop.GetStatements.Clear();
 
-                            prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return ({optionsSetName}?)GetAttributeValue<OptionSetValue>(\"{enumAtt.LogicalName}\")?.Value;"));
-
-                            if (prop.HasSet || AddSetters)
+                            if (enumAtt as MultiSelectPicklistAttributeMetadata != null)
                             {
-                                prop.SetStatements.Clear();
-                                prop.SetStatements.AddRange(new[] {
-                                    new CodeSnippetStatement($"{tabs}SetAttributeValue(\"{logicalName}\", nameof({prop.Name}), value.HasValue ? new OptionSetValue((int)value.Value) : null);"),
-                                });
+                                prop.Type = new CodeTypeReference($"IEnumerable<{optionsSetName}>");
+
+                                prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return GetAttributeEnums<{optionsSetName}>(\"{enumAtt.LogicalName}\");"));
+                                if (prop.HasSet || AddSetters)
+                                {
+                                    prop.SetStatements.Clear();
+                                    prop.SetStatements.AddRange(new[] {
+                                        new CodeSnippetStatement($"{tabs}SetAttributeEnums(\"{logicalName}\", nameof({prop.Name}), value);"),
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                prop.Type = new CodeTypeReference(optionsSetName + "?");
+
+                                prop.GetStatements.Add(new CodeSnippetStatement($"{tabs}return ({optionsSetName}?)GetAttributeValue<OptionSetValue>(\"{enumAtt.LogicalName}\")?.Value;"));
+                                if (prop.HasSet || AddSetters)
+                                {
+                                    prop.SetStatements.Clear();
+                                    prop.SetStatements.AddRange(new[] {
+                                        new CodeSnippetStatement($"{tabs}SetAttributeValue(\"{logicalName}\", nameof({prop.Name}), value.HasValue ? new OptionSetValue((int)value.Value) : null);"),
+                                    });
+                                }
                             }
 
                             continue;
@@ -456,6 +471,10 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                             if (parent != null)
                             {
+                                var isProbablyGlobal = metadata.OptionSets.Any(x => x.DisplayName.DisplayName() == type.Name);
+                                if (isProbablyGlobal)
+                                    continue;
+
                                 var enums = parent.Members.Cast<CodeTypeMember>().FirstOrDefault(x => x.Name == "Enums") as CodeTypeDeclaration;
                                 if (enums == null)
                                 {
@@ -557,9 +576,19 @@ namespace EarlyXrm.EarlyBoundGenerator
 		    return base.GetAttributeValue<EntityCollection>(attributeLogicalName)?.Entities?.Cast<T>();
 	    }"),
                 new CodeSnippetTypeMember(twoTabs +
+        @"public IEnumerable<T> GetAttributeEnums<T>(string attributeLogicalName) where T : struct, IConvertible
+	    {
+		    return base.GetAttributeValue<OptionSetValueCollection>(attributeLogicalName)?.Select(x => (T)(object)x.Value);
+	    }"),
+                new CodeSnippetTypeMember(twoTabs +
         @"protected void SetAttributeValues<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : Entity
         {
             SetAttributeValue(logicalName, attributePropertyName, new EntityCollection(new List<Entity>(value)));
+        }"),
+                new CodeSnippetTypeMember(twoTabs +
+        @"protected void SetAttributeEnums<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : struct, IConvertible
+        {
+            SetAttributeValue(logicalName, attributePropertyName, new OptionSetValueCollection(new List<OptionSetValue>(value.Select(x => new OptionSetValue((int)(object)x)))));
         }"),
                 new CodeSnippetTypeMember(twoTabs +
         @"protected void SetAttributeValue(string logicalName, string attributePropertyName, object value)

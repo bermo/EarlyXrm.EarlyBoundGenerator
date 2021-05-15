@@ -121,43 +121,36 @@ namespace EarlyXrm.EarlyBoundGenerator
                     }
                     else if (entityMetadata.LogicalName == one2many.ReferencingEntity) // many to one
                     {
-                        var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == one2many.ReferencingAttribute);
-
-                        var name = att.DisplayName(false);
-
-                        var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == one2many.ReferencingAttribute);
-                        // is this even possible?
-                        if (dups.Count() > 1)
+                        Func<OneToManyRelationshipMetadata, string> many2OneNamingLogic = m2o =>
                         {
-                            otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == one2many.ReferencedEntity);
-                            name += otherMeta.DisplayName(false);
-                        }
+                            var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == m2o.ReferencingAttribute);
+                            var dname = att.DisplayName(false);
 
-                        var takenAttNameDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name) + metaData.Entities.Count(x => x.DisplayName() == name);
-                        if (takenAttNameDups > 0)
-                        {
-                            name += takenAttNameDups.ToString();
-                        }
+                            var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == m2o.ReferencingAttribute);
+                            if (dups.Count() > 1)
+                            {
+                                otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == m2o.ReferencedEntity);
+                                dname += otherMeta.DisplayName(false);
+                            }
 
-                        var nameDups = entityMetadata.ManyToOneRelationships
-                            .Where(x => entityMetadata.Attributes.Any(y => y.LogicalName == x.ReferencingAttribute && y.DisplayName(false) == name))
-                            .OrderByDescending(x => x.SchemaName).ToList();
-                        if (nameDups.Count() > 1)
+                            return dname;
+                        };
+
+                        var name = many2OneNamingLogic(one2many);
+
+                        var entDups = metaData.Entities.Count(x => x.DisplayName() == name);
+
+                        // find attribute name matches
+                        var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name);
+
+                        // find many-to-one name matches
+                        var manyDups = entityMetadata.ManyToOneRelationships.Where(x => many2OneNamingLogic(x) == name).OrderBy(x => x.SchemaName).ToList();
+
+                        if (manyDups.Count() > 1 || attDups > 0 || entDups > 0)
                         {
-                            var index = nameDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
+                            var index = manyDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + attDups + entDups + 1;
                             if (index > 1)
                                 name += index.ToString();
-                        }
-
-                        var nameDups2 = entityMetadata.ManyToOneRelationships
-                            .Where(x => entityMetadata.Attributes.Any(y => y.DisplayName(false) + metaData.Entities.FirstOrDefault(z => z.LogicalName == x.ReferencedEntity).DisplayName() == name))
-                            .OrderByDescending(x => x.SchemaName).ToList();
-
-                        if (nameDups2.Count() > 1)
-                        {
-                            var index = nameDups2.FindIndex(x => x.SchemaName == one2many.SchemaName) + 1;
-                            if (index > 1)
-                                name += (index).ToString();
                         }
 
                         returnValue = name;
@@ -329,6 +322,8 @@ namespace EarlyXrm.EarlyBoundGenerator
                     }
                 }
             }
+
+            this.Debug(name, entityMetadata?.LogicalName ?? "GLOBAL", optionSetMetadata.Name);
 
             return name;
         }

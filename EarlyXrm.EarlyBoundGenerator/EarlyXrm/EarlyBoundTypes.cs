@@ -790,7 +790,7 @@ namespace EarlyBoundTypes
 		
 		[AttributeLogicalNameAttribute("solutionid")]
 		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public Solution Solution1
+		public Solution Solution2
 		{
 			get
 			{
@@ -854,7 +854,7 @@ namespace EarlyBoundTypes
 		public struct Relationships
 		{
 			
-			public const string Solution1 = "solution_solutioncomponent";
+			public const string Solution2 = "solution_solutioncomponent";
 		}
 	}
 	

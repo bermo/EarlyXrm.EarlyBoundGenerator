@@ -282,6 +282,32 @@ namespace EarlyXrm.EarlyBoundGenerator
                             var optionsSetName = namingService.GetNameForOptionSet(entityMetadata, enumAtt.OptionSet, services);
                             var enumDef = codeNamespace.Types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsEnum && x.Name == optionsSetName);
 
+                            if (enumDef == null) // probably only used by a multi-picklist, for some reason they don't get generated!
+                            {
+                                var codeTypeDeclaration = new CodeTypeDeclaration
+                                {
+                                    IsEnum = true,
+                                    Name = optionsSetName,
+                                };
+                                
+                                codeTypeDeclaration.Members.AddRange(enumAtt.OptionSet.Options
+                                    .Select(x => 
+                                        new CodeMemberField
+                                        {
+                                            CustomAttributes =
+                                            {
+                                                new CodeAttributeDeclaration("EnumMember")
+                                            },
+                                            InitExpression = new CodePrimitiveExpression(x.Value),
+                                            Name = x.Label.DisplayName()
+                                        }
+                                    ).ToArray());
+
+                                codeNamespace.Types.Add(codeTypeDeclaration);
+
+                                enumDef = codeTypeDeclaration;
+                            }
+
                             CleanEnum(enumDef, enumAtt, entityClass.Name);
 
                             if (UseDisplayNames && NestNonGlobalEnums && enumAtt.OptionSet.IsGlobal == false)

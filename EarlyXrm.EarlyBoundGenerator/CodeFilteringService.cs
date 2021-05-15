@@ -97,15 +97,12 @@ namespace EarlyXrm.EarlyBoundGenerator
         {
             var solutionEntities = services.LoadSolutionEntities();
 
-            var generate = false;
-
             if (optionSetMetadata.IsGlobal == true)
             {
                 if (!solutionEntities.Any(x => x.IncludedFields.Any(y => y.OptionSetName != null && y.OptionSetName == optionSetMetadata.Name)))
                 {
-                    generate = false;
-                    this.Debug(generate, optionSetMetadata.Name);
-                    return generate;
+                    this.Debug(false, optionSetMetadata.Name);
+                    return false;
                 }
 
                 var name = optionSetMetadata?.Name;
@@ -122,7 +119,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (optionSetMetadata.IsCustomOptionSet ?? false)
             {
-                this.Debug(false, optionSetMetadata.Name);
+                this.Debug(true, optionSetMetadata.Name);
                 return true;
             }
 
@@ -139,7 +136,6 @@ namespace EarlyXrm.EarlyBoundGenerator
             }
 
             this.Debug(false, optionSetMetadata.Name);
-
             return false;
         }
 

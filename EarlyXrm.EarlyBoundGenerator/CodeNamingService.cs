@@ -126,7 +126,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == m2o.ReferencingAttribute);
                             var dname = att.DisplayName(false);
 
-                            var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == m2o.ReferencingAttribute);
+                            var dups = entityMetadata.ManyToOneRelationships.Where(x => x.ReferencingAttribute == m2o.ReferencingAttribute || x.ReferencedAttribute == m2o.ReferencedAttribute);
                             if (dups.Count() > 1)
                             {
                                 otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == m2o.ReferencedEntity);

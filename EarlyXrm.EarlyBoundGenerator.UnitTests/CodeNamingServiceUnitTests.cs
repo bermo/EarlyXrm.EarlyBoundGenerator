@@ -4,6 +4,8 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
@@ -230,7 +232,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 {
                     new StringAttributeMetadata{
                         LogicalName = "ee_testid",
-                        DisplayName = new Label("Test Id", 1033)
+                        DisplayName = "Test Id".AsLabel()
                     }
                 })
             });
@@ -248,7 +250,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 Entity2LogicalName = "ee_testprop",
                 SchemaName = "ee_testProp_association"
             };
-            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
+            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Test Id".AsLabel() };
             var metadata = new EntityMetadata { LogicalName = "ee_test" }
                     .Set(x => x.Attributes, new AttributeMetadata[] { attMetadata })
                     .Set(x => x.OneToManyRelationships, new OneToManyRelationshipMetadata[]
@@ -261,6 +263,107 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var output = sut.GetNameForRelationship(metadata, many2Many, null, serviceProvider);
 
             Assert.AreEqual("TestProps2", output);
+        }
+
+        private EntityMetadata[] SetupEntities()
+        {
+            var testParent = new EntityMetadata { 
+                LogicalName = "ee_testparent", 
+                DisplayName = "Test Parent".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testparentid")
+            .Setup(
+                new AttributeMetadata[] {
+                    new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Id".AsLabel() },
+                    new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
+                    new LookupAttributeMetadata { LogicalName = "ee_testparentcopyid", DisplayName = "Test Parent".AsLabel() }
+                },
+                new[]{
+                    new OneToManyRelationshipMetadata { ReferencedEntity = "ee_test", ReferencedAttribute = "ee_testid", SchemaName = "ee_testparent_tests" }
+                },
+                new OneToManyRelationshipMetadata[] { }
+            );
+
+            var test = new EntityMetadata { 
+                LogicalName = "ee_test", 
+                DisplayName = "Test".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testid")
+            .Setup(
+                new AttributeMetadata[] {
+                    new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Id".AsLabel()},
+                    new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel()},
+                    new StringAttributeMetadata { LogicalName = "ee_testparent", DisplayName = "Test Parent".AsLabel()},
+                    new LookupAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Main".AsLabel() }
+                },
+                new[] {
+                    new OneToManyRelationshipMetadata {
+                        ReferencingEntity = "ee_testchild", ReferencingAttribute = "ee_testid", 
+                        SchemaName = "ee_test_testchilds" },
+                    new OneToManyRelationshipMetadata {
+                        ReferencingEntity = "ee_testchild", ReferencingAttribute = "ee_testotherid",
+                        SchemaName = "ee_test_testchilds_other" }
+                },
+                new[] {
+                    new OneToManyRelationshipMetadata {
+                        ReferencedEntity = "ee_testparent", 
+                        ReferencedAttribute = "ee_testparentid", 
+                        ReferencingAttribute = "ee_testparentid", SchemaName = "ee_testparent_tests" },
+                    new OneToManyRelationshipMetadata {
+                        ReferencedEntity = "ee_testparent", ReferencedAttribute = "ee_testparentid",
+                        ReferencingAttribute = "ee_testparentcopyid", SchemaName = "ee_testparent_tests_copy" }
+                }
+            );
+
+            var testChild = new EntityMetadata { 
+                LogicalName = "ee_testchild",
+                DisplayName = "Test Child".AsLabel(),
+                DisplayCollectionName = "Test Children".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testchildid")
+            .Setup(
+                new AttributeMetadata[] {
+                    new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testchildid", DisplayName = "Id".AsLabel() },
+                    new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
+                    new LookupAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Test".AsLabel() },
+                    new LookupAttributeMetadata { LogicalName = "ee_testotherid", DisplayName = "Test Other".AsLabel() }
+                },
+                new OneToManyRelationshipMetadata[]{},
+                new[] {
+                    new OneToManyRelationshipMetadata {
+                        ReferencingEntity = "ee_test", ReferencingAttribute = "ee_testid", SchemaName = "ee_test_testchilds" }
+                }
+            );
+
+            var entities = new[] { testParent, test, testChild };
+
+            organizationMetadata.Entities.Returns(entities);
+
+            return entities;
+        }
+
+        [TestMethod]
+        public void GetNameForRelationship_OneToMany_()
+        {
+            var entities = SetupEntities();
+            var entity = entities.First(x => x.LogicalName == "ee_test");
+            var rel = entity.OneToManyRelationships.First(x => x.SchemaName == "ee_test_testchilds");
+
+            var output = sut.GetNameForRelationship(entity, rel, null, serviceProvider);
+
+            Assert.AreEqual("TestTestChildren", output);
+        }
+
+        [TestMethod]
+        public void GetNameForRelationship_ManyToOne()
+        {
+            var entities = SetupEntities();
+            var entity = entities.First(x => x.LogicalName == "ee_test");
+            var rel = entity.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
+
+            var output = sut.GetNameForRelationship(entity, rel, null, serviceProvider);
+
+            Assert.AreEqual("MainTestParent", output);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Crm.Services.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Metadata;
 using ModelBuilder;
 using NSubstitute;
 using System;
@@ -12,6 +14,12 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
     {
         protected IServiceProvider serviceProvider;
         protected IBuildConfiguration Builder;
+
+        protected IOrganizationMetadata organizationMetadata;
+
+        protected EntityMetadata testParent;
+        protected EntityMetadata test;
+        protected EntityMetadata testChild;
 
         [TestInitialize]
         public void Initialise()
@@ -63,6 +71,72 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 cad.Arguments.Add(new CodeAttributeArgument(arg));
             }
             return cad;
+        }
+
+        protected void SetupEntities()
+        {
+            testParent = new EntityMetadata
+            {
+                LogicalName = "ee_testparent",
+                DisplayName = "Test Parent".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testparentid")
+            .AddAttribute(
+                new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Id".AsLabel() },
+                new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() })
+            .AddOneToMany(
+                new OneToManyRelationshipMetadata { ReferencedEntity = "ee_test", ReferencedAttribute = "ee_testid", SchemaName = "ee_testparent_tests" }
+            );
+
+            test = new EntityMetadata
+            {
+                LogicalName = "ee_test",
+                DisplayName = "Test".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testid")
+            .AddAttribute(
+                new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Id".AsLabel() },
+                new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
+                new LookupAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Test Parent".AsLabel() })
+            .AddOneToMany(
+                new OneToManyRelationshipMetadata
+                {
+                    ReferencingEntity = "ee_testchild",
+                    ReferencingAttribute = "ee_testid",
+                    SchemaName = "ee_test_testchilds"
+                })
+            .AddManyToOne(
+                new OneToManyRelationshipMetadata
+                {
+                    ReferencedEntity = "ee_testparent",
+                    ReferencedAttribute = "ee_testparentid",
+                    ReferencingAttribute = "ee_testparentid",
+                    SchemaName = "ee_testparent_tests"
+                });
+
+            testChild = new EntityMetadata
+            {
+                LogicalName = "ee_testchild",
+                DisplayName = "Test Child".AsLabel(),
+                DisplayCollectionName = "Test Children".AsLabel()
+            }
+            .Set(x => x.PrimaryIdAttribute, "ee_testchildid")
+            .AddAttribute(
+                new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testchildid", DisplayName = "Id".AsLabel() },
+                new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
+                new LookupAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Test".AsLabel() })
+            .AddManyToOne(
+                new OneToManyRelationshipMetadata
+                {
+                    ReferencingEntity = "ee_test",
+                    ReferencingAttribute = "ee_testid",
+                    SchemaName = "ee_test_testchilds"
+                }
+            );
+
+            var entities = new[] { testParent, test, testChild };
+
+            organizationMetadata.Entities.Returns(entities);
         }
     }
 }

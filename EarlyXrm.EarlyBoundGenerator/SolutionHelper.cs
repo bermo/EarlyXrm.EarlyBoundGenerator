@@ -303,6 +303,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 .Replace("=", "")
                                 .Replace("&", "")
                                 .Replace("|", "")
+                                .Replace("#", "")
                                 ;
 
                 return description;

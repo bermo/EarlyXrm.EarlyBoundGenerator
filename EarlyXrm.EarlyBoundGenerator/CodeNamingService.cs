@@ -138,7 +138,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         var name = many2OneNamingLogic(one2many);
 
-                        var entDups = metaData.Entities.Count(x => x.DisplayName() == name);
+                        var entDups = entityMetadata.DisplayName() == name ? 1 : 0;
 
                         // find attribute name matches
                         var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name);

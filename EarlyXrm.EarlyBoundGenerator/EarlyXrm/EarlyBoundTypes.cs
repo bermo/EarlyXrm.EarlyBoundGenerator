@@ -484,7 +484,7 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("organizationid")]
-		public EntityReference OrganizationRef
+		public EntityReference Organization
 		{
 			get
 			{
@@ -492,7 +492,7 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetAttributeValue("organizationid", nameof(OrganizationRef), value);
+				SetAttributeValue("organizationid", nameof(Organization), value);
 			}
 		}
 		
@@ -510,17 +510,7 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("parentsolutionid")]
-		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referencing)]
-		public Solution ParentSolution
-		{
-			get
-			{
-				return GetRelatedEntity<Solution>("solution_parent_solution", EntityRole.Referencing);
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("parentsolutionid")]
-		public EntityReference ParentSolutionRef
+		public EntityReference ParentSolution
 		{
 			get
 			{
@@ -528,12 +518,22 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetAttributeValue("parentsolutionid", nameof(ParentSolutionRef), value);
+				SetAttributeValue("parentsolutionid", nameof(ParentSolution), value);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("parentsolutionid")]
+		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referencing)]
+		public Solution ParentSolution_Solution
+		{
+			get
+			{
+				return GetRelatedEntity<Solution>("solution_parent_solution", EntityRole.Referencing);
 			}
 		}
 		
 		[RelationshipSchemaNameAttribute("solution_parent_solution", EntityRole.Referenced)]
-		public IEnumerable<Solution> ParentSolutionSolutions
+		public IEnumerable<Solution> ParentSolution_Solutions
 		{
 			get
 			{
@@ -541,7 +541,7 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetRelatedEntities<Solution>("solution_parent_solution", nameof(ParentSolutionSolutions), value, EntityRole.Referenced);
+				SetRelatedEntities<Solution>("solution_parent_solution", nameof(ParentSolution_Solutions), value, EntityRole.Referenced);
 			}
 		}
 		
@@ -559,7 +559,7 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("publisherid")]
-		public EntityReference PublisherRef
+		public EntityReference Publisher
 		{
 			get
 			{
@@ -567,12 +567,12 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetAttributeValue("publisherid", nameof(PublisherRef), value);
+				SetAttributeValue("publisherid", nameof(Publisher), value);
 			}
 		}
 		
 		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public IEnumerable<SolutionComponent> SolutionComponents
+		public IEnumerable<SolutionComponent> Solution_SolutionComponents
 		{
 			get
 			{
@@ -580,7 +580,7 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetRelatedEntities<SolutionComponent>("solution_solutioncomponent", nameof(SolutionComponents), value);
+				SetRelatedEntities<SolutionComponent>("solution_solutioncomponent", nameof(Solution_SolutionComponents), value);
 			}
 		}
 		
@@ -674,15 +674,15 @@ namespace EarlyBoundTypes
 			
 			public const string Name = "uniquename";
 			
-			public const string OrganizationRef = "organizationid";
+			public const string Organization = "organizationid";
 			
 			public const string PackageType = "ismanaged";
 			
-			public const string ParentSolutionRef = "parentsolutionid";
+			public const string ParentSolution = "parentsolutionid";
 			
 			public const string PinpointSolutionDefaultLocale = "pinpointsolutiondefaultlocale";
 			
-			public const string PublisherRef = "publisherid";
+			public const string Publisher = "publisherid";
 			
 			public const string SolutionPackageVersion = "solutionpackageversion";
 			
@@ -697,11 +697,11 @@ namespace EarlyBoundTypes
 		public struct Relationships
 		{
 			
-			public const string ParentSolution = "solution_parent_solution";
+			public const string ParentSolution_Solution = "solution_parent_solution";
 			
-			public const string ParentSolutionSolutions = "solution_parent_solution";
+			public const string ParentSolution_Solutions = "solution_parent_solution";
 			
-			public const string SolutionComponents = "solution_solutioncomponent";
+			public const string Solution_SolutionComponents = "solution_solutioncomponent";
 		}
 	}
 	
@@ -789,17 +789,7 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("solutionid")]
-		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
-		public Solution Solution2
-		{
-			get
-			{
-				return GetRelatedEntity<Solution>("solution_solutioncomponent");
-			}
-		}
-		
-		[AttributeLogicalNameAttribute("solutionid")]
-		public EntityReference SolutionRef
+		public EntityReference Solution
 		{
 			get
 			{
@@ -807,7 +797,17 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetAttributeValue("solutionid", nameof(SolutionRef), value);
+				SetAttributeValue("solutionid", nameof(Solution), value);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("solutionid")]
+		[RelationshipSchemaNameAttribute("solution_solutioncomponent")]
+		public Solution Solution_Solution
+		{
+			get
+			{
+				return GetRelatedEntity<Solution>("solution_solutioncomponent");
 			}
 		}
 		
@@ -847,14 +847,14 @@ namespace EarlyBoundTypes
 			
 			public const string RootSolutionComponentId = "rootsolutioncomponentid";
 			
-			public const string SolutionRef = "solutionid";
+			public const string Solution = "solutionid";
 		}
 		
 		[DataContract()]
 		public struct Relationships
 		{
 			
-			public const string Solution2 = "solution_solutioncomponent";
+			public const string Solution_Solution = "solution_solutioncomponent";
 		}
 	}
 	

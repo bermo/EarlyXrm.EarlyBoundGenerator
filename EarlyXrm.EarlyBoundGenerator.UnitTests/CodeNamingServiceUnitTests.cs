@@ -17,6 +17,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         
         private IMetadataProviderService metadataProviderService;
         private INamingService namingService;
+        private ICodeWriterFilterService filterService;
 
         [TestInitialize]
         public void TestInitialise()
@@ -25,6 +26,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             organizationMetadata = Substitute.For<IOrganizationMetadata>();
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
+
+            filterService = Substitute.For<ICodeWriterFilterService>();
+            serviceProvider.GetService(typeof(ICodeWriterFilterService)).Returns(filterService);
 
             namingService = Substitute.For<INamingService>();
             parameters = new Dictionary<string, string> {
@@ -70,7 +74,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             
             var output = sut.GetNameForAttribute(metadata, attMetadata, serviceProvider);
 
-            Assert.AreEqual("TestPropRef", output);
+            Assert.AreEqual("TestProp", output);
         }
 
         [TestMethod]
@@ -109,7 +113,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(metadata, relationship, null, serviceProvider);
 
-            Assert.AreEqual("TestIdTestProp", output);
+            Assert.AreEqual("TestId_TestProp", output);
         }
 
         [TestMethod]
@@ -145,7 +149,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(metadata, relationship, null, serviceProvider);
 
-            Assert.AreEqual("TestIdTestProps2", output);
+            Assert.AreEqual("TestId_TestProps", output);
         }
 
         [TestMethod]
@@ -173,7 +177,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(metadata, relationship, EntityRole.Referenced, serviceProvider);
 
-            Assert.AreEqual("TestIdTests", output);
+            Assert.AreEqual("TestId_Tests", output);
         }
 
         [TestMethod]
@@ -273,7 +277,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
 
-            Assert.AreEqual("TestChildren", output);
+            Assert.AreEqual("Test_TestChildren", output);
         }
 
         [TestMethod]
@@ -284,7 +288,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForAttribute(test, att, serviceProvider);
 
-            Assert.AreEqual("TestParentRef", output);
+            Assert.AreEqual("TestParent", output);
         }
 
         [TestMethod]
@@ -295,7 +299,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
 
-            Assert.AreEqual("TestParent", output);
+            Assert.AreEqual("TestParent_TestParent", output);
         }
 
         [TestMethod]
@@ -307,7 +311,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
 
-            Assert.AreEqual("TestParent2", output);
+            Assert.AreEqual("TestParent_TestParent", output);
         }
     }
 }

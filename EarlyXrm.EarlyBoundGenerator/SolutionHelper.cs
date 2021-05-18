@@ -176,7 +176,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     new LinkEntity()
                     {
                         LinkFromEntityName = SolutionComponent.EntityLogicalName,
-                        LinkFromAttributeName = SolutionComponent.LogicalNames.SolutionRef,
+                        LinkFromAttributeName = SolutionComponent.LogicalNames.Solution,
                         LinkToEntityName = Solution.EntityLogicalName,
                         LinkToAttributeName = Solution.LogicalNames.Id,
                         JoinOperator = JoinOperator.Inner,
@@ -198,7 +198,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             return result;
         }
 
-        public static string DisplayName(this MetadataBase metadataBase, bool useRef = true)
+        public static string DisplayName(this MetadataBase metadataBase)
         {
             string displayName = null;
             var attribute = metadataBase as AttributeMetadata;
@@ -209,15 +209,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                 if (string.IsNullOrWhiteSpace(displayName))
                 {
                     displayName = attribute.SchemaName;
-                }
-
-                if (useRef && (
-                    attribute.AttributeType == AttributeTypeCode.Lookup ||
-                    attribute.AttributeType == AttributeTypeCode.Customer ||
-                    attribute.AttributeType == AttributeTypeCode.Owner
-                ))
-                {
-                    displayName += "Ref";
                 }
             }
 

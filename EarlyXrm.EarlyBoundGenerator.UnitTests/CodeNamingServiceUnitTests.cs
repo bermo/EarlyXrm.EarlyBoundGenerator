@@ -266,7 +266,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var output = sut.GetNameForRelationship(metadata, many2Many, null, serviceProvider);
 
-            Assert.AreEqual("TestProps2", output);
+            Assert.AreEqual("TestProps", output);
         }
 
         [TestMethod]

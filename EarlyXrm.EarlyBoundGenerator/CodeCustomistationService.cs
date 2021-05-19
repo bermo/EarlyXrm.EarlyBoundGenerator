@@ -405,7 +405,17 @@ namespace EarlyXrm.EarlyBoundGenerator
                         
                         if (m2mRelationship != null)
                         {
-                            prop.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AmbientValue", new CodeAttributeArgument(new CodePrimitiveExpression(m2mRelationship.IntersectEntityName))));
+                            var m2mEnt = metadata.Entities.FirstOrDefault(x => x.LogicalName == m2mRelationship.IntersectEntityName);
+                            var generate = filteringService.GenerateEntity(m2mEnt, services);
+
+                            if (generate)
+                            {
+                                var type = UseDisplayNames ? m2mEnt.DisplayName() : m2mEnt.SchemaName;
+                                if (string.IsNullOrEmpty(type))
+                                    type = m2mEnt.SchemaName;
+
+                                prop.CustomAttributes.Insert(0, new CodeAttributeDeclaration("AttributeProvider", new CodeAttributeArgument(new CodeTypeOfExpression(type))));
+                            }
                         }
 
                         var baseType = prop.Type.TypeArguments[0].BaseType.Replace(codeNamespace.Name + ".", "");

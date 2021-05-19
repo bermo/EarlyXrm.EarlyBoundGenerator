@@ -102,6 +102,8 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (useDisplayNames)
             {
+                var filteringService = (ICodeWriterFilterService)services.GetService(typeof(ICodeWriterFilterService));
+
                 Func<OneToManyRelationshipMetadata, string> many2OneNamingLogic = m2o =>
                 {
                     var att = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == m2o.ReferencingAttribute);
@@ -144,11 +146,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         var name = many2OneNamingLogic(one2many);
 
                         var entDups = entityMetadata.DisplayName() == name ? 1 : 0;
-
-                        // find attribute name matches
                         var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name);
-
-                        // find many-to-one name matches
                         var manyDups = entityMetadata.ManyToOneRelationships.Where(x => many2OneNamingLogic(x) == name).OrderBy(x => x.SchemaName).ToList();
 
                         if (manyDups.Count() > 1 || attDups > 0 || entDups > 0)
@@ -177,18 +175,16 @@ namespace EarlyXrm.EarlyBoundGenerator
                         var name = one2ManyNamingLogic(one2many);
                         name = string.IsNullOrWhiteSpace(name) ? one2many.SchemaName : name;
 
-                        var filteringService = (ICodeWriterFilterService)services.GetService(typeof(ICodeWriterFilterService));
-
                         var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == name);
                         var m2oDups = entityMetadata.ManyToOneRelationships?.Count(x => many2OneNamingLogic(x) == name) ?? 0;
-                        var manyDups = entityMetadata.OneToManyRelationships
+                        var o2mDups = entityMetadata.OneToManyRelationships
                                         .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == x.ReferencingEntity), services))
                                         .Where(x => one2ManyNamingLogic(x) == name)
                                         .OrderBy(x => x.SchemaName).ToList();
 
-                        if (manyDups.Count() > 1 || attDups > 0)
+                        if (o2mDups.Count() > 1 || attDups > 0)
                         {
-                            var index = manyDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + attDups + 1;
+                            var index = o2mDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + attDups + 1;
                             if (index > 1)
                                 name += index.ToString();
                         }
@@ -198,31 +194,37 @@ namespace EarlyXrm.EarlyBoundGenerator
                 }
                 else // many to many
                 {
-                    var many2many = relationshipMetadata as ManyToManyRelationshipMetadata;
-                    var the = entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity1LogicalName : many2many.Entity2LogicalName;
-                    var other = entityMetadata.LogicalName == many2many.Entity1LogicalName ? many2many.Entity2LogicalName : many2many.Entity1LogicalName;
-                    otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == other);
+                    Func<ManyToManyRelationshipMetadata, string> many2ManyNamingLogic = m2m =>
+                    {
+                        var ot = entityMetadata.LogicalName == m2m.Entity1LogicalName ? m2m.Entity2LogicalName : m2m.Entity1LogicalName;
+                        otherMeta = metaData.Entities.FirstOrDefault(x => x.LogicalName == ot);
 
-                    returnValue = otherMeta.DisplayCollectionName.DisplayName();
+                        var nm = otherMeta.DisplayCollectionName.DisplayName();
+
+                        return nm;
+                    };
+
+                    var many2many = relationshipMetadata as ManyToManyRelationshipMetadata;
+
+                    returnValue = many2ManyNamingLogic(many2many);
 
                     if (reflexiveRole != null)
                     {
                         returnValue = $"{reflexiveRole.Value}{returnValue}";
                     }
 
-                    var oneToManysAtts = entityMetadata.OneToManyRelationships
-                        .Where(x => x.ReferencingEntity == other);
-                    var start = oneToManysAtts.Count();
+                    var attDups = entityMetadata.Attributes.Count(x => x.DisplayName() == returnValue);
 
-                    var manyToManys = entityMetadata.ManyToManyRelationships
-                    .Where(x => (x.Entity1LogicalName == the || x.Entity2LogicalName == the) && otherMeta.DisplayCollectionName.DisplayName() == returnValue)
-                    .OrderBy(x => x.SchemaName).ToList();
+                    var m2mDups = entityMetadata.ManyToManyRelationships
+                                        .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == (entityMetadata.LogicalName == x.Entity1LogicalName ? x.Entity2LogicalName : x.Entity1LogicalName)), services))
+                                        .Where(x => many2ManyNamingLogic(x) == returnValue)
+                                        .OrderBy(x => x.SchemaName).ToList();
 
-                    var mmIndex = manyToManys.FindIndex(x => x.SchemaName == many2many.SchemaName);
-                    var comIndex = start + mmIndex;
-                    if (comIndex > 0)
+                    if (m2mDups.Count() > 1 || attDups > 0)
                     {
-                        returnValue += comIndex.ToString();
+                        var index = m2mDups.FindIndex(x => x.SchemaName == many2many.SchemaName) + attDups + 1;
+                        if (index > 1)
+                            returnValue += index.ToString();
                     }
                 }
             }

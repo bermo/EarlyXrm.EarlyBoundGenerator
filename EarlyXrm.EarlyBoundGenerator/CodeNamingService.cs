@@ -164,7 +164,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                         {
                             var other = metaData.Entities.FirstOrDefault(x => x.LogicalName == o2m.ReferencingEntity);
 
-                            var at = other.Attributes.FirstOrDefault(x => x.LogicalName == o2m.ReferencingAttribute || x.AttributeOf == o2m.ReferencingAttribute);
+                            var at = other.Attributes.FirstOrDefault(x => x.LogicalName == o2m.ReferencingAttribute);
+                            if (string.IsNullOrWhiteSpace(at.DisplayName()))
+                                at = other.Attributes.FirstOrDefault(x => x.AttributeOf == o2m.ReferencingAttribute && o2m.ReferencingAttribute.Equals(x.SchemaName+"name", StringComparison.OrdinalIgnoreCase));
 
                             if (at == null)
                                 return other.DisplayCollectionName?.DisplayName() ?? other.SchemaName;

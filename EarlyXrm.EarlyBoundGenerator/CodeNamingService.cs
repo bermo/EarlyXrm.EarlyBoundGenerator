@@ -267,7 +267,10 @@ namespace EarlyXrm.EarlyBoundGenerator
                 {
                     name = optionSet?.DisplayName();
 
-                    var matches = metadata.OptionSets.Where(x => x.DisplayName() == name).OrderBy(x => x.Name).ToList();
+                    var matches = metadata.OptionSets
+                                    .Where(x => x.DisplayName() == name)
+                                    .OrderBy(x => x.Name).ToList();
+
                     if (metadata.Entities.Any(x => x.DisplayName() == name)) {
                         matches.Insert(0, new OptionSetMetadata { Name = "" });
                     }
@@ -299,7 +302,9 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         name = entName + "_" + optionSet?.DisplayName();
 
-                        var matches = metadata.Entities.Where(x => x.DisplayName() == entityMetadata.DisplayName()).SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y.OptionSet.DisplayName() == optionSet?.DisplayName()))
+                        var matches = metadata.Entities
+                                        .Where(x => x.DisplayName() == entityMetadata.DisplayName())
+                                        .SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y.OptionSet.DisplayName() == optionSet?.DisplayName()))
                                         .OrderBy(x => x.OptionSet.MetadataId).ToList();
 
                         if (matches.Count() > 1)

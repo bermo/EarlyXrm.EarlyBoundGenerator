@@ -16,7 +16,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
     {
         private Dictionary<string, string> parameters;
         private CodeFilteringService sut;
-        private IOrganizationMetadata organizationMetadata;
         private IMetadataProviderService metadataProviderService;
         private ICodeWriterFilterService codeWriterFilterService;
 

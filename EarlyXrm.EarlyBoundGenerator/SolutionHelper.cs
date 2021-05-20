@@ -16,7 +16,7 @@ namespace EarlyXrm.EarlyBoundGenerator
     public static class SolutionHelper
     {
         private static bool debugMode;
-        private static string solutionName;
+        private static string[] solutions;
         private static IOrganizationMetadata organisationMetadata;
         private static IServiceProvider services;
         private static IEnumerable<IncludedEntity> solutionEntities;
@@ -157,7 +157,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                 organisationService = new CrmServiceClient(GetParameter("connectionstring"));
             }
                 
-            solutionName = GetParameter("solutionname");
+            solutions = GetParameter("solutionname")?.Split(';');
 
             var types = componentTypes.Select(x => (int)x).ToArray();
             var query = new QueryExpression(SolutionComponent.EntityLogicalName)
@@ -182,7 +182,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         JoinOperator = JoinOperator.Inner,
                         LinkCriteria = { 
                             Conditions = { 
-                                new ConditionExpression(Solution.LogicalNames.Name, ConditionOperator.Equal, solutionName) 
+                                new ConditionExpression(Solution.LogicalNames.Name, ConditionOperator.In, solutions) 
                             } 
                         }
                     }

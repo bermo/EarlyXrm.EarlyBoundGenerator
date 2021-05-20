@@ -1,16 +1,23 @@
 {
+  // interactive login by default.
+  "ConnectionString": null, //This can be populated this for convenience and/or to enable filtering via solution/s. 
+
   "Out": "EarlyXrm\\EarlyBoundTypes.cs", // the path off the project root where to generate the c# file to
   "Namespace": "EarlyBoundTypes", // the namespace for the generated code
-  "UseDisplayNames": true, // whether to use Dynamics friendly nameas or not
+  "UseDisplayNames": true, // whether to use Dynamics friendly names or not
   "DebugMode": false,
   "Instrument": false,
   "AddSetters": true, // globally add setters to readonly properties (note, this will cause exceptions in some cases)
   "NestNonGlobalEnums": true, // this nests entity specific enums inside the entity class.  Only works if UseDisplayNames = true
   "GenerateConstants": true, // generates a list of nested constants containing logical name and relationships
 
-  "Include": {
-    "solution": [], // include all solution attributes
-    "solutioncomponent": [ // include specific attributes for the "solutioncomponent" entity
+  "Solutions": [ // if one or more solution (unique) names are included, those entities and attributes will be automatically included
+    //"default"   // eg. including this will generate all entities, attributes, and relationships in the organisation!
+  ], // note, if any "Solutions" are included, the "ConnectionString" setting needs to be populated
+
+  "Include": { // ability to include specific entities and attributes (if they haven't already been included via "Solutions"
+    "solution": [], // eg. this includes all "solution" entity attributes
+    "solutioncomponent": [ // eg. and this includes the following attributes for the "solutioncomponent" entity
       "solutionid",
       "componenttype",
       "objectid",
@@ -18,21 +25,8 @@
     ]
   },
 
-  "Exclude": {
-    "*": [ // global exclude filter for logicalname attributes on any entity
-      "importsequencenumber",
-      "createdonbehalfby",
-      "createdbyexternalparty",
-      "modifiedonbehalfby",
-      "modifiedbyexternalparty",
-      "versionnumber",
-      "transactioncurrencyid",
-      "overriddencreatedon",
-      "timezoneruleversionnumber",
-      "utcconversiontimezonecode",
-      "overwritetime"
-    ],
-    "solution": [ // exclude specific attributes for the "solution" entity
+  "Exclude": { // exclude specific entities  and attribtues even if they have been included via "Solutions" or "Include"
+    "solution": [ // eg. exclude specific attributes for the "solution" entity
       "configurationpageid",
       "createdby",
       "createdon",
@@ -45,13 +39,19 @@
       "templatesuffix",
       "thumbprint",
       "upgradeinfo"
+    ],
+    "*": [ // eg. asterisk is a global exclude filter used to exclude attributes if present on any entity
+      "importsequencenumber",
+      "createdonbehalfby",
+      "createdbyexternalparty",
+      "modifiedonbehalfby",
+      "modifiedbyexternalparty",
+      "versionnumber",
+      "transactioncurrencyid",
+      "overriddencreatedon",
+      "timezoneruleversionnumber",
+      "utcconversiontimezonecode",
+      "overwritetime"
     ]
-  },
-
-  "Solutions": [], // if one or more solution (unique) names are added, the "ConnectionString" setting needs to be populated
-
-  "ConnectionString": null // interactive login by default. Populate this for convenience or to enable filtering via solution/s. Some sample connection strings below:
-  //"ConnectionString": "AuthType=OAuth;Url=https://?.crm!.dynamics.com/;Username=?;Password=?;ClientId={51f81489-12ee-4a9e-aaae-a2591f45987d};RedirectUri=app://58145b91-0c36-4500-8554-080854f2ac97/;",
-  //"ConnectionString": "AuthType=ClientSecret;Url=https://?.crm!.dynamics.com/;ClientId=?;ClientSecret=?;",
-  //"ConnectionString": "AuthType=Office365;Url=https://?.dynamics.com;Username=?;Password=?;"
+  }
 }

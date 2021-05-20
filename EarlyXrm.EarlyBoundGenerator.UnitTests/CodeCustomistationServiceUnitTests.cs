@@ -15,7 +15,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
     public class CodeCustomistationServiceUnitTests : UnitTestBase
     {
         private Dictionary<string, string> parameters;
-        private IOrganizationMetadata organizationMetadata;
 
         [TestInitialize]
         public void TestInitialise()

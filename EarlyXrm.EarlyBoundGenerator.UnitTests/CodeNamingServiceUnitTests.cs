@@ -4,7 +4,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using NSubstitute;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
@@ -155,9 +154,17 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_Reflexive()
         {
-            organizationMetadata.Entities.Returns(new[] {
-                new EntityMetadata { LogicalName = "ee_test", DisplayName = new Label("Test", 1033), DisplayCollectionName = new Label("Tests", 1033)}
+            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
+            var em = new EntityMetadata
+            {
+                LogicalName = "ee_test",
+                DisplayName = new Label("Test", 1033),
+                DisplayCollectionName = new Label("Tests", 1033)
+            };
+            em.Set(x => x.Attributes, new [] {
+                attMetadata
             });
+            organizationMetadata.Entities.Returns(new[] {em});
 
             var relationship = new OneToManyRelationshipMetadata
             {
@@ -166,10 +173,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 ReferencedEntity = "ee_test",
                 ReferencedAttribute = "ee_testid"
             };
-            var attMetadata = new StringAttributeMetadata { LogicalName = "ee_testid", DisplayName = new Label("Test Id", 1033) };
             var metadata = new EntityMetadata { LogicalName = "ee_test" }
                     .Set(x => x.Attributes, new AttributeMetadata[] { attMetadata })
-                    .Set(x => x.ManyToOneRelationships, new OneToManyRelationshipMetadata[]
+                    .Set(x => x.OneToManyRelationships, new OneToManyRelationshipMetadata[]
                     {
                         relationship,
                         new OneToManyRelationshipMetadata { ReferencingAttribute = "ee_testid" }

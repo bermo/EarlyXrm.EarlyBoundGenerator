@@ -246,46 +246,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
-        public void GenerateStateOptionSet()
-        {
-            var optionSetMetadata = new OptionSetMetadata
-            {
-                IsGlobal = false,
-                IsCustomOptionSet = false,
-                OptionSetType = OptionSetType.State
-            };
-
-            organizationMetadata.Entities.Returns(new EntityMetadata[0]);
-
-            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
-                .Returns(new EntityCollection(new List<Entity>(0)));
-
-            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void GenerateStatusOptionSet()
-        {
-            var optionSetMetadata = new OptionSetMetadata
-            {
-                IsGlobal = false,
-                IsCustomOptionSet = false,
-                OptionSetType = OptionSetType.Status
-            };
-
-            organizationMetadata.Entities.Returns(new EntityMetadata[0]);
-
-            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
-                .Returns(new EntityCollection(new List<Entity>(0)));
-
-            var result = sut.GenerateOptionSet(optionSetMetadata, serviceProvider);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
         public void GenerateOptionSet()
         {
             var optionSetMetadata = new OptionSetMetadata

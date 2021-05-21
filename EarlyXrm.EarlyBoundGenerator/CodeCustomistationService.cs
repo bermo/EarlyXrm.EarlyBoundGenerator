@@ -13,7 +13,6 @@ namespace EarlyXrm.EarlyBoundGenerator
     public class CodeCustomistationService : ICustomizeCodeDomService
     {
         private readonly bool UseDisplayNames;
-        private readonly bool Instrument;
         private readonly bool AddSetters;
         private readonly bool NestNonGlobalEnums;
         private readonly bool GenerateConstants;
@@ -26,7 +25,6 @@ namespace EarlyXrm.EarlyBoundGenerator
         public CodeCustomistationService(IDictionary<string, string> parameters)
         {
             bool.TryParse(parameters[nameof(UseDisplayNames)], out UseDisplayNames);
-            bool.TryParse(parameters[nameof(Instrument)], out Instrument);
             bool.TryParse(parameters[nameof(AddSetters)], out AddSetters);
             bool.TryParse(parameters[nameof(NestNonGlobalEnums)], out NestNonGlobalEnums);
             bool.TryParse(parameters[nameof(GenerateConstants)], out GenerateConstants);
@@ -71,19 +69,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                     IsInterface = true
                 };
 
-                if (Instrument)
-                {
-                    codeNamespace.Types.Add(interfaceCodeType);
-                }
-
                 entityClass.Comments.Clear();
                 entityClass.BaseTypes.Clear();
                 entityClass.BaseTypes.Add(new CodeTypeReference("EarlyEntity"));
-                if (Instrument)
-                {
-                    entityClass.BaseTypes.Add(new CodeTypeReference("I" + entityClass.Name));
-                }
-
                 entityClass.CustomAttributes.Add(new CodeAttributeDeclaration("ExcludeFromCodeCoverage"));
 
                 for (var i = entityClass.Members.Count - 1; i >= 0; i--)
@@ -143,32 +131,13 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                     codeTypeMember.Comments.Clear();
 
-                    var interfaceProp = new CodeMemberProperty
-                    {
-                        Name = codeMemberProperty.Name,
-                        HasSet = false,
-                        HasGet = true
-                    };
-
                     var type = codeMemberProperty.Type;
 
                     if (type.BaseType == "System.Guid") codeMemberProperty.Type = new CodeTypeReference("Guid");
                     if (type.BaseType.StartsWith("Microsoft.Xrm.Sdk.")) codeMemberProperty.Type = new CodeTypeReference(codeMemberProperty.Type.BaseType.Replace("Microsoft.Xrm.Sdk.", ""));
                     if (type.BaseType.StartsWith(codeNamespace.Name + "."))
                     {
-                        interfaceProp.Type = new CodeTypeReference(codeMemberProperty.Type.BaseType.Replace(codeNamespace.Name + ".", "I"));
                         codeMemberProperty.Type = new CodeTypeReference(codeMemberProperty.Type.BaseType.Replace(codeNamespace.Name + ".", ""));
-
-                        if (Instrument)
-                        {
-                            entityClass.Members.Add(new CodeMemberProperty
-                            {
-                                PrivateImplementationType = new CodeTypeReference($"I{entityClass.Name}"),
-                                Name = codeMemberProperty.Name,
-                                Type = interfaceProp.Type,
-                                GetStatements = { new CodeSnippetStatement($"\t\t\t\treturn {codeMemberProperty.Name};") }
-                            });
-                        }
                     }
 
                     if (type.BaseType.StartsWith("System.Nullable`1"))
@@ -213,7 +182,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                                 optionsSetName = $"{entityMetadata?.DisplayName()}_{enumAtt.OptionSet.DisplayName()}";
 
                             var crt = new CodeTypeReference(optionsSetName + "?");
-                            interfaceProp.Type = crt;
                         }
                     }
 
@@ -223,9 +191,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                         {
                             codeMemberProperty.Type = new CodeTypeReference(type.BaseType.Replace("System.Collections.Generic.", ""),
                                 new CodeTypeReference(type.TypeArguments[0].BaseType.Replace("Microsoft.Xrm.Sdk.", "")));
-
-                            interfaceProp.Type = new CodeTypeReference(type.BaseType.Replace("System.Collections.Generic.", ""),
-                                new CodeTypeReference("I" + type.TypeArguments[0].BaseType.Replace("Microsoft.Xrm.Sdk.", "")));
                         }
                     }
 
@@ -233,29 +198,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                     {
                         var baseType = type.TypeArguments[0].BaseType.Replace(codeNamespace.Name + ".", "");
                         codeMemberProperty.Type = new CodeTypeReference(type.BaseType.Replace("System.Collections.Generic.", ""), new CodeTypeReference($"{baseType}"));
-
-                        if (Instrument)
-                        {
-                            interfaceProp.Type = new CodeTypeReference(type.BaseType.Replace("System.Collections.Generic.", ""), new CodeTypeReference($"I{baseType}"));
-
-                            entityClass.Members.Add(new CodeMemberProperty
-                            {
-                                PrivateImplementationType = new CodeTypeReference($"I{entityClass.Name}"),
-                                Name = codeMemberProperty.Name,
-                                Type = interfaceProp.Type,
-                                GetStatements = { new CodeSnippetStatement($"\t\t\t\treturn {codeMemberProperty.Name}.Cast<I{baseType}>();") }
-                            });
-                        }
-                    }
-
-                    if (Instrument)
-                    {
-                        if (interfaceProp.Type.BaseType == "System.Void")
-                        {
-                            interfaceProp.Type = codeMemberProperty.Type;
-                        }
-
-                        interfaceCodeType.Members.Add(interfaceProp);
                     }
                 }
 
@@ -266,7 +208,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                     var prop = props[index];
 
                     var logicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();
-                    var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();                   
+                    var relationshipSchema = GetAttributeValues<RelationshipSchemaNameAttribute>(prop.CustomAttributes)?.FirstOrDefault();             
 
                     if (logicalName != null && relationshipSchema == null)
                     {
@@ -275,9 +217,9 @@ namespace EarlyXrm.EarlyBoundGenerator
 
                         var propertyLogicalName = GetAttributeValues<AttributeLogicalNameAttribute>(prop.CustomAttributes).First();
                         var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => x.LogicalName == propertyLogicalName &&
-                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State, AttributeTypeCode.Virtual }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
+                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State, AttributeTypeCode.Virtual, AttributeTypeCode.EntityName }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
 
-                        if (enumAtt != null)
+                        if (enumAtt != null && enumAtt.OptionSet != null)
                         {
                             var optionsSetName = namingService.GetNameForOptionSet(entityMetadata, enumAtt.OptionSet, services);
                             var enumDef = codeNamespace.Types.Cast<CodeTypeDeclaration>().FirstOrDefault(x => x.IsEnum && x.Name == optionsSetName);

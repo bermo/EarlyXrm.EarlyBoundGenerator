@@ -10,7 +10,6 @@ namespace EarlyXrm.EarlyBoundGenerator
         public string Namespace;
         public bool UseDisplayNames;
         public bool DebugMode;
-        public bool Instrument;
         public bool AddSetters;
         public bool GenerateConstants;
         public bool NestNonGlobalEnums;

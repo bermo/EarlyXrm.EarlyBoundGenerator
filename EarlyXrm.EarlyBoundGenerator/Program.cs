@@ -69,7 +69,6 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             parameters.Add("usedisplaynames", earlyBoundConfig.UseDisplayNames.ToString().ToLower());
             parameters.Add("debugMode", earlyBoundConfig.DebugMode.ToString().ToLower());
-            parameters.Add("instrument", earlyBoundConfig.Instrument.ToString().ToLower());
             parameters.Add("addsetters", earlyBoundConfig.AddSetters.ToString().ToLower());
 
             earlyBoundConfig.Out = @"..\..\" + earlyBoundConfig.Out;

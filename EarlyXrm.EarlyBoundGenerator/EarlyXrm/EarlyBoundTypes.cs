@@ -736,19 +736,6 @@ namespace EarlyBoundTypes
 			}
 		}
 		
-		[AttributeLogicalNameAttribute("objectid")]
-		public Guid? ObjectId
-		{
-			get
-			{
-				return GetAttributeValue<Guid?>("objectid");
-			}
-			set
-			{
-				SetAttributeValue("objectid", nameof(ObjectId), value);
-			}
-		}
-		
 		[AttributeLogicalNameAttribute("componenttype")]
 		public ComponentType? ObjectTypeCode
 		{
@@ -759,6 +746,19 @@ namespace EarlyBoundTypes
 			set
 			{
 				SetAttributeValue("componenttype", nameof(ObjectTypeCode), value.HasValue ? new OptionSetValue((int)value.Value) : null);
+			}
+		}
+		
+		[AttributeLogicalNameAttribute("objectid")]
+		public Guid? Regarding
+		{
+			get
+			{
+				return GetAttributeValue<Guid?>("objectid");
+			}
+			set
+			{
+				SetAttributeValue("objectid", nameof(Regarding), value);
 			}
 		}
 		
@@ -776,7 +776,7 @@ namespace EarlyBoundTypes
 		}
 		
 		[AttributeLogicalNameAttribute("rootsolutioncomponentid")]
-		public Guid? RootSolutionComponentId
+		public Guid? RootSolutionComponentID
 		{
 			get
 			{
@@ -784,7 +784,7 @@ namespace EarlyBoundTypes
 			}
 			set
 			{
-				SetAttributeValue("rootsolutioncomponentid", nameof(RootSolutionComponentId), value);
+				SetAttributeValue("rootsolutioncomponentid", nameof(RootSolutionComponentID), value);
 			}
 		}
 		
@@ -839,13 +839,13 @@ namespace EarlyBoundTypes
 			
 			public const string Id = "solutioncomponentid";
 			
-			public const string ObjectId = "objectid";
-			
 			public const string ObjectTypeCode = "componenttype";
+			
+			public const string Regarding = "objectid";
 			
 			public const string RootComponentBehavior = "rootcomponentbehavior";
 			
-			public const string RootSolutionComponentId = "rootsolutioncomponentid";
+			public const string RootSolutionComponentID = "rootsolutioncomponentid";
 			
 			public const string Solution = "solutionid";
 		}

@@ -103,7 +103,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             foreach (var entity in organisationMetadata.Entities)
             {
-                var solutionComponent = solutionComponents.FirstOrDefault(x => x.ObjectId.Value == entity.MetadataId.Value);
+                var solutionComponent = solutionComponents.FirstOrDefault(x => x.Regarding.Value == entity.MetadataId.Value);
 
                 var skipFields = skip.ContainsKey(entity.LogicalName) ? skip[entity.LogicalName] : null;
                 var fullSkip = skip.ContainsKey(entity.LogicalName) && (!skipFields?.Any() ?? true);
@@ -124,7 +124,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                             entity.IsCustomEntity == true ||
                             solutionComponent != null && solutionComponent.RootComponentBehavior == SolutionComponent.Enums.IncludeBehavior.IncludeSubcomponents ||
                             (extraFields?.Any(y => y == attribute.LogicalName) ?? extra.ContainsKey(entity.LogicalName)) ||
-                            solutionComponents.Any(y => y.ObjectId.HasValue && attribute.MetadataId.HasValue && y.ObjectId.Value == attribute.MetadataId.Value)
+                            solutionComponents.Any(y => y.Regarding.HasValue && attribute.MetadataId.HasValue && y.Regarding.Value == attribute.MetadataId.Value)
                         )
                     )
                     {
@@ -163,7 +163,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             var query = new QueryExpression(SolutionComponent.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(
-                    SolutionComponent.LogicalNames.ObjectId, 
+                    SolutionComponent.LogicalNames.Regarding, 
                     SolutionComponent.LogicalNames.RootComponentBehavior
                 ),
                 Criteria = { 

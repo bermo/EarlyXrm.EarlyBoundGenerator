@@ -22,37 +22,46 @@ namespace EarlyXrm.EarlyBoundGenerator
             DefaultNamingService = namingService;
         }
 
+        string reservedEntities = "Entity";
+
+        private string EntityNamingLogic(EntityMetadata entityMetadata)
+        {
+            return entityMetadata.DisplayName();
+        }
+
         public string GetNameForEntity(EntityMetadata entityMetadata, IServiceProvider services)
         {
             var entityName = DefaultNamingService.GetNameForEntity(entityMetadata, services);
 
             if (useDisplayNames)
             {
-                var dn = entityMetadata?.DisplayName();
-                if (!string.IsNullOrWhiteSpace(dn))
-                {
-                    if (dn == "Entity")
-                    {
-                        return dn += "1";
-                    }
+                var metaData = services.LoadMetadata();
 
-                    entityName = dn;
+                entityName = EntityNamingLogic(entityMetadata);
 
-                    var metaData = services.LoadMetadata();
-                    var dups = metaData.Entities.Where(x => x.DisplayName() == entityName).OrderBy(x => x.LogicalName).ToList();
+                var reservedDups = entityName == reservedEntities ? 1 : 0;
+                var dups = metaData.Entities.Where(x => x.DisplayName() == entityName);
 
-                    if(dups.Count() > 1)
-                    {
-                        var index = dups.FindIndex(x => x.LogicalName == entityMetadata.LogicalName) + 1;
-                        if (index > 1)
-                            entityName += index.ToString();
-                    }
-                }
+                entityName = MakeUnique(entityName, dups, x => x.LogicalName, entityMetadata.LogicalName, reservedDups);
             }
 
             this.Debug(entityName, entityMetadata.LogicalName);
 
             return entityName;
+        }
+
+        private string[] reservedAttributes = new[] { 
+            nameof(EarlyBoundTypes.Solution.EntityLogicalName), nameof(EarlyBoundTypes.Solution.EntityLogicalCollectionName), 
+            nameof(EarlyBoundTypes.Solution.EntitySetName), nameof(EarlyBoundTypes.Solution.LogicalName), 
+            nameof(Entity.KeyAttributes), nameof(Entity.Attributes), nameof(Entity.EntityState), 
+            nameof(Entity.ExtensionData), nameof(Entity.FormattedValues), nameof(Entity.RelatedEntities), 
+            nameof(Entity.RowVersion), nameof(Entity.LazyFileAttributeKey), nameof(Entity.LazyFileAttributeValue), 
+            nameof(Entity.LazyFileSizeAttributeKey), nameof(Entity.LazyFileSizeAttributeValue),
+        };
+
+        private string AttributeNamingLogic(EntityMetadata entityMetadata, AttributeMetadata attributeMetadata)
+        {
+            return attributeMetadata.DisplayName();
         }
 
         public string GetNameForAttribute(EntityMetadata entityMetadata, AttributeMetadata attributeMetadata, IServiceProvider services)
@@ -61,30 +70,14 @@ namespace EarlyXrm.EarlyBoundGenerator
 
             if (useDisplayNames)
             {
-                attributeName = attributeMetadata.DisplayName();
+                attributeName = AttributeNamingLogic(entityMetadata, attributeMetadata);
 
-                var matches = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName).OrderBy(x => x.LogicalName).ToList();
-                if (entityMetadata.DisplayName() == attributeName)
-                {
-                    matches.Insert(0, new AttributeMetadata { LogicalName = "" });
-                }
+                var entDups = entityMetadata.DisplayName() == attributeName ? 1 : 0;
+                var reservedDups = reservedAttributes.Any(x => x == attributeName) ? 1 : 0;
 
-                if (matches.Count() > 1)
-                {
-                    var index = matches.ToList().FindIndex(x => x.LogicalName == attributeMetadata.LogicalName) + 1;
-                    if (index > 1)
-                        attributeName += index.ToString();
-                }
+                var attDups = entityMetadata.Attributes.Where(x => x.DisplayName() == attributeName);
 
-                if (string.IsNullOrWhiteSpace(attributeName) || attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
-                {
-                    attributeName = DefaultNamingService.GetNameForAttribute(entityMetadata, attributeMetadata, services);
-                }
-
-                if (attributeName == "EntityLogicalName" || attributeName == "EntitySetName" || attributeName == "LogicalName" || attributeName == "Attributes")
-                {
-                    attributeName += "2";
-                }
+                attributeName = MakeUnique(attributeName, attDups, x => x.LogicalName, attributeMetadata.LogicalName, entDups, reservedDups);
             }
 
             this.Debug(attributeName, entityMetadata.LogicalName, attributeMetadata.LogicalName);
@@ -142,17 +135,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                                         .Count(x => x.DisplayName() == name);
                         var manyDups = entityMetadata.ManyToOneRelationships
                                         .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == x.ReferencedEntity), services))
-                                        .Where(x => many2OneNamingLogic(x) == name)
-                                        .OrderBy(x => x.SchemaName).ToList();
+                                        .Where(x => many2OneNamingLogic(x) == name);
 
-                        if (manyDups.Count() > 1 || attDups > 0 || entDups > 0)
-                        {
-                            var index = manyDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + attDups + entDups + 1;
-                            if (index > 1)
-                                name += index.ToString();
-                        }
-
-                        returnValue = name;
+                        returnValue = MakeUnique(name, manyDups, x => x.SchemaName, one2many.SchemaName, entDups, attDups);
                     }
                     else // one to many
                     {
@@ -167,17 +152,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                                         .Count(x => many2OneNamingLogic(x) == name) ?? 0;
                         var o2mDups = entityMetadata.OneToManyRelationships
                                         .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == x.ReferencingEntity), services))
-                                        .Where(x => one2ManyNamingLogic(x) == name)
-                                        .OrderBy(x => x.SchemaName).ToList();
+                                        .Where(x => one2ManyNamingLogic(x) == name);
 
-                        if (o2mDups.Count() > 1 || entDups > 0 || attDups > 0 || m2oDups > 0)
-                        {
-                            var index = o2mDups.FindIndex(x => x.SchemaName == one2many.SchemaName) + m2oDups + attDups + entDups + 1;
-                            if (index > 1)
-                                name += index.ToString();
-                        }
-
-                        returnValue = name;
+                        returnValue = MakeUnique(name, o2mDups, x => x.SchemaName, one2many.SchemaName, entDups, attDups, m2oDups);
                     }
                 }
                 else // many to many
@@ -201,15 +178,9 @@ namespace EarlyXrm.EarlyBoundGenerator
                                         .Count(x => x.DisplayName() == returnValue);
                     var m2mDups = entityMetadata.ManyToManyRelationships
                                         .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == (entityMetadata.LogicalName == x.Entity1LogicalName ? x.Entity2LogicalName : x.Entity1LogicalName)), services))
-                                        .Where(x => many2ManyNamingLogic(x) == returnValue)
-                                        .OrderBy(x => x.SchemaName).ToList();
+                                        .Where(x => many2ManyNamingLogic(x) == returnValue);
 
-                    if (m2mDups.Count() > 1 || attDups > 0)
-                    {
-                        var index = m2mDups.FindIndex(x => x.SchemaName == many2many.SchemaName) + attDups + 1;
-                        if (index > 1)
-                            returnValue += index.ToString();
-                    }
+                    returnValue = MakeUnique(returnValue, m2mDups, x => x.SchemaName, many2many.SchemaName, attDups);
                 }
             }
 
@@ -267,20 +238,10 @@ namespace EarlyXrm.EarlyBoundGenerator
                 {
                     name = optionSet?.DisplayName();
 
-                    var matches = metadata.OptionSets
-                                    .Where(x => x.DisplayName() == name)
-                                    .OrderBy(x => x.Name).ToList();
+                    var entDups = metadata.Entities.Count(x => x.DisplayName() == name);
+                    var matches = metadata.OptionSets.Where(x => x.DisplayName() == name);
 
-                    if (metadata.Entities.Any(x => x.DisplayName() == name)) {
-                        matches.Insert(0, new OptionSetMetadata { Name = "" });
-                    }
-
-                    if (matches.Count() > 1)
-                    {
-                        var index = matches.FindIndex(x => x.Name == optionSetMetadata.Name) + 1;
-                        if (index > 1)
-                            name += index.ToString();
-                    }
+                    name = MakeUnique(name, matches, x => x.Name, optionSetMetadata.Name, entDups);
                 }
                 else // not global
                 { 
@@ -292,27 +253,16 @@ namespace EarlyXrm.EarlyBoundGenerator
                     {
                         var entName = entityMetadata.DisplayName();
 
-                        var entMatches = metadata.Entities.Where(x => x.DisplayName() == entName).OrderBy(x => x.LogicalName).ToList();
-                        if (entMatches.Count() > 1)
-                        {
-                            var index = entMatches.FindIndex(x => x.LogicalName == entityMetadata.LogicalName) + 1;
-                            if (index > 1)
-                                entName += index.ToString();
-                        }
+                        var entMatches = metadata.Entities.Where(x => x.DisplayName() == entName);
+
+                        entName = MakeUnique(entName, entMatches, x => x.LogicalName, entityMetadata.LogicalName);
 
                         name = entName + "_" + optionSet?.DisplayName();
 
-                        var matches = metadata.Entities
-                                        .Where(x => x.DisplayName() == entityMetadata.DisplayName())
-                                        .SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y.OptionSet.DisplayName() == optionSet?.DisplayName()))
-                                        .OrderBy(x => x.OptionSet.MetadataId).ToList();
+                        var matches = metadata.Entities.Where(x => x.DisplayName() == entityMetadata.DisplayName())
+                                        .SelectMany(x => x?.Attributes?.OfType<EnumAttributeMetadata>()?.Where(y => y.OptionSet.DisplayName() == optionSet?.DisplayName()));
 
-                        if (matches.Count() > 1)
-                        {
-                            var index = matches.FindIndex(x => x.OptionSet.MetadataId == optionSetMetadata.MetadataId) + 1;
-                            if (index > 1)
-                                name += index.ToString();
-                        }
+                        name = MakeUnique(name, matches, x => x.OptionSet.Name, optionSetMetadata.Name);
                     }
                 }
             }
@@ -344,15 +294,23 @@ namespace EarlyXrm.EarlyBoundGenerator
             optionName = EnsureValidIdentifier(optionName);
 
             var optionSet = optionSetMetadata as OptionSetMetadata;
-            var matches = optionSet.Options.Where(x => EnsureValidIdentifier(x.DisplayName()) == optionName).OrderBy(x => x.Value);
-            if (matches.Count() > 1)
+            var matches = optionSet.Options.Where(x => EnsureValidIdentifier(x.DisplayName()) == optionName);
+
+            optionName = MakeUnique(optionName, matches, x => x.Value, optionMetadata.Value);
+            
+            return optionName;
+        }
+
+        private string MakeUnique<T, U>(string name, IEnumerable<T> duplicates, Func<T, U> uniqueFunction, U uniqueData, params int[] dupCounts)
+        {
+            if (duplicates.Count() > 1 || dupCounts.Any(x => x > 0))
             {
-                var index = matches.ToList().FindIndex(x => x.Value == optionMetadata.Value) + 1;
+                var index = duplicates.OrderBy(uniqueFunction).ToList().FindIndex(x => uniqueFunction(x).Equals(uniqueData)) + dupCounts.Sum() + 1;
                 if (index > 1)
-                    optionName += index.ToString();
+                    name += index.ToString();
             }
 
-            return optionName;
+            return name;
         }
     }
 }

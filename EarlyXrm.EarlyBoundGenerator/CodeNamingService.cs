@@ -143,7 +143,7 @@ namespace EarlyXrm.EarlyBoundGenerator
                         var manyDups = entityMetadata.ManyToOneRelationships
                                         .Where(x => filteringService.GenerateRelationship(x, metaData.Entities.FirstOrDefault(y => y.LogicalName == x.ReferencedEntity), services))
                                         .Where(x => many2OneNamingLogic(x) == name)
-                                        .OrderBy(x => x.MetadataId.Value).ToList();
+                                        .OrderBy(x => x.SchemaName).ToList();
 
                         if (manyDups.Count() > 1 || attDups > 0 || entDups > 0)
                         {

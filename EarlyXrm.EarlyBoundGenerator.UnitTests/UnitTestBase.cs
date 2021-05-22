@@ -16,6 +16,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         protected IBuildConfiguration Builder;
 
         protected IOrganizationMetadata organizationMetadata;
+        protected ICodeWriterFilterService filterService;
 
         protected EntityMetadata testParent;
         protected EntityMetadata test;
@@ -37,6 +38,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             SolutionHelper.organisationService = Substitute.For<IOrganizationService>();
 
             serviceProvider = Substitute.For<IServiceProvider>();
+
+            filterService = Substitute.For<ICodeWriterFilterService>();
+            serviceProvider.GetService(typeof(ICodeWriterFilterService)).Returns(filterService);
         }
 
         protected CodeAttributeDeclaration Build<T>(params string[] args) where T : Attribute
@@ -81,10 +85,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 DisplayName = "Test Parent".AsLabel()
             }
             .Set(x => x.PrimaryIdAttribute, "ee_testparentid")
-            .AddAttribute(
+            .AddAttribute(filterService,
                 new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Id".AsLabel() },
                 new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() })
-            .AddOneToMany(
+            .AddOneToMany(filterService,
                 new OneToManyRelationshipMetadata { ReferencedEntity = "ee_test", ReferencedAttribute = "ee_testid", SchemaName = "ee_testparent_tests" }
             );
 
@@ -94,18 +98,18 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 DisplayName = "Test".AsLabel()
             }
             .Set(x => x.PrimaryIdAttribute, "ee_testid")
-            .AddAttribute(
+            .AddAttribute(filterService,
                 new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Id".AsLabel() },
                 new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
                 new LookupAttributeMetadata { LogicalName = "ee_testparentid", DisplayName = "Test Parent".AsLabel() })
-            .AddOneToMany(
+            .AddOneToMany(filterService,
                 new OneToManyRelationshipMetadata
                 {
                     ReferencingEntity = "ee_testchild",
                     ReferencingAttribute = "ee_testid",
                     SchemaName = "ee_test_testchilds"
                 })
-            .AddManyToOne(
+            .AddManyToOne(filterService,
                 new OneToManyRelationshipMetadata
                 {
                     ReferencedEntity = "ee_testparent",
@@ -121,11 +125,11 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 DisplayCollectionName = "Test Children".AsLabel()
             }
             .Set(x => x.PrimaryIdAttribute, "ee_testchildid")
-            .AddAttribute(
+            .AddAttribute(filterService,
                 new UniqueIdentifierAttributeMetadata { LogicalName = "ee_testchildid", DisplayName = "Id".AsLabel() },
                 new StringAttributeMetadata { LogicalName = "ee_name", DisplayName = "Name".AsLabel() },
                 new LookupAttributeMetadata { LogicalName = "ee_testid", DisplayName = "Test".AsLabel() })
-            .AddManyToOne(
+            .AddManyToOne(filterService,
                 new OneToManyRelationshipMetadata
                 {
                     ReferencingEntity = "ee_test",

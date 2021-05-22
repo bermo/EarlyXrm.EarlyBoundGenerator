@@ -17,7 +17,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         private Dictionary<string, string> parameters;
         private CodeFilteringService sut;
         private IMetadataProviderService metadataProviderService;
-        private ICodeWriterFilterService codeWriterFilterService;
 
         [TestInitialize]
         public void TestInitialise()
@@ -27,11 +26,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             metadataProviderService.LoadMetadata().Returns(organizationMetadata);
             serviceProvider.GetService(typeof(IMetadataProviderService)).Returns(metadataProviderService);
 
-            codeWriterFilterService = Substitute.For<ICodeWriterFilterService>();
-            codeWriterFilterService.GenerateAttribute(Arg.Any<AttributeMetadata>(), serviceProvider).Returns(true);
+            filterService.GenerateAttribute(Arg.Any<AttributeMetadata>(), serviceProvider).Returns(true);
             parameters = new Dictionary<string, string> {};
 
-            sut = new CodeFilteringService(codeWriterFilterService, parameters);
+            sut = new CodeFilteringService(filterService, parameters);
         }
 
         [TestMethod]
@@ -92,7 +90,7 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GenerateRelationshipReturnsFalse()
         {
-            codeWriterFilterService.GenerateRelationship(Arg.Any<RelationshipMetadataBase>(), Arg.Any<EntityMetadata>(), serviceProvider).Returns(true);
+            filterService.GenerateRelationship(Arg.Any<RelationshipMetadataBase>(), Arg.Any<EntityMetadata>(), serviceProvider).Returns(true);
 
             var id = Guid.NewGuid();
             var testId = Guid.NewGuid();

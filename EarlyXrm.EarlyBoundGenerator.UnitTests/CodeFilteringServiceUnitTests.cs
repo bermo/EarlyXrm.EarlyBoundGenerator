@@ -74,12 +74,15 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 entityMetadata.Set(x => x.Attributes, new AttributeMetadata [] { stringAttributeMetadata, picklistAttributeMetadata, stateAttributeMetadata })
             });
 
+            var f = Builder.Create<SolutionComponent>();
+            f.Set(x => x.Regarding, entityMetadata.MetadataId);
+
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
                 .Returns(new EntityCollection(new List<Entity> {
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = entityMetadata.MetadataId; x.ObjectTypeCode = ComponentType.Entity; }),
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = stringAttributeMetadata.MetadataId; x.ObjectTypeCode = ComponentType.Attribute; }),
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = picklistAttributeMetadata.MetadataId; x.ObjectTypeCode = ComponentType.Attribute; }),
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = stateAttributeMetadata.MetadataId; x.ObjectTypeCode = ComponentType.Attribute; }),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, entityMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Entity),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stringAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, picklistAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stateAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
                 }));
 
             Assert.IsTrue(sut.GenerateAttribute(stringAttributeMetadata, serviceProvider));
@@ -299,8 +302,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
                 .Returns(new EntityCollection(new List<Entity> {
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = id; x.ObjectTypeCode = ComponentType.Entity; }),
-                    Builder.Create<SolutionComponent>().Set(x => { x.Regarding = testId; x.ObjectTypeCode = ComponentType.Attribute; }),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, id).Set(x => x.ObjectTypeCode, ComponentType.Entity),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, testId).Set(x => x.ObjectTypeCode, ComponentType.Attribute),
                 }));
 
             var result = sut.GenerateAttribute(attributeMetadata, serviceProvider);

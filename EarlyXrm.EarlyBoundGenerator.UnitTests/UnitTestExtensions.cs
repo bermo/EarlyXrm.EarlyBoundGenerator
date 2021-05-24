@@ -16,7 +16,21 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             var me = prop.Body as MemberExpression;
             var pi = me.Member as PropertyInfo;
 
-            typeof(T).GetProperty(pi.Name).SetValue(t, val);
+            var property = typeof(T).GetProperty(pi.Name);
+            if (property.GetSetMethod(true) == null)
+            {
+                if (typeof(Entity).IsAssignableFrom(typeof(T)))
+                {
+                    var att = property.GetCustomAttribute<AttributeLogicalNameAttribute>().LogicalName;
+
+                    (t as Entity).Attributes[att] = val;
+                }
+            }
+            else
+            {
+                property.SetValue(t, val);
+            }
+
             return t;
         }
 

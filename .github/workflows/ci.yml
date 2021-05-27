@@ -52,14 +52,14 @@ jobs:
       with:
         solution: EarlyXrm.EarlyBoundGenerator.sln
 
-    - run: echo "Id-$GITHUB_SHA Branch-$GITHUB_REF Message-${{ github.event.commits[0].message }}"
+    - run: echo "Id-${{ github.sha }} Branch-${{ github.ref }} Message-${{ github.event.commits[0].message }}"
 
     - run: |
         $mstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
         $opencover = (Resolve-Path "packages/OpenCover.*/tools/OpenCover.Console.exe").ToString()
         & $opencover -target:$mstest -targetargs:"EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll" -filter:"+[EarlyXrm.EarlyBoundGenerator]*" -excludebyattribute:*.ExcludeFromCodeCoverageAttribute -output:.\openCoverage.xml
         $coveralls = (Resolve-Path "packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
-        & $coveralls --opencover -i .\openCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $GITHUB_SHA --commitBranch $GITHUB_REF --commitAuthor "Andy" --commitMessage "${{ github.event.commits[0].message }}" --jobId $GITHUB_JOB
+        & $coveralls --opencover -i .\openCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId ${{ github.sha }} --commitBranch ${{ github.ref }} --commitAuthor "Andy" --commitMessage "${{ github.event.commits[0].message }}" --jobId ${{ github.job }}
       shell: powershell
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

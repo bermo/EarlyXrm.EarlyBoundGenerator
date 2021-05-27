@@ -52,6 +52,14 @@ jobs:
       with:
         solution: EarlyXrm.EarlyBoundGenerator.sln
 
+    - run: |
+        $mstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
+        $opencover = (Resolve-Path "packages/OpenCover.*/tools/OpenCover.Console.exe").ToString()
+        & $opencover -target:$mstest -targetargs:"EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll" -output:.\openCoverage.xml
+        $coveralls = (Resolve-Path "packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
+        & $coveralls --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN
+      shell: powershell
+
     - name: Pack EarlyXrm.EarlyBoundGenerator
       run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }} -properties Configuration=Release
 

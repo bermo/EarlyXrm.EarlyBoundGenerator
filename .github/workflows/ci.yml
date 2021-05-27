@@ -55,7 +55,7 @@ jobs:
     - run: |
         $mstest = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
         $opencover = (Resolve-Path "packages/OpenCover.*/tools/OpenCover.Console.exe").ToString()
-        & $opencover -target:$mstest -targetargs:"EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll" -filter:"+[EarlyXrm.EarlyBoundGenerator]*" -output:.\openCoverage.xml
+        & $opencover -target:$mstest -targetargs:"EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll" -filter:"+[EarlyXrm.EarlyBoundGenerator]*" -excludebyattribute:*.ExcludeFromCodeCoverageAttribute -output:.\openCoverage.xml
         $coveralls = (Resolve-Path "packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
         & $coveralls --opencover -i .\openCoverage.xml --commitBranch master --commitAuthor Andy --commitMessage "${{ github.event.commits[0].message }}" --repoToken $env:COVERALLS_REPO_TOKEN
       shell: powershell

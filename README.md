@@ -1,6 +1,6 @@
 # EarlyBoundGenerator
 
-[![Coverage Status](https://coveralls.io/repos/github/bermo/EarlyXrm.EarlyBoundGenerator/badge.svg?branch=)](https://coveralls.io/github/bermo/EarlyXrm.EarlyBoundGenerator?branch=)
+[![Coverage Status](https://coveralls.io/repos/github/bermo/EarlyXrm.EarlyBoundGenerator/badge.svg?branch=master)](https://coveralls.io/github/bermo/EarlyXrm.EarlyBoundGenerator?branch=master)
 
 This is an early bound class generator for Dynamics 365 which can be easily integrated into 
 your Visual Studio projects.

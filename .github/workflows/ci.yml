@@ -28,14 +28,14 @@ jobs:
           useConfigFile: true
           configFilePath: ./GitVersion.yml
 
-    - name: Use GitVersion
+    - name: Run GitVersion
       id: gitversion # step id used as reference for output values
       uses: gittools/actions/gitversion/execute@v0.9.7
     
     - name: Setup MSbuild
       uses: microsoft/setup-msbuild@v1
       
-    - name: Setup VSTest.console.exe
+    - name: Setup VSTest
       uses: darenm/Setup-VSTest@v1  
       
     - name: Setup NuGet
@@ -47,7 +47,7 @@ jobs:
     - name: Build
       run: msbuild EarlyXrm.EarlyBoundGenerator.sln /p:Configuration=Release
 
-    - name: vstest-solution-action
+    - name: Run Unit Tests
       uses: tonyhallett/vstest-solution-action@v1.0.0
       with:
         solution: EarlyXrm.EarlyBoundGenerator.sln
@@ -58,7 +58,7 @@ jobs:
         $opencover = (Resolve-Path "packages/OpenCover.*/tools/OpenCover.Console.exe").ToString()
         & $opencover -target:$mstest -targetargs:"EarlyXrm.EarlyBoundGenerator.UnitTests\bin\Release\EarlyXrm.EarlyBoundGenerator.UnitTests.dll" -filter:"+[EarlyXrm.EarlyBoundGenerator]*" -excludebyattribute:*.ExcludeFromCodeCoverageAttribute -output:.\openCoverage.xml
         $coveralls = (Resolve-Path "packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
-        & $coveralls --opencover -i .\openCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId ${{ github.sha }} --commitBranch ${{ github.ref }} --commitAuthor Andy --commitEmail andy.berman@gmail.com --commitMessage "${{ github.event.commits[0].message }}"
+        & $coveralls --opencover -i .\openCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId ${{ github.sha }} --commitBranch ${{ github.ref }} --jobId ${{ github.run_id }}
       shell: powershell
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

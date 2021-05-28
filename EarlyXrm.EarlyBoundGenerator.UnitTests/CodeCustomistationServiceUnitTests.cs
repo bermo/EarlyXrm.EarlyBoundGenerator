@@ -637,5 +637,99 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Assert.AreEqual("Test_B", (firstArg.TargetObject as CodeTypeReferenceExpression).Type.BaseType);
             Assert.AreEqual("Blah", firstArg.FieldName);
         }
+
+        [TestMethod]
+        public void CustomizeCodeDomIsIntersect()
+        {
+            var testMany = new EntityMetadata
+            {
+                LogicalName = "ee_testmany",
+                DisplayName = "Test Many".AsLabel()
+            }.Set(x => x.IsIntersect, true);
+            testMany.AddManyToMany(filterService, new ManyToManyRelationshipMetadata
+            {
+                Entity1LogicalName = "ee_testparent",
+                Entity1IntersectAttribute = "ee_testparentid",
+                Entity2LogicalName = "ee_test",
+                Entity2IntersectAttribute = "ee_testid",
+                SchemaName = "schema"
+            });
+            entities.Add(testMany);
+
+            SetupEntities();
+
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces =
+                {
+                    new CodeNamespace("Test Many"){
+                        Types =
+                        {
+                            new CodeTypeDeclaration {
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_testmany") },
+                                Members =
+                                {
+                                    new CodeMemberProperty
+                                    {
+                                        Name = "Schema",
+                                        CustomAttributes = { Build<RelationshipSchemaNameAttribute>("schema") }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var sut = new CodeCustomistationService(parameters);
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var members = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First().Types.Cast<CodeTypeDeclaration>().First().Members.OfType<CodeMemberProperty>();
+            Assert.IsNull(members.FirstOrDefault(x => x.Name == "Schema"));
+        }
+
+        [TestMethod]
+        public void CustomizeCodeDomOptionCreatesMissingMultiSelectOptionSet()
+        {
+            SetupEntities();
+            test.AddAttribute(new MultiSelectPicklistAttributeMetadata
+            {
+                LogicalName = "ee_log",
+                OptionSet = new OptionSetMetadata { Name = "option_name" } 
+            });
+
+            var namingService = Substitute.For<INamingService>();
+            serviceProvider.GetService(typeof(INamingService)).Returns(namingService);
+            namingService.GetNameForOptionSet(Arg.Any<EntityMetadata>(), Arg.Any<OptionSetMetadataBase>(), serviceProvider)
+                .Returns("TestEnum");
+
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces =
+                {
+                    new CodeNamespace("Test"){
+                        Types =
+                        {
+                            new CodeTypeDeclaration {
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members =
+                                {
+                                    new CodeMemberProperty { 
+                                        CustomAttributes = { Build<AttributeLogicalNameAttribute>("ee_log") },
+                                        HasSet = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var sut = new CodeCustomistationService(parameters);
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var types = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First().Types.Cast<CodeTypeDeclaration>();
+            Assert.IsNotNull(types.First(x => x.Name == "TestEnum"));
+        }
     }
 }

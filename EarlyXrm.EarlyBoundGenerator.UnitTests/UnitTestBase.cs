@@ -6,6 +6,7 @@ using ModelBuilder;
 using NSubstitute;
 using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
@@ -77,6 +78,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             return cad;
         }
 
+        protected List<EntityMetadata> entities = new List<EntityMetadata>();
+
         protected void SetupEntities()
         {
             testParent = new EntityMetadata
@@ -138,9 +141,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 }
             );
 
-            var entities = new[] { testParent, test, testChild };
+            entities.AddRange(new[] { testParent, test, testChild });
 
-            organizationMetadata.Entities.Returns(entities);
+            organizationMetadata.Entities.Returns(entities.ToArray());
         }
     }
 }

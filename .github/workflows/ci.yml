@@ -63,27 +63,27 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-    #- name: Pack EarlyXrm.EarlyBoundGenerator
-    #  run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }} -properties Configuration=Release
-    #
-    #- name: Publish build artifacts
-    #  uses: actions/upload-artifact@master
-    #  with:
-    #    name: packages
-    #    path: ./**/EarlyXrm.EarlyBoundGenerator.*.nupkg
-    #
-    #- name: Add Github Source
-    #  run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -Username ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
-    #
-    #- name: Delete old packages
-    #  uses: smartsquaregmbh/delete-old-packages@v0.3.1
-    #  with:
-    #    keep: 2
-    #    names: |
-    #      EarlyXrm.EarlyBoundGenerator
-    #
-    #- name: Push to github
-    #  run: nuget push **/EarlyXrm.EarlyBoundGenerator.*.nupkg -ApiKey ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -SkipDuplicate
-    #
-    #- name: Push to nuget.org
-    #  run: nuget push **/EarlyXrm.EarlyBoundGenerator.*.nupkg -ApiKey ${{ secrets.NUGET_APIKEY }} -source https://api.nuget.org/v3/index.json
+    - name: Pack EarlyXrm.EarlyBoundGenerator
+      run: nuget pack EarlyXrm.EarlyBoundGenerator\EarlyXrm.EarlyBoundGenerator.nuspec -Version ${{ steps.gitversion.outputs.NuGetVersionV2 }} -properties Configuration=Release
+    
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: packages
+        path: ./**/EarlyXrm.EarlyBoundGenerator.*.nupkg
+    
+    - name: Add Github Source
+      run: nuget sources add -name "github" -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -Username ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Delete old packages
+      uses: smartsquaregmbh/delete-old-packages@v0.3.1
+      with:
+        keep: 2
+        names: |
+          EarlyXrm.EarlyBoundGenerator
+    
+    - name: Push to github
+      run: nuget push **/EarlyXrm.EarlyBoundGenerator.*.nupkg -ApiKey ${{ secrets.GITHUB_TOKEN }} -Source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -SkipDuplicate
+    
+    - name: Push to nuget.org
+      run: nuget push **/EarlyXrm.EarlyBoundGenerator.*.nupkg -ApiKey ${{ secrets.NUGET_APIKEY }} -source https://api.nuget.org/v3/index.json

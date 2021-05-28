@@ -166,25 +166,6 @@ namespace EarlyXrm.EarlyBoundGenerator
                         }
                     }
 
-                    if (type.BaseType == "Microsoft.Xrm.Sdk.OptionSetValue" || type.BaseType == "System.Object") // this seems a bit useless
-                    {
-                        var enumAtt = entityMetadata.Attributes.FirstOrDefault(x => (UseDisplayNames ? x.DisplayName() : x.SchemaName) == codeMemberProperty.Name &&
-                                new[] { AttributeTypeCode.Picklist, AttributeTypeCode.Status, AttributeTypeCode.State, AttributeTypeCode.Virtual }.Any(y => y == x.AttributeType)) as EnumAttributeMetadata;
-
-                        if (enumAtt != null)
-                        {
-                            var optionsSetName = "";
-                            if (!UseDisplayNames)
-                                optionsSetName = enumAtt.OptionSet.Name;
-                            else if (enumAtt.OptionSet.IsGlobal ?? false)
-                                optionsSetName = enumAtt.OptionSet.DisplayName();
-                            else
-                                optionsSetName = $"{entityMetadata?.DisplayName()}_{enumAtt.OptionSet.DisplayName()}";
-
-                            var crt = new CodeTypeReference(optionsSetName + "?");
-                        }
-                    }
-
                     if (type.BaseType.StartsWith("System.Collections.Generic."))
                     {
                         if (type.TypeArguments[0].BaseType.StartsWith("Microsoft.Xrm.Sdk."))

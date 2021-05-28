@@ -94,14 +94,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
         public static EntityMetadata AddOneToMany(
             this EntityMetadata entityMetadata,
-            params OneToManyRelationshipMetadata[] oneToManyRelationshipMetadata
-        )
-        {
-            return entityMetadata.AddOneToMany(null, oneToManyRelationshipMetadata);
-        }
-
-        public static EntityMetadata AddOneToMany(
-            this EntityMetadata entityMetadata,
             ICodeWriterFilterService filterService,
             params OneToManyRelationshipMetadata[] oneToManyRelationshipMetadata
         )
@@ -123,14 +115,6 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
         public static EntityMetadata AddManyToOne(
             this EntityMetadata entityMetadata,
-            params OneToManyRelationshipMetadata[] manyToOneRelationshipMetadata
-        )
-        {
-            return entityMetadata.AddManyToOne(null, manyToOneRelationshipMetadata);
-        }
-
-        public static EntityMetadata AddManyToOne(
-            this EntityMetadata entityMetadata,
             ICodeWriterFilterService filterService,
             params OneToManyRelationshipMetadata[] manyToOneRelationshipMetadata
         )
@@ -147,6 +131,35 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var existing = entityMetadata.ManyToOneRelationships ?? Array.Empty<OneToManyRelationshipMetadata>();
             entityMetadata.Set(x => x.ManyToOneRelationships, existing.Union(manyToOneRelationshipMetadata).ToArray());
+            return entityMetadata;
+        }
+
+        public static EntityMetadata AddManyToMany(
+            this EntityMetadata entityMetadata,
+            ICodeWriterFilterService filterService,
+            params ManyToManyRelationshipMetadata[] manyToManyRelationshipMetadata
+        )
+        {
+            foreach (var many2Many in manyToManyRelationshipMetadata)
+            {
+                many2Many.Set(x => x.RelationshipType, RelationshipType.ManyToManyRelationship);
+                if (many2Many.Entity1LogicalName == null)
+                {
+                    many2Many.Entity1IntersectAttribute = entityMetadata.PrimaryIdAttribute;
+                    many2Many.Entity1LogicalName = entityMetadata.LogicalName;
+                }
+                else
+                {
+                    many2Many.Entity2IntersectAttribute = entityMetadata.PrimaryIdAttribute;
+                    many2Many.Entity2LogicalName = entityMetadata.LogicalName;
+                }
+
+                if (filterService != null)
+                    filterService.GenerateRelationship(many2Many, Arg.Any<EntityMetadata>(), Arg.Any<IServiceProvider>())
+                        .Returns(true);
+            }
+            var existing = entityMetadata.ManyToManyRelationships ?? Array.Empty<ManyToManyRelationshipMetadata>();
+            entityMetadata.Set(x => x.ManyToManyRelationships, existing.Union(manyToManyRelationshipMetadata).ToArray());
             return entityMetadata;
         }
 

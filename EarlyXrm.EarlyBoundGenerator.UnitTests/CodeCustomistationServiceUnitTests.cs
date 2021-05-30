@@ -641,6 +641,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void CustomizeCodeDomIsIntersect()
         {
+            var ents = new TestMetadata(filterService);
+
             var testMany = new EntityMetadata
             {
                 LogicalName = "ee_testmany",
@@ -654,9 +656,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 Entity2IntersectAttribute = "ee_testid",
                 SchemaName = "schema"
             });
-            entities.Add(testMany);
+            ents.Add(testMany);
 
-            SetupEntities();
+            organizationMetadata.Entities.Returns(ents.ToArray());
 
             var codeCompileUnit = new CodeCompileUnit
             {
@@ -691,8 +693,11 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void CustomizeCodeDomOptionCreatesMissingMultiSelectOptionSet()
         {
-            SetupEntities();
-            test.AddAttribute(new MultiSelectPicklistAttributeMetadata
+            var ents = new TestMetadata(filterService);
+
+            organizationMetadata.Entities.Returns(ents.ToArray());
+
+            ents.Test.AddAttribute(new MultiSelectPicklistAttributeMetadata
             {
                 LogicalName = "ee_log",
                 OptionSet = new OptionSetMetadata { Name = "option_name" } 
@@ -730,6 +735,46 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 
             var types = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First().Types.Cast<CodeTypeDeclaration>();
             Assert.IsNotNull(types.First(x => x.Name == "TestEnum"));
+        }
+
+        [TestMethod]
+        public void CustomizeCodeDomOptionLogicalAndRelation()
+        {
+            var ents = new TestMetadata(filterService);
+            organizationMetadata.Entities.Returns(ents.ToArray());
+            var codeCompileUnit = new CodeCompileUnit
+            {
+                Namespaces =
+                {
+                    new CodeNamespace("Test"){
+                        Types =
+                        {
+                            new CodeTypeDeclaration {
+                                CustomAttributes = { Build<EntityLogicalNameAttribute>("ee_test") },
+                                Members =
+                                {
+                                    new CodeMemberProperty {
+                                        Name = "ManyToOne",
+                                        Type = new CodeTypeReference("Test.Blah"),
+                                        CustomAttributes = { 
+                                            Build<AttributeLogicalNameAttribute>("ee_log"),
+                                            Build<RelationshipSchemaNameAttribute>("ee_rel")
+                                        },
+                                        HasSet = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var sut = new CodeCustomistationService(parameters);
+            sut.CustomizeCodeDom(codeCompileUnit, serviceProvider);
+
+            var types = codeCompileUnit.Namespaces.Cast<CodeNamespace>().First().Types.Cast<CodeTypeDeclaration>();
+            var prop = types.First().Members.OfType<CodeMemberProperty>().First(x => x.Name == "ManyToOne");
+            Assert.AreEqual("Blah", prop.Type.BaseType);
         }
     }
 }

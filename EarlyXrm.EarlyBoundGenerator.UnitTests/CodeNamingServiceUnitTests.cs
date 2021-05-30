@@ -17,6 +17,8 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         private IMetadataProviderService metadataProviderService;
         private INamingService namingService;
 
+        private TestMetadata testMetadata;
+
         [TestInitialize]
         public void TestInitialise()
         {
@@ -29,6 +31,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             parameters = new Dictionary<string, string> {
                 { "UseDisplayNames", true.ToString() }
             };
+
+            testMetadata = new TestMetadata(filterService);
+
+            organizationMetadata.Entities.Returns(testMetadata.ToArray());
 
             sut = new CodeNamingService(namingService, parameters);
         }
@@ -274,10 +280,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_OneToMany_()
         {
-            SetupEntities();
-            var rel = test.OneToManyRelationships.First(x => x.SchemaName == "ee_test_testchilds");
+            //SetupEntities();
+            var rel = testMetadata.Test.OneToManyRelationships.First(x => x.SchemaName == "ee_test_testchilds");
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("Test_TestChildren", output);
         }
@@ -285,10 +291,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForLookupAttribute()
         {
-            SetupEntities();
-            var att = test.Attributes.First(x => x.LogicalName == "ee_testparentid");
+            var att = testMetadata.Test.Attributes.First(x => x.LogicalName == "ee_testparentid");
 
-            var output = sut.GetNameForAttribute(test, att, serviceProvider);
+            var output = sut.GetNameForAttribute(testMetadata.Test, att, serviceProvider);
 
             Assert.AreEqual("TestParent", output);
         }
@@ -296,11 +301,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForAttribute_DuplicateDisplayNameAppends2()
         {
-            SetupEntities();
-            test.AddAttribute(new StringAttributeMetadata { DisplayName = "Name".AsLabel(), LogicalName = "ee_name1" });
-            var att = test.Attributes.First(x => x.LogicalName == "ee_name1");
+            testMetadata.Test.AddAttribute(new StringAttributeMetadata { DisplayName = "Name".AsLabel(), LogicalName = "ee_name1" });
+            var att = testMetadata.Test.Attributes.First(x => x.LogicalName == "ee_name1");
 
-            var output = sut.GetNameForAttribute(test, att, serviceProvider);
+            var output = sut.GetNameForAttribute(testMetadata.Test, att, serviceProvider);
 
             Assert.AreEqual("Name2", output);
         }
@@ -308,13 +312,12 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_Duplicates()
         {
-            SetupEntities();
-            test.AddAttribute(filterService, new StringAttributeMetadata { 
+            testMetadata.Test.AddAttribute(filterService, new StringAttributeMetadata { 
                 DisplayName = "Test Parent_Test Parent".AsLabel(), 
                 LogicalName = "ee_testparent" });
-            var rel = test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
+            var rel = testMetadata.Test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("TestParent_TestParent2", output);
         }
@@ -322,22 +325,21 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_AttributeAndManyToOneDups()
         {
-            SetupEntities();
-            test.AddAttribute(filterService, new StringAttributeMetadata { 
+            testMetadata.Test.AddAttribute(filterService, new StringAttributeMetadata { 
                 DisplayName = "Test Parent_Test Parent".AsLabel(),
                 LogicalName = "ee_testparent" });
-            testParent.AddAttribute(filterService, new AttributeMetadata { 
+            testMetadata.TestParent.AddAttribute(filterService, new AttributeMetadata { 
                 DisplayName = "Test Parent".AsLabel(), 
                 LogicalName = "ee_testid2" });
-            test.AddManyToOne(filterService, new OneToManyRelationshipMetadata {
+            testMetadata.Test.AddManyToOne(filterService, new OneToManyRelationshipMetadata {
                 ReferencedEntity = "ee_testparent",
                 ReferencedAttribute = "ee_testid2",
                 ReferencingAttribute = "ee_testparentid",
                 SchemaName = "ee_testparent_tests2"
             });
-            var rel = test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests2");
+            var rel = testMetadata.Test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests2");
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("TestParent_TestParent3", output);
         }
@@ -345,39 +347,38 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_AttributeAndOneToManyDupsClash()
         {
-            SetupEntities();
-            test.AddAttribute(filterService, new StringAttributeMetadata
+            testMetadata.Test.AddAttribute(filterService, new StringAttributeMetadata
             {
                 DisplayName = "Test Parent_Test Parent".AsLabel(),
                 LogicalName = "ee_testparent"
             });
-            testParent.AddAttribute(filterService, new AttributeMetadata
+            testMetadata.TestParent.AddAttribute(filterService, new AttributeMetadata
             {
                 DisplayName = "Test Parent".AsLabel(),
                 LogicalName = "ee_testid2"
             });
-            test.AddManyToOne(filterService, new OneToManyRelationshipMetadata
+            testMetadata.Test.AddManyToOne(filterService, new OneToManyRelationshipMetadata
             {
                 ReferencedEntity = "ee_testparent",
                 ReferencedAttribute = "ee_testid2",
                 ReferencingAttribute = "ee_testparentid",
                 SchemaName = "ee_testparent_tests2"
             });
-            testParent.DisplayCollectionName = "TestParent".AsLabel();
-            testParent.AddAttribute(filterService, new AttributeMetadata
+            testMetadata.TestParent.DisplayCollectionName = "TestParent".AsLabel();
+            testMetadata.TestParent.AddAttribute(filterService, new AttributeMetadata
             {
                 DisplayName = "Test Parent".AsLabel(),
                 LogicalName = "ee_testid3"
             });
-            test.AddOneToMany(filterService, new OneToManyRelationshipMetadata
+            testMetadata.Test.AddOneToMany(filterService, new OneToManyRelationshipMetadata
             {
                 ReferencingEntity = "ee_testparent",
                 ReferencingAttribute = "ee_testid3",
                 SchemaName = "ee_test_testparent3"
             });
-            var rel = test.OneToManyRelationships.First(x => x.SchemaName == "ee_test_testparent3");
+            var rel = testMetadata.Test.OneToManyRelationships.First(x => x.SchemaName == "ee_test_testparent3");
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("TestParent_TestParent4", output);
         }
@@ -385,10 +386,9 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_ManyToOneWithDupEntityName()
         {
-            SetupEntities();
-            var rel = test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
+            var rel = testMetadata.Test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("TestParent_TestParent", output);
         }
@@ -396,11 +396,10 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         [TestMethod]
         public void GetNameForRelationship_ManyToOneWithDupAttribute()
         {
-            SetupEntities();
-            var rel = test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
-            test.AddAttribute(new StringAttributeMetadata { DisplayName = "Test Parent".AsLabel() });
+            var rel = testMetadata.Test.ManyToOneRelationships.First(x => x.SchemaName == "ee_testparent_tests");
+            testMetadata.Test.AddAttribute(new StringAttributeMetadata { DisplayName = "Test Parent".AsLabel() });
 
-            var output = sut.GetNameForRelationship(test, rel, null, serviceProvider);
+            var output = sut.GetNameForRelationship(testMetadata.Test, rel, null, serviceProvider);
 
             Assert.AreEqual("TestParent_TestParent", output);
         }

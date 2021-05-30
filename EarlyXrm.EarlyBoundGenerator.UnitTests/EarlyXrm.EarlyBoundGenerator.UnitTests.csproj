@@ -89,6 +89,7 @@
     <Compile Include="CodeCustomistationServiceUnitTests.cs" />
     <Compile Include="CodeFilteringServiceUnitTests.cs" />
     <Compile Include="CodeNamingServiceUnitTests.cs" />
+    <Compile Include="SolutionHelperUnitTests.cs" />
     <Compile Include="TestMetadata.cs" />
     <Compile Include="UnitTestExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

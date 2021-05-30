@@ -16,19 +16,18 @@ namespace EarlyXrm.EarlyBoundGenerator
     public static class SolutionHelper
     {
         private static bool debugMode;
+
         private static string[] solutions;
-        private static IOrganizationMetadata organisationMetadata;
-        private static IServiceProvider services;
-        private static IEnumerable<IncludedEntity> solutionEntities;
-        private static Dictionary<string, List<string>> skip = new Dictionary<string, List<string>>();
-        private static Dictionary<string, List<string>> extra = new Dictionary<string, List<string>>();
+        internal static IOrganizationMetadata organisationMetadata;
+        internal static IServiceProvider services;
+        internal static IEnumerable<IncludedEntity> solutionEntities;
+        internal static Dictionary<string, List<string>> skip = new Dictionary<string, List<string>>();
+        internal static Dictionary<string, List<string>> extra = new Dictionary<string, List<string>>();
+        internal static IOrganizationService organisationService;
+        internal static string[] commandlineArgs = Environment.GetCommandLineArgs();
 
-        public static IOrganizationService organisationService;
-
-        static SolutionHelper()
+        internal static void SetExtra()
         {
-            bool.TryParse(GetParameter("DebugMode"), out debugMode);
-
             var extra = GetParameter("extra");
             if (extra != null)
             {
@@ -38,7 +37,10 @@ namespace EarlyXrm.EarlyBoundGenerator
                                     .Select(y => y.Trim()).ToList());
                 SolutionHelper.extra = metaInclude;
             }
+        }
 
+        internal static void SetSkip()
+        {
             var skip = GetParameter("skip");
             if (skip != null)
             {
@@ -48,9 +50,16 @@ namespace EarlyXrm.EarlyBoundGenerator
                                         x => x.First().Trim(),
                                         x => x.Skip(1).FirstOrDefault()
                                     );
-                var metaInclude = meta2Include.ToDictionary(x => x.Key, x => x?.SelectMany(y => y?.Split(',')?.Select(z => z?.Trim()) ?? new List<string>()).ToList() );
+                var metaInclude = meta2Include.ToDictionary(x => x.Key, x => x?.SelectMany(y => y?.Split(',')?.Select(z => z?.Trim()) ?? new List<string>()).ToList());
                 SolutionHelper.skip = metaInclude;
             }
+        }
+
+        static SolutionHelper()
+        {
+            bool.TryParse(GetParameter("DebugMode"), out debugMode);
+            SetExtra();
+            SetSkip();
         }
 
         public static IOrganizationMetadata LoadMetadata(this IServiceProvider services)
@@ -82,7 +91,7 @@ namespace EarlyXrm.EarlyBoundGenerator
 
         private static string GetParameter(string key)
         {
-            var args = Environment.GetCommandLineArgs();
+            var args = commandlineArgs;
             var arg = args.FirstOrDefault(x => x.ToLower().StartsWith("/" + key.ToLower()));
 
             if (arg != null)
@@ -94,7 +103,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             return null;
         }
 
-        private static IEnumerable<IncludedEntity> GetSolutionEntities()
+        internal static IEnumerable<IncludedEntity> GetSolutionEntities()
         {
             var includedEntities = new List<IncludedEntity>();
             var solutionComponents = GetSolutionComponents(ComponentType.Entity, ComponentType.Attribute);
@@ -303,7 +312,7 @@ namespace EarlyXrm.EarlyBoundGenerator
             return null;
         }
 
-        private static string Signature(this StackTrace stackTrace, params string[] parameters)
+        internal static string Signature(this StackTrace stackTrace, params string[] parameters)
         {
             var callingMethod = stackTrace.GetFrame(1).GetMethod();
             var joinedParameters = string.Join(", ", parameters);

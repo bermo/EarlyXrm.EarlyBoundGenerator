@@ -34,6 +34,14 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             return t;
         }
 
+        public static Type NullStaticField(this Type t, string field)
+        {
+            t
+                .GetField(field, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                .SetValue(null, null);
+            return t;
+        }
+
         public static EntityMetadata Setup(
             this EntityMetadata ent,
             AttributeMetadata[] attributes,

@@ -5,7 +5,6 @@ using ModelBuilder;
 using NSubstitute;
 using System;
 using System.CodeDom;
-using System.Reflection;
 
 namespace EarlyXrm.EarlyBoundGenerator.UnitTests
 {
@@ -23,18 +22,14 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             Builder = Model.UsingModule<DynamicsModule>();
 
             typeof(SolutionHelper)
-                .GetField("organisationMetadata", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
-
-            typeof(SolutionHelper)
-                .GetField("solutionEntities", BindingFlags.Static | BindingFlags.NonPublic)
-                .SetValue(null, null);
+                .NullStaticField(nameof(SolutionHelper.organisationMetadata))
+                .NullStaticField(nameof(SolutionHelper.solutionEntities));
 
             SolutionHelper.organisationService = Substitute.For<IOrganizationService>();
 
             serviceProvider = Substitute.For<IServiceProvider>();
-
             filterService = Substitute.For<ICodeWriterFilterService>();
+            
             serviceProvider.GetService(typeof(ICodeWriterFilterService)).Returns(filterService);
         }
 

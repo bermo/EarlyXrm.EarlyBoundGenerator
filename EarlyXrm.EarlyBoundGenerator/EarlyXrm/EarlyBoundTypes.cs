@@ -822,70 +822,70 @@ namespace EarlyBoundTypes
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		protected void OnPropertyChanged(string propertyName)
-        {
-            if ((PropertyChanged != null))
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+		{
+			if ((PropertyChanged != null))
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
 		
 		protected void OnPropertyChanging(string propertyName)
-        {
-            if ((PropertyChanging != null))
-            {
-                PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
-            }
-        }
+		{
+			if ((PropertyChanging != null))
+			{
+				PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
+			}
+		}
 		
 		public IEnumerable<T> GetAttributeValues<T>(string attributeLogicalName) where T : Entity
-	    {
-		    return base.GetAttributeValue<EntityCollection>(attributeLogicalName)?.Entities?.Cast<T>();
-	    }
+		{
+			return base.GetAttributeValue<EntityCollection>(attributeLogicalName)?.Entities?.Cast<T>();
+		}
 		
 		public IEnumerable<T> GetAttributeEnums<T>(string attributeLogicalName) where T : struct, IConvertible
-	    {
-		    return base.GetAttributeValue<OptionSetValueCollection>(attributeLogicalName)?.Select(x => (T)(object)x.Value);
-	    }
+		{
+			return base.GetAttributeValue<OptionSetValueCollection>(attributeLogicalName)?.Select(x => (T)(object)x.Value);
+		}
 		
 		protected void SetAttributeValues<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : Entity
-        {
-            SetAttributeValue(logicalName, attributePropertyName, new EntityCollection(new List<Entity>(value)));
-        }
+		{
+			SetAttributeValue(logicalName, attributePropertyName, new EntityCollection(new List<Entity>(value)));
+		}
 		
 		protected void SetAttributeEnums<T>(string logicalName, string attributePropertyName, IEnumerable<T> value)  where T : struct, IConvertible
-        {
-            SetAttributeValue(logicalName, attributePropertyName, new OptionSetValueCollection(new List<OptionSetValue>(value.Select(x => new OptionSetValue((int)(object)x)))));
-        }
+		{
+			SetAttributeValue(logicalName, attributePropertyName, new OptionSetValueCollection(new List<OptionSetValue>(value.Select(x => new OptionSetValue((int)(object)x)))));
+		}
 		
 		protected void SetAttributeValue(string logicalName, string attributePropertyName, object value)
-        {
-            OnPropertyChanging(attributePropertyName);
-            base.SetAttributeValue(logicalName, value);
-            OnPropertyChanged(attributePropertyName);
-        }
+		{
+			OnPropertyChanging(attributePropertyName);
+			base.SetAttributeValue(logicalName, value);
+			OnPropertyChanged(attributePropertyName);
+		}
 		
 		protected new T GetRelatedEntity<T>(string relationshipSchemaName, EntityRole? primaryEntityRole = null) where T : Entity
-        {
-            return base.GetRelatedEntity<T>(relationshipSchemaName, primaryEntityRole);
-        }
+		{
+			return base.GetRelatedEntity<T>(relationshipSchemaName, primaryEntityRole);
+		}
 		
 		protected void SetRelatedEntity<T>(string relationshipSchemaName, string attributePropertyName, T entity, EntityRole? primaryEntityRole = null) where T : Entity
-        {
-            OnPropertyChanging(attributePropertyName);
-            base.SetRelatedEntity(relationshipSchemaName, primaryEntityRole, entity);
-            OnPropertyChanged(attributePropertyName);
-        }
+		{
+			OnPropertyChanging(attributePropertyName);
+			base.SetRelatedEntity(relationshipSchemaName, primaryEntityRole, entity);
+			OnPropertyChanged(attributePropertyName);
+		}
 		
 		protected new IEnumerable<T> GetRelatedEntities<T>(string relationshipSchemaName, EntityRole? primaryEntityRole = null) where T : Entity
-        {
-            return base.GetRelatedEntities<T>(relationshipSchemaName, primaryEntityRole);
-        }
+		{
+			return base.GetRelatedEntities<T>(relationshipSchemaName, primaryEntityRole);
+		}
 		
 		protected void SetRelatedEntities<T>(string relationshipSchemaName, string attributePropertyName, IEnumerable<T> entities, EntityRole? primaryEntityRole = null) where T : Entity
-        {
-            OnPropertyChanging(attributePropertyName);
-            base.SetRelatedEntities(relationshipSchemaName, primaryEntityRole, entities);
-            OnPropertyChanged(attributePropertyName);
-        }
+		{
+			OnPropertyChanging(attributePropertyName);
+			base.SetRelatedEntities(relationshipSchemaName, primaryEntityRole, entities);
+			OnPropertyChanged(attributePropertyName);
+		}
 	}
 }

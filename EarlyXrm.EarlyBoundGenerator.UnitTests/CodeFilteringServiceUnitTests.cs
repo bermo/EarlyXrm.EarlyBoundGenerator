@@ -50,6 +50,29 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
+        public void GenerateEntityWithIntersect()
+        {
+            var id = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+            organizationMetadata.Entities.Returns(new[] {
+                new EntityMetadata { LogicalName = "ee_test", MetadataId = id },
+                new EntityMetadata { LogicalName = "ee_testparent", MetadataId = id2 }
+            });
+
+            var entityMetadata = new EntityMetadata { LogicalName = "ee_intersect" }.Set(x => x.IsIntersect, true);
+            entityMetadata.Set(x => x.ManyToManyRelationships, new[] { new ManyToManyRelationshipMetadata { Entity1LogicalName = "ee_test", Entity2LogicalName = "ee_testparent" } });
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    new SolutionComponent().Set(x => x.Regarding, id),
+                    new SolutionComponent().Set(x => x.Regarding, id2)
+                }));
+
+            var result = sut.GenerateEntity(entityMetadata, serviceProvider);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
         public void GenerateAttributes()
         {
             var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = Guid.NewGuid(), DisplayName = new Label("Test", 1033) };           
@@ -70,8 +93,14 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
                 MetadataId = Guid.NewGuid(),
                 DisplayName = new Label("Test State", 1033)
             }.Set(x => x.EntityLogicalName, entityMetadata.LogicalName);
+            var imageAttributeMetadata = new ImageAttributeMetadata
+            {
+                LogicalName = "ee_testimage",
+                MetadataId = Guid.NewGuid(),
+                DisplayName = new Label("Test Image", 1033)
+            }.Set(x => x.EntityLogicalName, entityMetadata.LogicalName).Set(x => x.AttributeOf, "blah");
             organizationMetadata.Entities.Returns(new[] {
-                entityMetadata.Set(x => x.Attributes, new AttributeMetadata [] { stringAttributeMetadata, picklistAttributeMetadata, stateAttributeMetadata })
+                entityMetadata.Set(x => x.Attributes, new AttributeMetadata [] { stringAttributeMetadata, picklistAttributeMetadata, stateAttributeMetadata, imageAttributeMetadata })
             });
 
             var f = Builder.Create<SolutionComponent>();
@@ -80,14 +109,66 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
             SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
                 .Returns(new EntityCollection(new List<Entity> {
                     Builder.Create<SolutionComponent>().Set(x => x.Regarding, entityMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Entity),
-                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stringAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
-                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, picklistAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
-                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stateAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode,ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stringAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, picklistAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, stateAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Attribute),
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, imageAttributeMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Attribute)
                 }));
 
             Assert.IsTrue(sut.GenerateAttribute(stringAttributeMetadata, serviceProvider));
             Assert.IsTrue(sut.GenerateAttribute(picklistAttributeMetadata, serviceProvider));
             Assert.IsTrue(sut.GenerateAttribute(stateAttributeMetadata, serviceProvider));
+            Assert.IsTrue(sut.GenerateAttribute(imageAttributeMetadata, serviceProvider));
+        }
+
+        [TestMethod]
+        public void GenerateAttributeUniqueIdentifier()
+        {
+            var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = Guid.NewGuid(), DisplayName = new Label("Test", 1033) };
+            var guidAttributeMetadata = new UniqueIdentifierAttributeMetadata
+            {
+                LogicalName = "ee_testguid",
+                MetadataId = Guid.NewGuid(),
+                DisplayName = new Label("Id", 1033)
+            }.Set(x => x.EntityLogicalName, entityMetadata.LogicalName);
+            organizationMetadata.Entities.Returns(new[] {
+                entityMetadata.Set(x => x.Attributes, new AttributeMetadata [] { guidAttributeMetadata })
+            });
+
+            var f = Builder.Create<SolutionComponent>();
+            f.Set(x => x.Regarding, entityMetadata.MetadataId);
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, entityMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Entity),
+                }));
+
+            Assert.IsTrue(sut.GenerateAttribute(guidAttributeMetadata, serviceProvider));
+        }
+
+        [TestMethod]
+        public void GenerateAttributeAttributeOf()
+        {
+            var entityMetadata = new EntityMetadata { LogicalName = "ee_test", MetadataId = Guid.NewGuid(), DisplayName = new Label("Test", 1033) };
+            var decimalAttributeMetadata = new DecimalAttributeMetadata
+            {
+                LogicalName = "ee_testdecimal",
+                MetadataId = Guid.NewGuid(),
+                DisplayName = new Label("Dec", 1033)
+            }.Set(x => x.EntityLogicalName, entityMetadata.LogicalName).Set(x => x.AttributeOf, "ee_blah");
+            organizationMetadata.Entities.Returns(new[] {
+                entityMetadata.Set(x => x.Attributes, new AttributeMetadata [] { decimalAttributeMetadata })
+            });
+
+            var f = Builder.Create<SolutionComponent>();
+            f.Set(x => x.Regarding, entityMetadata.MetadataId);
+
+            SolutionHelper.organisationService.RetrieveMultiple(Arg.Any<QueryExpression>())
+                .Returns(new EntityCollection(new List<Entity> {
+                    Builder.Create<SolutionComponent>().Set(x => x.Regarding, entityMetadata.MetadataId).Set(x => x.ObjectTypeCode, ComponentType.Entity),
+                }));
+
+            Assert.IsFalse(sut.GenerateAttribute(decimalAttributeMetadata, serviceProvider));
         }
 
         [TestMethod]

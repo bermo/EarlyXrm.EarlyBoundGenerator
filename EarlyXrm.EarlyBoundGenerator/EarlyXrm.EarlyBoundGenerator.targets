@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<Target Name="CopyEarlyBound" BeforeTargets="Build">
+	<Target Name="CopyEarlyBound" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)EarlyXrm.EarlyBoundGenerator.exe"
           DestinationFiles="$(MSBuildProjectDirectory)\bin\coretools\EarlyXrm.EarlyBoundGenerator.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyBatch" BeforeTargets="Build">
+	<Target Name="CopyBatch" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.bat"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat"
@@ -16,13 +16,13 @@
 	
 	<Target Name="CopyConfig" BeforeTargets="Build" 
 			Condition="!Exists('$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json')">
-		<Copy
+		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.json"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyCrmSvcUtilExe" BeforeTargets="Build">
+	<Target Name="CopyCrmSvcUtilExe" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
@@ -31,7 +31,7 @@
 	
 	<Target Name="CopyCrmSvcUtilExeConfig" BeforeTargets="Build" 
 			Condition="!Exists('$(MSBuildProjectDirectory)\bin\coretools\CrmSvcUtil.exe.config')">
-		<Copy
+		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
           SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe.config"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
@@ -41,7 +41,7 @@
 		<ItemGroup>
 			<CoreTools Include="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\*\content\bin\coretools\*.dll" />
 		</ItemGroup>
-		<Copy
+		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
           SourceFiles="@(CoreTools)"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>

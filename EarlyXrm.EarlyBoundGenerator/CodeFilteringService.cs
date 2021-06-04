@@ -49,12 +49,10 @@ namespace EarlyXrm.EarlyBoundGenerator
             var solutionEntities = services.LoadSolutionEntities();
 
             var generate = false;
-            if (attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier && attributeMetadata.IsPrimaryId == true)
+            if (attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
                 generate = true;
             else if (attributeMetadata.AttributeOf != null && attributeMetadata.GetType() != typeof(ImageAttributeMetadata))
                 generate = false;
-            else if (attributeMetadata.AttributeType == AttributeTypeCode.Uniqueidentifier)
-                generate = true;
             else if (solutionEntities.Any(x => x.LogicalName == attributeMetadata.EntityLogicalName && x.IncludedFields.Any(y => y.LogicalName == attributeMetadata.LogicalName)))
                 generate = _defaultService.GenerateAttribute(attributeMetadata, services);
 

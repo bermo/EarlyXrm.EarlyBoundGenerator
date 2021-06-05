@@ -1,37 +1,35 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<Target Name="CopyEarlyBound" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+	<Target Name="CopyEarlyBound" BeforeTargets="Build" Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)EarlyXrm.EarlyBoundGenerator.exe"
           DestinationFiles="$(MSBuildProjectDirectory)\bin\coretools\EarlyXrm.EarlyBoundGenerator.exe"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyBatch" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+	<Target Name="CopyBatch" BeforeTargets="Build" Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.bat"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.bat"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyConfig" BeforeTargets="Build" 
-			Condition="!Exists('$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json')">
-		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
+	<Target Name="CopyConfig" BeforeTargets="Build" Condition="!Exists('$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json')">
+		<Copy Condition="'$(UsingMicrosoftNETSdk)' == 'true'"
           SourceFiles="$(MSBuildThisFileDirectory)earlybound.json"
           DestinationFiles="$(MSBuildProjectDirectory)\EarlyXrm\earlybound.json"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyCrmSvcUtilExe" BeforeTargets="Build" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
+	<Target Name="CopyCrmSvcUtilExe" BeforeTargets="Build" Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
 		<Copy
           SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
-	<Target Name="CopyCrmSvcUtilExeConfig" BeforeTargets="Build" 
-			Condition="!Exists('$(MSBuildProjectDirectory)\bin\coretools\CrmSvcUtil.exe.config')">
-		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
+	<Target Name="CopyCrmSvcUtilExeConfig" BeforeTargets="Build" Condition="!Exists('$(MSBuildProjectDirectory)\bin\coretools\CrmSvcUtil.exe.config')">
+		<Copy Condition="'$(UsingMicrosoftNETSdk)' == 'true'"
           SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe.config"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
@@ -41,7 +39,7 @@
 		<ItemGroup>
 			<CoreTools Include="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\*\content\bin\coretools\*.dll" />
 		</ItemGroup>
-		<Copy Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"
+		<Copy Condition="'$(UsingMicrosoftNETSdk)' == 'true'"
           SourceFiles="@(CoreTools)"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>

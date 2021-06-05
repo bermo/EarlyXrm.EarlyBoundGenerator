@@ -215,6 +215,31 @@ namespace EarlyXrm.EarlyBoundGenerator.UnitTests
         }
 
         [TestMethod]
+        public void GetNameForOptionSet_NonGlobal()
+        {
+            var optionSet = new OptionSetMetadata { Name = "OptionsetName" };
+            var attMetadata = new PicklistAttributeMetadata { 
+                LogicalName = "ee_testid", DisplayName = new Label("Test_OptionsetName", 1033),
+            OptionSet = optionSet};
+            var em = new EntityMetadata
+            {
+                LogicalName = "ee_test",
+                DisplayName = new Label("Test", 1033),
+                DisplayCollectionName = new Label("Tests", 1033)
+            };
+            em.Set(x => x.Attributes, new[] {
+                attMetadata
+            });
+            organizationMetadata.Entities.Returns(new[] { em });
+            
+            organizationMetadata.OptionSets.Returns(new OptionSetMetadata [0]);
+
+            var result = sut.GetNameForOptionSet(em, optionSet, serviceProvider);
+
+            Assert.AreEqual(result, "Test_OptionsetName");
+        }
+
+        [TestMethod]
         public void GetNameForOption_AdjustsOptionName()
         {
             var option = new OptionMetadata

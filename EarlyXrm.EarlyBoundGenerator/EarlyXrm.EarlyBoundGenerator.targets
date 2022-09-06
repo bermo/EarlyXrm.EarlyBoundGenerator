@@ -23,14 +23,14 @@
 	
 	<Target Name="CopyCrmSvcUtilExe" BeforeTargets="Build" Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
 		<Copy
-          SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe"
+          SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.115\content\bin\coretools\CrmSvcUtil.exe"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
 	</Target>
 	
 	<Target Name="CopyCrmSvcUtilExeConfig" BeforeTargets="Build" Condition="!Exists('$(MSBuildProjectDirectory)\bin\coretools\CrmSvcUtil.exe.config')">
 		<Copy Condition="'$(UsingMicrosoftNETSdk)' == 'true'"
-          SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.79\content\bin\coretools\CrmSvcUtil.exe.config"
+          SourceFiles="$(MSBuildThisFileDirectory)..\..\..\microsoft.crmsdk.coretools\9.1.0.115\content\bin\coretools\CrmSvcUtil.exe.config"
           DestinationFolder="$(MSBuildProjectDirectory)\bin\coretools"
           SkipUnchangedFiles="true"/>
 	</Target>

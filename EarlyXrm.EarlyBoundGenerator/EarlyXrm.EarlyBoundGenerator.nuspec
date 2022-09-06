@@ -11,8 +11,8 @@
 	<repository type="git" url="https://github.com/bermo/EarlyXrm.EarlyBoundGenerator.git"></repository>
     <dependencies>
       <group targetFramework=".NETFramework4.6.2">
-		<dependency id="Microsoft.CrmSdk.CoreTools" version="9.1.0.79" exclude="Build,Analyzers" />
-		<dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.33" exclude="Build,Analyzers" />
+		<dependency id="Microsoft.CrmSdk.CoreTools" version="9.1.0.115" exclude="Build,Analyzers" />
+		<dependency id="Microsoft.CrmSdk.CoreAssemblies" version="9.0.2.45" exclude="Build,Analyzers" />
 	  </group>
     </dependencies>
     <contentFiles />
